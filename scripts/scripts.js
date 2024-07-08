@@ -711,7 +711,7 @@ export const getLongJSONData = async (props) => {
  * @returns {Worker} the search worker
  */
 export function loadWorker() {
-  const worker = new Worker('/blocks/search/worker.js');
+  const worker = new Worker('/blocks/search/worker.js', { type: 'module' });
   // this just launch the worker, and the message listener is triggered in another script
   worker.postMessage('run');
   // this enable the search in any page

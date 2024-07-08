@@ -147,7 +147,7 @@ export default async function decorate(block) {
   const docRange = document.createRange();
   // fetch nav content
   const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta).pathname : '/nav';
+  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
   const resp = await fetch(`${navPath}.plain.html`);
 
   if (resp.ok) {

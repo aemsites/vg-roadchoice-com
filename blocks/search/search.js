@@ -1,10 +1,13 @@
 /* eslint-disable object-curly-newline */
 import { createElement, getJsonFromUrl as getFiltersData, getTextLabel } from '../../scripts/scripts.js';
+import { getMetadata } from '../../scripts/lib-franklin.js';
 
+const langLocale = getMetadata('i18n');
+const i18nPath = langLocale ? `/${langLocale}` : '';
 let isCrossRefActive = true;
 let noOthersItems;
 const modelsItems = [];
-const FILTERS_DATA = '/search/search-filters.json';
+const FILTERS_DATA = `${i18nPath}/search/search-filters.json`;
 let crData;
 let pnData;
 export const amountOfProducts = 12;

@@ -40,8 +40,10 @@ const formatDate = (date) => {
 };
 
 export default async function decorate(block) {
+  const langLocale = getMetadata('i18n');
+  const i18nPath = langLocale ? `/${langLocale}` : '';
   const limit = Number(getLimit(block));
-  const route = '/blog/query-index.json';
+  const route = `${i18nPath}/blog/query-index.json`;
   const { data: allArticles } = await getJsonFromUrl(route);
 
   const sortedArticles = allArticles.sort((a, b) => {
