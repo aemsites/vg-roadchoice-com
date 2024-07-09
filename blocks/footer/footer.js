@@ -31,7 +31,7 @@ export default async function decorate(block) {
 
     social.querySelectorAll('a').forEach((link) => {
       link.target = '_blank';
-      const linkText = link.innerText.toLowerCase();
+      const linkText = link.innerText.replace(' ', '-').toLowerCase();
       const icon = createElement('i', { classes: ['social-icon', 'fa-brands', `fa-${linkText}`] });
       link.innerHTML = '';
       link.appendChild(icon);

@@ -29,7 +29,7 @@ export default async function decorate(block) {
     asist: false,
     showAsistDialog: true,
     consolidateFilters: true,
-    selectedBrand: 'volvo',
+    selectedBrand: 'roadchoice',
     dataSource: datasource,
     amenities: ['Appointments Accepted', 'Bilingual Service', 'Driver Lounge', 'Free Pickup and Delivery', 'Hotel Shuttle', 'Internet Service', 'Laundry', 'Showers', 'Telephones', 'Trailer Parking', 'Video Games'],
   };
@@ -238,9 +238,7 @@ export default async function decorate(block) {
 
         <div class="dealer-details-header">
             <div class="detail-website">
-                <a target="_blank">
-                    <img src="/blocks/dealer-locator/images/Globe.svg"/>
-                    Website</a>
+
             </div>
             <div class="detail-direction">
                 <a id="directions" data-id="" onclick="$.fn.switchSidebarPane('sidebar-directions', this);">
@@ -252,14 +250,14 @@ export default async function decorate(block) {
             </div>
             <div class="detail-share">
 
-                <button type="button" class="accordion"><img
-                        src="/blocks/dealer-locator/images/Share.svg"/><span>SHARE</span></button>
+                <a id="share" class="accordion">
+                    <img src="/blocks/dealer-locator/images/Share.svg"/>
+                    SHARE
+                </a>
+
                 <div class="accordion-panel">
                     <input type="text" id="share-link" value="" onclick="this.select();"/>
                 </div>
-            </div>
-            <div class="detail-email">
-
             </div>
 
         </div>
@@ -280,7 +278,8 @@ export default async function decorate(block) {
                         <br/>
                         <div id="address2">
                             <div></div>
-                        </div>
+                            </div>
+                        <br/>
                         <div id="city-state-zip">
                             <div></div>
                         </div>
@@ -301,9 +300,9 @@ export default async function decorate(block) {
                                     class="tooltiptext link">Open website</span></i>
                         </div>
                     </li>
-                    <li id="email">
-
-                        <div></div>
+                    <li>
+                        <img src="/blocks/dealer-locator/images/Mail.svg"/>
+                        <div id="email" ></div>
                     </li>
 
 
@@ -323,7 +322,7 @@ export default async function decorate(block) {
     <div class="panel-card">
         <div class="panel-container">
             <article class="teaser">
-                <div class="marker-main" style="width: 15%;">
+                <div class="marker-main">
                     <img id="marker" src=""/>
                 </div>
                 <div class="dealerPanelContainer">

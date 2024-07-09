@@ -1,6 +1,5 @@
 import {
   createElement,
-  getJsonFromUrl,
   getLongJSONData,
   defaultLimit,
 } from '../../scripts/scripts.js';
@@ -70,12 +69,15 @@ const getCategoryData = async (cat) => {
 */
 const getFilterAttrib = async (cat) => {
   try {
-    const filtersJson = await getJsonFromUrl(categoryMaster);
-    if (!filtersJson) throw new Error('No data found in category master file');
-    const filterAttribs = await filtersJson.data.filter((el) => (
-      el.Subcategory.toLowerCase() === cat.toLowerCase().replaceAll('-', ' ')
-      && el.Filter === ''
-    )).map((el) => el.Attributes);
+    const filtersJson = await getLongJSONData({
+      url: categoryMaster,
+      limit: defaultLimit,
+    });
+
+    if (!filtersJson) throw new Error('Failed to fetch filter data');
+
+    const filterAttribs = filtersJson.filter((el) => el.Subcategory.toLowerCase() === cat.toLowerCase().replaceAll('-', ' ') && el.Filter === '').map((el) => el.Attributes);
+
     const event = new Event('FilterAttribsLoaded');
     sessionStorage.setItem('filter-attribs', JSON.stringify(filterAttribs));
     document.dispatchEvent(event);

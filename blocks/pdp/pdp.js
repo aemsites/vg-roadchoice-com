@@ -162,9 +162,12 @@ function groupByLanguage(data) {
 
 async function fetchCategoryKeys(category) {
   try {
-    const json = await getJsonFromUrl('/product-data/rc-attribute-master-file.json');
-    if (!json) return [];
-    return filterByCategory(json?.data, category, 'Subcategory');
+    const json = await getLongJSONData({
+      url: '/product-data/rc-attribute-master-file.json',
+      limit: defaultLimit,
+    });
+    if (!json || json.length === 0) return [];
+    return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
     return [];
   }

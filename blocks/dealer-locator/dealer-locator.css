@@ -411,6 +411,14 @@ main .section.dealer-locator-container > div {
   justify-content: center;
 }
 
+.dealer-locator .nearby-pins article.teaser .marker-main {
+  width: 15%;
+}
+
+.dealer-locator .nearby-pins article.teaser .dealerPanelContainer {
+  width: unset; 
+}
+
 .dealer-locator .nearby-pins article.teaser .teaser-top {
   cursor: pointer;
 }
@@ -436,6 +444,7 @@ main .section.dealer-locator-container > div {
   display: block;
   font-weight: 700;
   margin: 10px 0 0;
+  max-width: 230px;
 }
 
 .dealer-locator .nearby-pins article.teaser .teaser-top .heading div.distance {
@@ -466,6 +475,7 @@ main .section.dealer-locator-container > div {
   color: #000;
   font-weight: 700;
   margin-top: 10px;
+  max-width: 320px;
 }
 
 .dealer-locator .nearby-pins article.teaser .teaser-bottom {
@@ -561,6 +571,18 @@ main .section.dealer-locator-container > div {
     .right
     .more:hover {
     background: 0 0;
+  }
+
+  .dealer-locator .nearby-pins article.teaser .marker-main {
+    min-width: 10%;
+  }
+
+  .dealer-locator .nearby-pins article.teaser .teaser-top .heading p {
+    max-width: unset;
+  }
+
+  .dealer-locator .nearby-pins article.teaser .teaser-top .left {
+    max-width: unset;
   }
 }
 
@@ -835,7 +857,7 @@ main .section.dealer-locator-container > div {
   .dealer-locator .mobile-main-header {
     display: block;
     border: 1px solid;
-    height: 39px;
+    height: 41px;
   }
 
   .dealer-locator .mobile-main-header .row {
@@ -919,7 +941,7 @@ main .section.dealer-locator-container > div {
 
   .dealer-locator .mobile-main-header .panel-header .search-container {
     position: absolute;
-    right: 90px;
+    right: 45px;
     display: block;
     top: -3px;
   }
@@ -963,7 +985,7 @@ main .section.dealer-locator-container > div {
   .dealer-locator .mobile-main-header .panel-header .filter-container {
     position: absolute;
     right: 30px;
-    display: block;
+    display: none;
     top: -3px;
   }
 
@@ -1095,7 +1117,7 @@ main .section.dealer-locator-container > div {
 }
 
 .dealer-locator .go-back button {
-  position: relative;
+  position: absolute;
   display: inline-block;
   opacity: 1;
   font-size: 12px;
@@ -1105,8 +1127,7 @@ main .section.dealer-locator-container > div {
   background: #fff;
   border-radius: 4px;
   border: 1px solid #a7a8a9;
-  right: 0;
-  left: 0;
+  right: 10px;
   padding: 1px 6px;
   font-family: var(--body-ff);
   margin: 0;
@@ -1194,6 +1215,9 @@ main .section.dealer-locator-container > div {
   height: 160px;
   position: relative;
   color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .dealer-locator .sidebar .sidebar-content .pin-header div#title {
@@ -1203,6 +1227,7 @@ main .section.dealer-locator-container > div {
   font-size: 18px;
   margin-top: 15px;
   padding-left: 10px;
+  max-width: 70%;
 }
 
 .dealer-locator .sidebar .sidebar-content .pin-header #set-dealer {
@@ -1257,6 +1282,11 @@ main .section.dealer-locator-container > div {
   gap: 20px;
 }
 
+.dealer-locator .sidebar .sidebar-content .pin-header .dealer-details-header div {
+  min-width: 50px;
+  text-align: center;
+}
+
 @media (min-width: 496px) and (max-width: 992px) {
   .dealer-locator .sidebar .sidebar-content .pin-header .dealer-details-header {
     justify-content: unset;
@@ -1295,8 +1325,9 @@ main .section.dealer-locator-container > div {
   .pin-header
   .dealer-details-header
   a:hover {
-  color: #5ba1f8;
+  color: var(--link-hover-color);
   text-decoration: underline;
+  cursor: pointer;
 }
 
 @media (max-width: 992px) {
@@ -1470,6 +1501,7 @@ main .section.dealer-locator-container > div {
   color: #000;
   font-size: 13px;
   padding: 10px 15px;
+  z-index: 20;
 }
 
 .dealer-locator .sidebar .sidebar-content .accordion {
@@ -1659,6 +1691,7 @@ main .section.dealer-locator-container > div {
 }
 
 .dealer-locator .sidebar .sidebar-content ul.pin-details > li #address1,
+.dealer-locator .sidebar .sidebar-content ul.pin-details > li #address2,
 .dealer-locator .sidebar .sidebar-content ul.pin-details > li #city-state-zip {
   margin-left: 35px;
 }
@@ -1734,9 +1767,20 @@ main .section.dealer-locator-container > div {
   .sidebar
   .sidebar-content
   ul.pin-details
-  > li:not(.accordion-panel):hover
+  > li:not(.accordion-panel):not(.noDataClass):hover
   .controls {
   display: block;
+}
+
+.dealer-locator .sidebar .sidebar-content li.noDataClass {
+  background-color: none;
+  pointer-events: none;
+  cursor: unset;
+  opacity: 0.6;
+}
+
+.dealer-locator .sidebar .sidebar-content ul.pin-details>li:not(.accordion-panel):not(.noDataClass):hover .controls {
+  display: block
 }
 
 .dealer-locator .sidebar .sidebar-content ul.pin-details #details > div {
@@ -1887,7 +1931,7 @@ main .section.dealer-locator-container > div {
 
 .dealer-locator .sidebar .panel-header .search-container {
   position: absolute;
-  right: 90px;
+  right: 45px;
   display: block;
   top: 0;
 }
@@ -1927,7 +1971,7 @@ main .section.dealer-locator-container > div {
 .dealer-locator .sidebar .panel-header .filter-container {
   position: absolute;
   right: 30px;
-  display: block;
+  display: none;
   top: 0;
 }
 
@@ -2593,6 +2637,12 @@ main .section.dealer-locator-container > div {
   display: block;
 }
 
+@media (min-width: 496px) and (max-width: 992px) {
+  .sidebar .dealerPanelContainer {
+    width: 70% !important;
+  }
+}
+
 @media (max-width: 992px) {
   .sidebar {
     width: 100% !important;
@@ -2705,6 +2755,8 @@ main .section.dealer-locator-container > div {
     height: calc(100% - 1em) !important;
   }
 }
+
+
 
 footer {
   margin-top: 0 !important;
