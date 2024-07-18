@@ -262,7 +262,8 @@ function formListener(form) {
       sessionStorage.setItem(item, JSON.stringify(ssDataItems[i]));
     });
     if (!fitInStorage) sessionStorage.setItem('total-results-amount', results.length);
-    url.pathname = '/search/';
+
+    url.pathname = `${i18nPath}/search/`;
     url.search = `?q=${value}&st=${searchType}`;
     window.location.href = url;
   };
