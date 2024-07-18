@@ -1,7 +1,6 @@
-// import { getMetadata } from '../../scripts/lib-franklin.js';
+import { getMetadata } from '../../scripts/lib-franklin.js';
 
-// const langLocale = getMetadata('i18n');
-const langLocale = 'fr-ca'; // TODO: refactor to make this dynamic
+const langLocale = getMetadata('i18n');
 const i18nPath = langLocale ? `/${langLocale}` : '';
 
 /**
@@ -10,9 +9,9 @@ const i18nPath = langLocale ? `/${langLocale}` : '';
  * @property {string} imgData - Images Data URL
  */
 const URLs = {
-  crData: `${i18nPath}/cross-reference-data/cr-data.json`,
-  pnData: `${i18nPath}/product-data/road-choice-make-model-part-filter-options.json`,
-  imgData: `${i18nPath}/product-images/road-choice-website-images.json`,
+  crData: `${i18nPath}/sadcross-reference-data/cr-data.json`,
+  pnData: `${i18nPath}/asdproduct-data/road-choice-make-model-part-filter-options.json`,
+  imgData: `${i18nPath}/asdproduct-images/road-choice-website-images.json`,
 };
 
 const limit = 100_000;
