@@ -53,7 +53,7 @@ main .section.carousel-container {
   font-size: 19px;
 }
 
-.carousel .carousel-slide h1 {
+.carousel .carousel-slide .carousel-heading {
   font-size: 24px;
   line-height: 40px;
 }
@@ -144,7 +144,7 @@ main .section.carousel-container {
     line-height: 25px;
   }
 
-  .carousel .carousel-slide h1 {
+  .carousel .carousel-slide .carousel-heading {
     font-size: 32px;
     line-height: 50px;
   }
@@ -157,7 +157,7 @@ main .section.carousel-container {
     line-height: 50px;
   }
 
-  .carousel .carousel-slide h1 {
+  .carousel .carousel-slide .carousel-heading {
     font-size: 46px;
   }
 
@@ -177,7 +177,7 @@ main .section.carousel-container {
 }
 
 @media (min-width: 1200px) {
-  .carousel .carousel-slide h1 {
+  .carousel .carousel-slide .carousel-heading {
     font-size: 70px;
     line-height: 70px;
   }

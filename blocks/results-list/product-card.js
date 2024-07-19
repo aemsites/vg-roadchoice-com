@@ -1,7 +1,8 @@
-import { getTextLabel, createElement } from '../../scripts/scripts.js';
+import { getTextLabel, createElement } from '../../scripts/common.js';
 import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 
-const partNumberText = getTextLabel('part number');
+const blockName = 'product-card';
+const partNumberText = getTextLabel('part_number');
 
 const getProperties = (prod, st) => {
   const cardContent = {};
@@ -41,7 +42,7 @@ const productCard = (product, searchType) => {
     imgUrl,
   } = object;
 
-  const item = createElement('li', { classes: 'product' });
+  const item = createElement('li', { classes: blockName });
 
   const linkUrl = `/parts?category=${
     category.replace(/[^\w]/g, '-').toLowerCase()
@@ -62,12 +63,15 @@ const productCard = (product, searchType) => {
   imageLink.append(placeholderPicture, picture);
 
   const titleLink = createElement('a', { classes: 'title-link', props: { href: linkUrl } });
-  const title = createElement('h6', { classes: 'title', textContent: name });
+  const title = createElement('h6', { classes: 'title' });
+  title.textContent = name;
   titleLink.appendChild(title);
 
   const partLabel = createElement('span', { classes: 'part-number' });
-  const text = createElement('p', { classes: 'part-label', textContent: `${partNumberText}:` });
-  const number = createElement('a', { classes: 'part-link', props: { href: linkUrl }, textContent: partNumber });
+  const text = createElement('p', { classes: 'part-label' });
+  text.textContent = `${partNumberText}:`;
+  const number = createElement('a', { classes: 'part-link', props: { href: linkUrl } });
+  number.textContent = partNumber;
   partLabel.append(text, number);
 
   item.append(imageLink, titleLink, partLabel);

@@ -1,10 +1,7 @@
-import {
-  createElement,
-  getJsonFromUrl,
-} from '../../scripts/scripts.js';
+import { createElement, getJsonFromUrl } from '../../scripts/common.js';
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
 
-const blockName = 'catalogs';
+const blockName = 'catalogs-table';
 
 const tableInfo = [
   {
@@ -65,9 +62,9 @@ const buildTables = (catalogs) => {
     const heading = createElement('h2', {
       classes: `${blockName}-heading`,
       props: { id: sectionTitle },
-      textContent: (sectionTitle.replaceAll('-', ' ')),
     });
-    const tableSection = createElement('ul', { classes: `${blockName}-table` });
+    heading.textContent = sectionTitle.replaceAll('-', ' ');
+    const tableSection = createElement('ul', { classes: `${blockName}-list` });
 
     const selectedCatalogs = catalogs.filter((catalog) => {
       const conditions = [];
@@ -85,17 +82,18 @@ const buildTables = (catalogs) => {
 
     selectedCatalogs.forEach(({ notes, file, title }) => {
       const isPdf = file.slice(-4) === '.pdf';
-      const catalog = createElement('li', { classes: 'table-item' });
+      const catalog = createElement('li', { classes: `${blockName}-item` });
       const link = createElement('a', {
         classes: 'item-link',
         props: { href: file },
-        textContent: title,
       });
+      link.textContent = title;
       if (isPdf) {
         link.setAttribute('target', '_blank');
         link.setAttribute('rel', 'noopener noreferrer');
       }
-      const note = createElement('span', { classes: 'item-note', textContent: `(${notes})` });
+      const note = createElement('span', { classes: 'item-note' });
+      note.textContent = notes;
 
       catalog.append(link);
       if (notes.length > 0) link.append(note);

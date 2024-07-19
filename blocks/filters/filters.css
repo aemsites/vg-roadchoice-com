@@ -1,10 +1,10 @@
-.filter-section {
+.filters-section {
   width: 100%;
   line-height: 22px;
   padding: 0 0 20px;
 }
 
-.filter-section h3.title {
+.filters-section h3.title {
   font-family: var(--headings-ff-bold);
   font-size: var(--body-font-size-m);
   color: var(--primary-white);
@@ -15,7 +15,7 @@
   margin: 0;
 }
 
-.filter-section ul li.item {
+.filters-section ul li.item {
   background-color: var(--c-light-gray);
   text-align: left;
   border: 1px solid var(--primary-medium-gray);
@@ -23,17 +23,17 @@
   padding: 10px;
 }
 
-.filter-section ul li.item:first-of-type {
+.filters-section ul li.item:first-of-type {
   border-top: 1px solid var(--primary-medium-gray);;
 }
 
-.filter-section ul li.item a {
+.filters-section ul li.item a {
   font-size: var(--body-font-size-xs);
   color: var(--secondary-gray-4);
   text-decoration: none;
   text-transform: capitalize;
 }
 
-.filter-section ul li.item a:hover {
+.filters-section ul li.item a:hover {
   color: var(--primary-red);
 }

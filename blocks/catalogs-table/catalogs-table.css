@@ -1,8 +1,8 @@
-.catalogs-table .catalogs-subsection {
+.catalogs-table .catalogs-table-subsection {
   margin: 0 0 20px;
 }
 
-.catalogs-table .catalogs-heading {
+.catalogs-table .catalogs-table-heading {
   font-family: var(--headings-ff-black);
   font-size: var(--heading-font-size-s);
   text-transform: uppercase;
@@ -10,14 +10,14 @@
   margin: 10px 0;
 }
 
-.catalogs-table .catalogs-table {
+.catalogs-table .catalogs-table-list {
   display: flex;
   flex-wrap: wrap;
   border-left: 1px solid var(--primary-black);
   border-top: 1px solid var(--primary-black);
 }
 
-.catalogs-table .catalogs-table .table-item {
+.catalogs-table .catalogs-table-list .catalogs-table-item {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -29,14 +29,14 @@
   overflow: hidden;
 }
 
-.catalogs-table .catalogs-table .item-link {
+.catalogs-table .catalogs-table-list .item-link {
   font-family: var(--headings-ff-black);
   font-size: var(--body-font-size-m);
   color: var(--primary-red);
   text-decoration: none;
 }
 
-.catalogs-table .catalogs-table .item-note {
+.catalogs-table .catalogs-table-list .item-note {
   display: none
 }
 
@@ -45,19 +45,19 @@
     padding: 0 50px;
    }
 
-  .catalogs-table .catalogs-subsection {
+  .catalogs-table .catalogs-table-subsection {
     margin: 0 0 60px;
   }
 
-  .catalogs-table .catalogs-heading {
+  .catalogs-table .catalogs-table-heading {
     scroll-margin: 170px;
   }
 
-  .catalogs-table .catalogs-table .table-item {
+  .catalogs-table .catalogs-table-list .catalogs-table-item {
     flex-wrap: wrap;
   }
 
-  .catalogs-table .catalogs-table .item-note {
+  .catalogs-table .catalogs-table-list .item-note {
     display: inline;
     font-size: calc(var(--body-font-size-s) - 2px);
     font-family: var(--body-ff);
@@ -67,8 +67,8 @@
 }
 
 @media (min-width: 768px) {
-  .catalogs-table .catalogs-subsection-1 .table-item,
-  .catalogs-table .catalogs-subsection-2 .table-item {
+  .catalogs-table .catalogs-table-subsection-1 .catalogs-table-item,
+  .catalogs-table .catalogs-table-subsection-2 .catalogs-table-item {
     width: calc(100% / 3);
   }
 }

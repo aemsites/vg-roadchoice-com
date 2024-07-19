@@ -2,48 +2,48 @@
   --text-scaling: 0.5;
 }
 
-.cookies-table .cookie-table {
+.cookies-table table {
   border: 2px solid var(--primary-black);
   margin: 16px 0;
   width: 100%;
 }
 
-.cookie-table .cookie-table-head,
-.cookie-table .cookie-table-cell {
+.cookies-table .cookies-table-head,
+.cookies-table .cookies-table-cell {
   text-align: left;
   border: 2px solid var(--primary-black);
 }
 
-.cookie-table .cookie-table-row .t-0 {
+.cookies-table .cookies-table-row .t-0 {
   width: 25%;
 }
 
-.cookie-table .cookie-table-row .t-1 {
+.cookies-table .cookies-table-row .t-1 {
   width: 55%;
 }
 
-.cookie-table .cookie-table-row .t-2 {
+.cookies-table .cookies-table-row .t-2 {
   width: 20%;
 }
 
-.cookie-table th.cookie-table-head,
-.cookie-table .cookie-table-cell {
+.cookies-table th.cookies-table-head,
+.cookies-table .cookies-table-cell {
   vertical-align: middle;
   padding: 2px 5px;
   overflow: auto;
 }
 
-.cookie-table th.cookie-table-head {
+.cookies-table th.cookies-table-head {
   text-transform: capitalize;
   background-color: var(--primary-light-gray);
   font-size: calc(var(--body-font-size-xs) * var(--text-scaling));
 }
 
-.cookie-table .cookie-table-cell {
+.cookies-table .cookies-table-cell {
   font-size: calc(var(--body-font-size-s) * var(--text-scaling));
 }
 
-.cookie-table .cookie-table-cell.bold-red {
+.cookies-table .cookies-table-cell.bold-red {
   font-family: var(--headings-ff-black);
   color: var(--primary-red);
 }
@@ -54,22 +54,22 @@
     --text-scaling: 0.8;
   }
 
-  .cookie-table th.cookie-table-head {
+  .cookies-table th.cookies-table-head {
     padding: 8px 10px;
   }
 
-  .cookie-table .cookie-table-cell {
+  .cookies-table .cookies-table-cell {
     padding: 8px 10px;
   }
 }
 
 @media (min-width: 992px) {
-  .cookie-table th.cookie-table-head {
+  .cookies-table th.cookies-table-head {
     font-size: var(--body-font-size-xs);
     padding: 12px 15px;
   }
 
-  .cookie-table .cookie-table-cell {
+  .cookies-table .cookies-table-cell {
     font-size: var(--body-font-size-s);
     padding: 12px 15px;
   }

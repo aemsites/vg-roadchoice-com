@@ -1,0 +1,90 @@
+{
+  "cookieValues": {
+    "total": 9,
+    "offset": 0,
+    "limit": 9,
+    "data": [
+      {
+        "name": "PERFORMANCE_COOKIE",
+        "value": "C0002"
+      },
+      {
+        "name": "FUNCTIONAL_COOKIE",
+        "value": "C0003"
+      },
+      {
+        "name": "TARGETING_COOKIE",
+        "value": "C0004"
+      },
+      {
+        "name": "SOCIAL_COOKIE",
+        "value": "C0005"
+      },
+      {
+        "name": "HOTJAR_ID",
+        "value": "714824"
+      },
+      {
+        "name": "GTM_ID",
+        "value": "GTM-MJJCNZK"
+      },
+      {
+        "name": "DATA_DOMAIN_SCRIPT",
+        "value": "73cee13a-d7db-4fb2-9508-a0b50738d660"
+      },
+      {
+        "name": "ARTIBOT_ID",
+        "value": "8b46bd2b-302c-418e-9d5a-b1c46088754f"
+      },
+      {
+        "name": "COOKIE_CHECK",
+        "value": "false"
+      }
+    ]
+  },
+  "projectConfig": {
+    "total": 3,
+    "offset": 0,
+    "limit": 3,
+    "data": [
+      {
+        "name": "GIT_OWNER",
+        "value": "hlxsites"
+      },
+      {
+        "name": "GIT_REPO",
+        "value": "vg-roadchoice-com"
+      },
+      {
+        "name": "GLOBAL_SITEMAP_URL",
+        "value": "/sitemap.xml"
+      }
+    ]
+  },
+  "dealerLocator": {
+    "total": 3,
+    "offset": 0,
+    "limit": 3,
+    "data": [
+      {
+        "name": "ENDPOINT_URL",
+        "value": "https://dealerlocator.roadchoice.com/DealerJSON.ashx"
+      },
+      {
+        "name": "API_KEY",
+        "value": "AIzaSyAP8IewqHuU8SMz_6tNiIUlbU_l0GFOd1w"
+      },
+      {
+        "name": "BACKUP_URL",
+        "value": "https://as-dealerloc-endpoint-prod-001.azurewebsites.net/Mack_DealerJSON.ashx"
+      }
+    ]
+  },
+  ":version": 3,
+  ":names": [
+    "cookieValues",
+    "projectConfig",
+    "dealerLocator"
+  ],
+  ":type": "multi-sheet"
+}

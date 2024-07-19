@@ -1,4 +1,12 @@
 import { loadScript } from '../../scripts/lib-franklin.js';
+import { DEALER_LOCATOR } from '../../scripts/common.js';
+
+// DEALER LOCATOR config coming from constants file.
+const {
+  ENDPOINT_URL,
+  API_KEY,
+  BACKUP_URL,
+} = DEALER_LOCATOR;
 
 function escapeHTML(input) {
   return input.replace(/&/g, '&amp;')
@@ -15,7 +23,7 @@ export default async function decorate(block) {
   const isMobile = MQ.matches;
   // add the zip code to the input search, if it is present
   const zipCode = hasZipLocation ? escapeHTML(searchParams.get('whereToBuy')) : null;
-  const datasource = block.textContent.trim();
+  const datasource = block.textContent.trim() || ENDPOINT_URL;
   const observer = new MutationObserver((list) => {
     list.forEach((change) => {
       if (change.target.dataset.blockStatus !== 'loaded') return;
@@ -31,6 +39,8 @@ export default async function decorate(block) {
     consolidateFilters: true,
     selectedBrand: 'roadchoice',
     dataSource: datasource,
+    backupUrl: BACKUP_URL,
+    apiKey: API_KEY,
     amenities: ['Appointments Accepted', 'Bilingual Service', 'Driver Lounge', 'Free Pickup and Delivery', 'Hotel Shuttle', 'Internet Service', 'Laundry', 'Showers', 'Telephones', 'Trailer Parking', 'Video Games'],
   };
 

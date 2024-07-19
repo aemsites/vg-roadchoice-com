@@ -4,9 +4,10 @@ import {
   getJsonFromUrl,
   getLongJSONData,
   defaultLimit,
-} from '../../scripts/scripts.js';
+} from '../../scripts/common.js';
 import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 
+const blockName = 'pdp';
 const docTypes = {
   catalog: 'catalog',
   manual: 'manual',
@@ -61,22 +62,24 @@ async function fetchPartImages(sku) {
 }
 
 function renderColDetails(part, block, categoryKeys) {
-  const list = block.querySelector('.pdp-list');
+  const list = block.querySelector(`.${blockName}-list`);
   const keys = Object.keys(part);
   keys.forEach((key) => {
     if (categoryKeys.map((item) => item.Attributes).includes(key) && part[key].length) {
-      const liFragment = docRange.createContextualFragment(`<li class="pdp-list-item">
-        <span class="pdp-list-item-title">${key}</span>:
-        <span class="pdp-list-item-value">${part[key]}</span>
-      </li>`);
+      const liFragment = docRange.createContextualFragment(`
+        <li class="${blockName}-list-item">
+          <span class="${blockName}-list-item-title">${key}</span>:
+          <span class="${blockName}-list-item-value">${part[key]}</span>
+        </li>
+      `);
       list.append(liFragment);
     }
   });
 }
 
 function renderImages(block, images) {
-  const imageWrapper = block.querySelector('.pdp-image-wrapper');
-  const selectedImage = block.querySelector('.pdp-selected-image');
+  const imageWrapper = block.querySelector(`.${blockName}-image-wrapper`);
+  const selectedImage = block.querySelector(`.${blockName}-selected-image`);
 
   // main image
   const mainPictureUrl = images[0]['Image URL'];
@@ -87,16 +90,16 @@ function renderImages(block, images) {
     undefined,
     !mainPictureUrl.startsWith('/'),
   );
-  mainPicture.querySelector('img').classList.add('pdp-image');
+  mainPicture.querySelector('img').classList.add(`${blockName}-image`);
   selectedImage.append(mainPicture);
 
   // additional images
   if (images.length <= 1) return;
 
-  const imageList = createElement('ul', { classes: 'pdp-image-list' });
+  const imageList = createElement('ul', { classes: `${blockName}-image-list` });
   images.forEach((image, id) => {
     const liFragment = docRange.createContextualFragment(`
-      <li class="pdp-image-item ${id === 0 ? 'active' : ''}"> </li>`);
+      <li class="${blockName}-image-item ${id === 0 ? 'active' : ''}"> </li>`);
     const picture = createOptimizedPicture(
       image['Image URL'],
       'Additional part image',
@@ -104,15 +107,15 @@ function renderImages(block, images) {
       undefined,
       !image['Image URL'].startsWith('/'),
     );
-    picture.querySelector('img').classList.add('pdp-gallery-image');
+    picture.querySelector('img').classList.add(`${blockName}-gallery-image`);
     liFragment.querySelector('li').append(picture);
     imageList.append(liFragment);
   });
   imageWrapper.append(imageList);
   imageWrapper.addEventListener('click', (e) => {
-    const target = e.target.closest('.pdp-image-item');
+    const target = e.target.closest(`.${blockName}-image-item`);
     if (target) {
-      const activeImage = imageWrapper.querySelector('.pdp-image-item.active');
+      const activeImage = imageWrapper.querySelector(`.${blockName}-image-item.active`);
       activeImage.classList.remove('active');
       target.classList.add('active');
       const newMainImage = target.querySelector('picture').cloneNode(true);
@@ -123,17 +126,17 @@ function renderImages(block, images) {
 
 function renderPartBlock(block) {
   const fragment = `
-    <div class="pdp-details-wrapper">
-      <div class="pdp-image-column">
-        <div class="pdp-image-wrapper">
-          <div class="pdp-selected-image">
+    <div class="${blockName}-details-wrapper">
+      <div class="${blockName}-image-column">
+        <div class="${blockName}-image-wrapper">
+          <div class="${blockName}-selected-image">
           </div>
         </div>
       </div>
-      <div class="pdp-content-column">
-        <h1 class="pdp-title"></h1>
-        <div class="pdp-description"></div>
-        <ul class="pdp-list"></ul>
+      <div class="${blockName}-content-column">
+        <h1 class="${blockName}-title"></h1>
+        <div class="${blockName}-description"></div>
+        <ul class="${blockName}-list"></ul>
       </div>
     </div>
   `;
@@ -143,8 +146,8 @@ function renderPartBlock(block) {
 }
 
 function setPartData(part, block) {
-  block.querySelector('.pdp-title').textContent = part['Base Part Number'];
-  block.querySelector('.pdp-description').textContent = part['Part Name'];
+  block.querySelector(`.${blockName}-title`).textContent = part['Base Part Number'];
+  block.querySelector(`.${blockName}-description`).textContent = part['Part Name'];
 }
 
 function filterByCategory(data, category, categoryKey = 'category') {
@@ -193,30 +196,28 @@ async function fetchDocs(category) {
 }
 
 function renderDocsSection(docsList, sectionType) {
-  const section = document.querySelector(`.pdp-${sectionType}`);
+  const section = document.querySelector(`.${blockName}-${sectionType}`);
   const sectionWrapper = section.querySelector('.default-content-wrapper');
   if (!section || !sectionWrapper || !Object.keys(docsList)?.length) return;
 
   const fragment = docRange.createContextualFragment(`
-    <ul class="pdp-${sectionType}-list"></ul>
+    <ul class="${blockName}-${sectionType}-list"></ul>
   `);
   sectionWrapper.append(fragment);
 
   Object.entries(docsList).forEach(([language, docs]) => {
     const docsFragment = docRange.createContextualFragment(`
-      <li class="pdp-${sectionType}-list-item">
-        <div class="pdp-${sectionType}-list-title">${getTextLabel(language)}</div>
-        <div class="pdp-${sectionType}-list-link"></div>
+      <li class="${blockName}-${sectionType}-list-item">
+        <div class="${blockName}-${sectionType}-list-title">${getTextLabel(language)}</div>
+        <div class="${blockName}-${sectionType}-list-link"></div>
       </li>
     `);
     docs.forEach((doc) => {
-      const anchor = createElement('a', {
-        props: { target: '_blank', href: doc.file },
-        textContent: doc.title,
-      });
-      docsFragment.querySelector(`.pdp-${sectionType}-list-link`).append(anchor);
+      const anchor = createElement('a', { props: { target: '_blank', href: doc.file } });
+      anchor.textContent = doc.title;
+      docsFragment.querySelector(`.${blockName}-${sectionType}-list-link`).append(anchor);
     });
-    sectionWrapper.querySelector(`.pdp-${sectionType}-list`).append(docsFragment);
+    sectionWrapper.querySelector(`.${blockName}-${sectionType}-list`).append(docsFragment);
   });
   section.classList.remove('hide');
 }
@@ -240,22 +241,22 @@ async function fetchSDS(category) {
 
 function renderSDS(sdsList) {
   if (!sdsList) return;
-  const sdsContainer = document.querySelector('.pdp-sds');
+  const sdsContainer = document.querySelector(`.${blockName}-sds`);
   const sectionWrapper = sdsContainer.querySelector('.default-content-wrapper');
   if (!sdsContainer || !sectionWrapper || !sdsList?.length) return;
 
   const fragment = docRange.createContextualFragment(`
-    <ul class="pdp-sds-list"></ul>
+    <ul class="${blockName}-sds-list"></ul>
   `);
   sectionWrapper.append(fragment);
 
   sdsList.forEach((sds) => {
     const sdsFragment = docRange.createContextualFragment(`
-      <li class="pdp-sds-list-item">
+      <li class="${blockName}-sds-list-item">
         <a target="_blank" href="${sds.file}">${sds.title}</a>
       </li>
     `);
-    sectionWrapper.querySelector('.pdp-sds-list').append(sdsFragment);
+    sectionWrapper.querySelector(`.${blockName}-sds-list`).append(sdsFragment);
   });
   sdsContainer.classList.remove('hide');
 }
@@ -272,12 +273,12 @@ async function fetchBlogs(category) {
 
 function renderBlogs(blogList) {
   if (!blogList) return;
-  const blogsContainer = document.querySelector('.pdp-blogs');
+  const blogsContainer = document.querySelector(`.${blockName}-blogs`);
   const sectionWrapper = blogsContainer.querySelector('.default-content-wrapper');
   if (!blogsContainer || !sectionWrapper || !blogList?.length) return;
 
   const fragment = docRange.createContextualFragment(`
-    <ul class="pdp-blogs-list"></ul>
+    <ul class="${blockName}-blogs-list"></ul>
   `);
   sectionWrapper.append(fragment);
 
@@ -287,18 +288,18 @@ function renderBlogs(blogList) {
     .slice(-3)
     .forEach((sds) => {
       const blogFragment = docRange.createContextualFragment(`
-        <li class="pdp-blogs-list-item">
-          <a class="pdp-blogs-anchor" target="_blank" href="${sds.path}">
-            <h6 class="pdp-blogs-title">${sds.title}</h6>
+        <li class="${blockName}-blogs-list-item">
+          <a class="${blockName}-blogs-anchor" target="_blank" href="${sds.path}">
+            <h6 class="${blockName}-blogs-title">${sds.title}</h6>
           </a>
-          <p class="pdp-blogs-date">
+          <p class="${blockName}-blogs-date">
             ${new Date(parseInt(sds.date, 10) * 1000).toLocaleDateString()}
           </p>
-          <p class="pdp-blogs-description">${sds.description}</p>
-          <a class="pdp-blogs-cta" target="_blank" href="${sds.path}">Read More</a>
+          <p class="${blockName}-blogs-description">${sds.description}</p>
+          <a class="${blockName}-blogs-cta" target="_blank" href="${sds.path}">Read More</a>
         </li>
       `);
-      sectionWrapper.querySelector('.pdp-blogs-list').append(blogFragment);
+      sectionWrapper.querySelector(`.${blockName}-blogs-list`).append(blogFragment);
     });
   blogsContainer.classList.remove('hide');
 }
@@ -330,7 +331,7 @@ async function fetchPartFit(pathSegments) {
 
 function renderPartFit(partFitData) {
   if (!partFitData) return;
-  const partFitContainer = document.querySelector('.pdp-part-fit');
+  const partFitContainer = document.querySelector(`.${blockName}-part-fit`);
   let sectionWrapper = partFitContainer.querySelector('.default-content-wrapper');
 
   if (!sectionWrapper) {
@@ -341,19 +342,19 @@ function renderPartFit(partFitData) {
   if (!partFitContainer || !sectionWrapper || !partFitData?.length) return;
 
   const fragment = docRange.createContextualFragment(`
-    <div class="pdp-part-fit-expanded">
-      <div class="pdp-part-fit-header">
-        <h3 class="pdp-part-fit-title">Advanced Filter</h3>
-        <div class="pdp-part-fit-search">
-          <input type="text" class="pdp-part-fit-search-input" placeholder="Search" />
+    <div class="${blockName}-part-fit-expanded">
+      <div class="${blockName}-part-fit-header">
+        <h3 class="${blockName}-part-fit-title">Advanced Filter</h3>
+        <div class="${blockName}-part-fit-search">
+          <input type="text" class="${blockName}-part-fit-search-input" placeholder="Search" />
         </div>
-        <div class="pdp-part-fit-filter">
-          <div class="pdp-part-fit-filter-title">Make</div>
-          <div class="pdp-part-fit-make-list"></div>
+        <div class="${blockName}-part-fit-filter">
+          <div class="${blockName}-part-fit-filter-title">Make</div>
+          <div class="${blockName}-part-fit-make-list"></div>
         </div>
-        <div class="pdp-part-fit-count">0 Entries</div>
+        <div class="${blockName}-part-fit-count">0 Entries</div>
       </div>
-      <div class="pdp-part-fit-list"></div>
+      <div class="${blockName}-part-fit-list"></div>
     </div>
   `);
   sectionWrapper.append(fragment);
@@ -365,57 +366,57 @@ function renderPartFit(partFitData) {
 
   makes.forEach((make) => {
     const makeFragment = docRange.createContextualFragment(`
-      <div class="pdp-part-fit-make-list-item">${make}</div>
+      <div class="${blockName}-part-fit-make-list-item">${make}</div>
     `);
-    sectionWrapper.querySelector('.pdp-part-fit-make-list').append(makeFragment);
+    sectionWrapper.querySelector(`.${blockName}-part-fit-make-list`).append(makeFragment);
   });
 
   partFitData
     .forEach((vehicle) => {
       const partFitFragment = docRange.createContextualFragment(`
-        <div class="pdp-part-fit-list-item" data-make="${vehicle.Make}">
-          <h4 class="pdp-part-fit-make">${vehicle.Make}</h4>
-          <h6 class="pdp-part-fit-model">Model: <span class="value">${vehicle.Model}</span></h6>
-          <p class="pdp-part-fit-model-description">${vehicle['Model Description']}</p>
-          <div class="pdp-part-fit-year">Year: <span class="value">${vehicle.Year}</span></div>
-          <div class="pdp-part-fit-engine-make">Engine Make: <span class="value">
+        <div class="${blockName}-part-fit-list-item" data-make="${vehicle.Make}">
+          <h4 class="${blockName}-part-fit-make">${vehicle.Make}</h4>
+          <h6 class="${blockName}-part-fit-model">Model: <span class="value">${vehicle.Model}</span></h6>
+          <p class="${blockName}-part-fit-model-description">${vehicle['Model Description']}</p>
+          <div class="${blockName}-part-fit-year">Year: <span class="value">${vehicle.Year}</span></div>
+          <div class="${blockName}-part-fit-engine-make">Engine Make: <span class="value">
           ${vehicle['Engine Make']}</span></div>
-          <div class="pdp-part-fit-engine-model">Engine Model: <span class="value">
+          <div class="${blockName}-part-fit-engine-model">Engine Model: <span class="value">
           ${vehicle['Engine Model']}</span></div>
         </div>
       `);
 
-      sectionWrapper.querySelector('.pdp-part-fit-list').append(partFitFragment);
+      sectionWrapper.querySelector(`.${blockName}-part-fit-list`).append(partFitFragment);
     });
 
   const countVisibleItems = () => {
     const count = sectionWrapper
-      .querySelectorAll('.pdp-part-fit-list-item:not(.pdp-hide-by-filter):not(.pdp-hide-by-search)')
+      .querySelectorAll(`.${blockName}-part-fit-list-item:not(.${blockName}-hide-by-filter):not(.${blockName}-hide-by-search)`)
       .length;
-    sectionWrapper.querySelector('.pdp-part-fit-count').textContent = `${count} Entries`;
+    sectionWrapper.querySelector(`.${blockName}-part-fit-count`).textContent = `${count} Entries`;
   };
 
   countVisibleItems();
 
   // filter
-  sectionWrapper.querySelector('.pdp-part-fit-make-list').addEventListener('click', (e) => {
-    const target = e.target.closest('.pdp-part-fit-make-list-item');
+  sectionWrapper.querySelector(`.${blockName}-part-fit-make-list`).addEventListener('click', (e) => {
+    const target = e.target.closest(`.${blockName}-part-fit-make-list-item`);
     if (target) {
       if (target.classList.contains('active')) {
         target.classList.remove('active');
-        sectionWrapper.querySelectorAll('.pdp-part-fit-list-item.pdp-hide-by-filter').forEach((item) => {
-          item.classList.remove('pdp-hide-by-filter');
+        sectionWrapper.querySelectorAll(`.${blockName}-part-fit-list-item.${blockName}-hide-by-filter`).forEach((item) => {
+          item.classList.remove(`${blockName}-hide-by-filter`);
         });
       } else {
-        sectionWrapper.querySelectorAll('.pdp-part-fit-make-list-item.active').forEach((item) => {
+        sectionWrapper.querySelectorAll(`.${blockName}-part-fit-make-list-item.active`).forEach((item) => {
           item.classList.remove('active');
         });
         target.classList.add('active');
-        sectionWrapper.querySelectorAll('.pdp-part-fit-list-item').forEach((item) => {
+        sectionWrapper.querySelectorAll(`.${blockName}-part-fit-list-item`).forEach((item) => {
           if (item.dataset.make === target.textContent) {
-            item.classList.remove('pdp-hide-by-filter');
+            item.classList.remove(`${blockName}-hide-by-filter`);
           } else {
-            item.classList.add('pdp-hide-by-filter');
+            item.classList.add(`${blockName}-hide-by-filter`);
           }
         });
       }
@@ -424,12 +425,12 @@ function renderPartFit(partFitData) {
   });
 
   // search
-  sectionWrapper.querySelector('input.pdp-part-fit-search-input').addEventListener('input', (e) => {
+  sectionWrapper.querySelector(`input.${blockName}-part-fit-search-input`).addEventListener('input', (e) => {
     const query = e.target.value.toLowerCase().trim();
-    sectionWrapper.querySelectorAll('.pdp-part-fit-list-item').forEach((item) => {
+    sectionWrapper.querySelectorAll(`.${blockName}-part-fit-list-item`).forEach((item) => {
       const text = item.textContent.toLowerCase();
       const shouldHide = text.length > 0 && !text.includes(query);
-      item.classList.toggle('pdp-hide-by-search', shouldHide);
+      item.classList.toggle(`${blockName}-hide-by-search`, shouldHide);
     });
     countVisibleItems();
   });

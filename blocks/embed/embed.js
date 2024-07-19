@@ -1,5 +1,6 @@
-import { createIframe, isVideoLink } from '../../scripts/scripts.js';
+import { createIframe, isVideoLink } from '../../scripts/video-helper.js';
 
+const blockName = 'embed';
 const ratioWidth = 16;
 const ratioHeight = 9;
 const defaultWidth = '100';
@@ -11,7 +12,7 @@ export default function decorate(block) {
   // if has Width class, use that to set the ratio
   const configWidth = block.className.includes('width-')
     ? block.className.split('width-')[1].split(' ')[0] : null;
-  videoContainer.className = 'embed-video-container';
+  videoContainer.className = `${blockName}-video-container`;
   videoContainer.textContent = '';
   if (!isYTLink) {
     // eslint-disable-next-line no-console
@@ -21,9 +22,9 @@ export default function decorate(block) {
 
   if (configWidth !== null && configWidth !== defaultWidth) {
     const newRatioHeight = Math.round((ratioHeight / ratioWidth) * configWidth);
-    videoContainer.style.setProperty('--embed-video-width', `${configWidth}%`);
-    videoContainer.style.setProperty('--embed-video-height', `${newRatioHeight}%`);
+    videoContainer.style.setProperty(`--${blockName}-video-width`, `${configWidth}%`);
+    videoContainer.style.setProperty(`--${blockName}-video-height`, `${newRatioHeight}%`);
   }
 
-  createIframe(link, { parentEl: videoContainer, className: 'embed-video' });
+  createIframe(link, { parentEl: videoContainer, className: `${blockName}-video` });
 }

@@ -365,3 +365,29 @@ div.default-content-wrapper {
   left: 10%;
   width: 30%;
 }
+
+/* Section background settings */
+main .section.section--black-bg {
+  color: var(--primary-white);
+  background-color: var(--primary-black);
+}
+
+main .section.section--white-bg {
+  background-color: var(--primary-white);
+}
+
+main .section.section--secondary-red-bg {
+  color: var(--primary-white);
+  background-color: var(--secondary-red);
+}
+
+main .section.section--primary-medium-gray-bg {
+  background-color: var(--primary-medium-gray);
+}
+
+main .section.section--no-vertical-padding {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+

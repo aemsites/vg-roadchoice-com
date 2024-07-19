@@ -59,13 +59,13 @@ $filters = $('.sidebar-content #filter-options input[type="checkbox"]');        
 $consolidateFilters = window.locatorConfig.consolidateFilters;                                  // Shows "All Dealers" and "Rental & Leasing" filter options
 $viewingPin = null;                                                                             // tracks current pin in view
 $pinIcon = 'pin.svg';                                                                           // sets basic marker pin icon
-$meIcon = '/blocks/dealer-locator/images/ME.svg';                                        // sets the icon of the ME marker
+$meIcon = '/blocks/dealer-locator/images/ME.svg';                                               // sets the icon of the ME marker
 $panes = [];                                                                                    // cache all panes created
 $lastPane = "";                                                                                 // track the last pane in view
 $radiusValue = $('#range').val();                                                               // the current radius value
 $sortedPins = null;                                                                             // stores all pins by distance (miles)
 $offset = ((new Date().getTimezoneOffset()) / 60) * -1;
-$key = 'AIzaSyAP8IewqHuU8SMz_6tNiIUlbU_l0GFOd1w';
+$key = window.locatorConfig.apiKey;
 $myDealer = null;
 $wayPoints = [];
 $directionsService = null;
@@ -225,39 +225,41 @@ $hoverText = $('#hoverText').val();
       }
     );
 
-    if ($isAsist) {
-      $('#filter-options').css('display', 'none');
-      $brandOptionSelected = window.locatorConfig.selectedBrand;
-    }
+    // This is commented because $isAsist is harcoded to false in dealer-locator.js
 
-    if ($isAsist && $showAsistDialog) {
+    // if ($isAsist) {
+    //   $('#filter-options').css('display', 'none');
+    //   $brandOptionSelected = window.locatorConfig.selectedBrand;
+    // }
 
-      $(".datasource-option").toggle();
+    // if ($isAsist && $showAsistDialog) {
 
-      var options = $.map([$(".brand button#volvo"), $(".brand button#mack"), $(".brand button#dual")], function (el) { return el.get() });
-      $(options).on('click', function (ev) {
+    //   $(".datasource-option").toggle();
 
-        $id = $brandOptionSelected = $(ev.target).attr("id");
+    //   var options = $.map([$(".brand button#volvo"), $(".brand button#mack"), $(".brand button#dual")], function (el) { return el.get() });
+    //   $(options).on('click', function (ev) {
 
-        switch ($id) {
-          case "mack":
-            window.locatorConfig.dataSource = "https://www.macktrucks.com/simpleprox.ashx?https://mvservices.na.volvogroup.com/DealerJSON_new.ashx";
-            break;
+    //     $id = $brandOptionSelected = $(ev.target).attr("id");
 
-          case "volvo":
-            window.locatorConfig.dataSource = "https://www.macktrucks.com/simpleprox.ashx?https://mvservices.na.volvogroup.com/Volvo_DealerJSON.ashx";
-            break;
+    //     switch ($id) {
+    //       case "mack":
+    //         window.locatorConfig.dataSource = "https://www.macktrucks.com/simpleprox.ashx?https://mvservices.na.volvogroup.com/DealerJSON_new.ashx";
+    //         break;
 
-          case "dual":
-            window.locatorConfig.dataSource = "https://www.macktrucks.com/simpleprox.ashx?https://mvservices.na.volvogroup.com/Dualbrand_DealerJSON.ashx";
-            break;
-        }
+    //       case "volvo":
+    //         window.locatorConfig.dataSource = "https://www.macktrucks.com/simpleprox.ashx?https://mvservices.na.volvogroup.com/Volvo_DealerJSON.ashx";
+    //         break;
 
-        $.fn.loadPins();
+    //       case "dual":
+    //         window.locatorConfig.dataSource = "https://www.macktrucks.com/simpleprox.ashx?https://mvservices.na.volvogroup.com/Dualbrand_DealerJSON.ashx";
+    //         break;
+    //     }
 
-        $(".datasource-option").toggle();
-      });
-    }
+    //     $.fn.loadPins();
+
+    //     $(".datasource-option").toggle();
+    //   });
+    // }
 
   }
 })();
@@ -292,7 +294,7 @@ $.fn.loadPins = function () {
   $markers = [];
 
   if (!window.locatorConfig.dataSource) {
-    window.locatorConfig.dataSource = '/simpleprox.ashx?https://as-dealerloc-endpoint-prod-001.azurewebsites.net/Mack_DealerJSON.ashx';
+    window.locatorConfig.dataSource = `/simpleprox.ashx?${window.locatorConfig.backupUrl}`;
   }
 
   $.ajax({

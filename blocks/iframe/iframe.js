@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { createElement } from '../../scripts/scripts.js';
+import { createElement } from '../../scripts/common.js';
 
 export default async function decorate(block) {
   const link = block.querySelector('a')?.getAttribute('href');

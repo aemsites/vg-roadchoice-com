@@ -3,8 +3,8 @@ import {
   buildBlock,
   loadHeader,
   loadFooter,
-  decorateIcons,
   decorateBlocks,
+  decorateBlock,
   decorateTemplateAndTheme,
   getMetadata,
   waitForLCP,
@@ -15,7 +15,21 @@ import {
   toCamelCase,
   toClassName,
   loadScript,
+  createOptimizedPicture,
 } from './lib-franklin.js';
+
+import {
+  addFavIcon,
+  createElement,
+  decorateIcons,
+  getPlaceholders,
+  loadDelayed,
+  slugify,
+  variantsClassesToBEM,
+} from './common.js';
+
+const disableHeader = getMetadata('disable-header').toLowerCase() === 'true';
+const disableFooter = getMetadata('disable-footer').toLowerCase() === 'true';
 
 /**
  * Add the image as background
@@ -28,39 +42,6 @@ function addBackgroundImage(section, picture) {
 }
 
 /**
- * Create an element with the given id and classes.
- * @param {string} tagName the tag
- * @param {Object} options the element options
- * @param {string[]|string} [options.classes=[]] the class or classes to add
- * @param {Object.<string, string>} [options.props={}] any other attributes to add to the element
- * @param {string} [options.textContent=null] add text content into the element
- * @returns {HTMLElement} the element
- */
-export function createElement(tagName, options = {}) {
-  const { classes = [], props = {}, textContent = null } = options;
-  const elem = document.createElement(tagName);
-  const isString = typeof classes === 'string';
-  if (classes || (isString && classes !== '') || (!isString && classes.length > 0)) {
-    const classesArr = isString ? [classes] : classes;
-    elem.classList.add(...classesArr);
-  }
-  if (!isString && classes.length === 0) elem.removeAttribute('class');
-
-  if (props) {
-    Object.keys(props).forEach((propName) => {
-      const value = propName === props[propName] ? '' : props[propName];
-      elem.setAttribute(propName, value);
-    });
-  }
-
-  if (textContent) {
-    elem.textContent = textContent;
-  }
-
-  return elem;
-}
-
-/**
  * Decorates all sections in a container element.
  * @param {Element} main The container element
  */
@@ -70,7 +51,7 @@ export function decorateSections(main) {
     let defaultContent = false;
     [...section.children].forEach((e) => {
       if (e.tagName === 'DIV' || !defaultContent) {
-        const wrapper = createElement('div');
+        const wrapper = document.createElement('div');
         wrappers.push(wrapper);
         defaultContent = e.tagName !== 'DIV';
         if (defaultContent) wrapper.classList.add('default-content-wrapper');
@@ -103,32 +84,123 @@ export function decorateSections(main) {
 }
 
 /**
- * Decorates paragraphs containing a single link as buttons.
- * @param {Element} element container element
+ * Reparents all child elements of a given element to its parent element.
+ * @param {Element} element - The element whose children need to be reparented.
  */
-export function decorateButtons(element) {
+const reparentChildren = (element) => {
+  const parent = element.parentNode;
+  while (element.firstChild) {
+    parent.insertBefore(element.firstChild, element);
+  }
+  element.remove();
+};
+
+/**
+ * Determines the appropriate button class based on the element hierarchy.
+ * @param {Element} up - The parent element of the anchor tag.
+ * @param {Element} twoUp - The grandparent element of the anchor tag.
+ * @returns {string} - The button class to be applied.
+ */
+const getButtonClass = (up, twoUp) => {
+  const isSingleChild = (element) => element.childNodes.length === 1;
+
+  const upTag = up.tagName;
+  const twoUpTag = twoUp.tagName;
+
+  if (isSingleChild(twoUp)) {
+    if (upTag === 'STRONG' && twoUpTag === 'P') return 'button button--primary';
+    if (upTag === 'STRONG' && twoUpTag === 'LI') return 'button arrowed';
+    if (upTag === 'EM' && twoUpTag === 'P') return 'button button--secondary';
+  }
+
+  if ((upTag === 'STRONG' || upTag === 'EM') && (twoUpTag === 'STRONG' || twoUpTag === 'EM')) {
+    return 'button button--red';
+  }
+
+  return '';
+};
+
+/**
+ * Adds the 'button-container' class to an element if it meets certain criteria.
+ * @param {Element} element - The element to add the class to.
+ */
+const addClassToContainer = (element) => {
+  if (element.childNodes.length === 1 && ['P', 'DIV', 'LI'].includes(element.tagName)) {
+    element.classList.add('button-container');
+  }
+};
+
+/**
+ * Handles the decoration of a single link element.
+ * @param {HTMLAnchorElement} link - The anchor tag to decorate.
+ */
+const handleLinkDecoration = (link) => {
+  const up = link.parentElement;
+  const twoUp = up.parentElement;
+  const threeUp = twoUp.parentElement;
+
+  if (getMetadata('style') === 'redesign-v2') {
+    if (['STRONG', 'EM'].includes(up.tagName)) reparentChildren(up);
+    if (['STRONG', 'EM'].includes(twoUp.tagName)) reparentChildren(twoUp);
+
+    const buttonClass = getButtonClass(up, twoUp);
+    if (buttonClass) link.className = `${buttonClass}`;
+
+    addClassToContainer(up);
+    addClassToContainer(twoUp);
+    addClassToContainer(threeUp);
+  } else {
+    // TODO: remove v1 button decoration logic when v2 is fully used
+    if (up.tagName === 'P' || up.tagName === 'DIV') {
+      link.className = 'button button--primary'; // default
+      up.className = 'button-container';
+    }
+    if (up.tagName === 'STRONG' && twoUp.childNodes.length === 1 && twoUp.tagName === 'P') {
+      link.className = 'button button--primary';
+      twoUp.className = 'button-container';
+    }
+    if (up.tagName === 'EM' && twoUp.childNodes.length === 1 && twoUp.tagName === 'P') {
+      link.className = 'button button--secondary';
+      twoUp.className = 'button-container';
+    }
+    if (up.tagName === 'STRONG' && twoUp.childNodes.length === 1 && twoUp.tagName === 'LI') {
+      const arrow = createElement('span', { classes: ['fa', 'fa-arrow-right'] });
+      link.className = 'button arrowed';
+      twoUp.parentElement.className = 'button-container';
+      link.appendChild(arrow);
+    }
+    if (up.tagName === 'LI' && twoUp.children.length === 1
+      && link.children.length > 0 && link.firstElementChild.tagName === 'STRONG') {
+      const arrow = createElement('span', { classes: ['fa', 'fa-arrow-right'] });
+      link.className = 'button arrowed';
+      twoUp.className = 'button-container';
+      link.appendChild(arrow);
+    }
+  }
+};
+
+/**
+ * Checks if an anchor tag should be decorated as a button.
+ * @param {HTMLAnchorElement} link - The anchor tag to check.
+ * @returns {boolean} - Returns true if the link should be decorated, otherwise false.
+ */
+const shouldDecorateLink = (link) => {
+  link.title = link.title || link.textContent;
+  return link.href !== link.textContent && !link.querySelector('img') && link.parentElement.childNodes.length === 1;
+};
+
+/**
+ * Applies button styling to anchor tags within a specified element,
+ * decorating them as button-like if they meet certain criteria.
+ * @param {Element} element - The container element within which to search and style anchor tags.
+ */
+export const decorateButtons = (element) => {
   element.querySelectorAll('a').forEach((link) => {
-    link.title = link.title || link.textContent;
-    if (link.href !== link.textContent) {
-      const up = link.parentElement;
-      const twoup = link.parentElement.parentElement;
-      if (!link.querySelector('img') && up.childNodes.length === 1) {
-        if (up.tagName === 'P' || up.tagName === 'DIV') {
-          link.className = 'button primary'; // default
-          up.className = 'button-container';
-        }
-        if (up.tagName === 'STRONG' && twoup.childNodes.length === 1 && twoup.tagName === 'P') {
-          link.className = 'button primary';
-          twoup.className = 'button-container';
-        }
-        if (up.tagName === 'EM' && twoup.childNodes.length === 1 && twoup.tagName === 'P') {
-          link.className = 'button secondary';
-          twoup.className = 'button-container';
-        }
-      }
+    if (shouldDecorateLink(link)) {
+      handleLinkDecoration(link);
     }
   });
-}
+};
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 window.hlx.RUM_GENERATION = 'project-1'; // add your RUM generation information here
@@ -139,25 +211,6 @@ window.mack.newsData = window.mack.newsData || {
   allLoaded: false,
 };
 
-let placeholders = null;
-
-async function getPlaceholders() {
-  placeholders = await fetch('/placeholder.json').then((resp) => resp.json());
-}
-
-/**
- * Returns the text label for the given key from the placeholder data.
- * @param {string} key The key
- * @returns {string} The text label from data or the key if not found
- */
-export function getTextLabel(key) {
-  return placeholders?.data.find((el) => el.Key === key)?.Text || key;
-}
-
-/**
-* add a link to the previous image
-* @param {Element} node the image container element
-*/
 export function findAndCreateImageLink(node) {
   const links = node.querySelectorAll('picture ~ a');
 
@@ -185,16 +238,18 @@ function buildHeroBlock(main) {
   const header = main.querySelector('h1');
   const picture = main.querySelector('picture');
   const isCarousel = header?.closest('.carousel');
-  const heroBlock = main.querySelector('.hero');
+  const heroBlock = main.querySelector('.hero, .v2-hero');
 
   if (isCarousel || heroBlock) {
     return;
   }
 
+  if (heroBlock) return;
+  // eslint-disable-next-line no-bitwise
   if (header && picture
     // eslint-disable-next-line no-bitwise
     && (header.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
-    const section = createElement('div');
+    const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, header] }));
     section.querySelector('.hero').classList.add('auto-block');
     main.prepend(section);
@@ -209,6 +264,15 @@ function buildSearchForm(main, head) {
   main.prepend(section);
 }
 
+function buildSubNavigation(main, head) {
+  const subnav = head.querySelector('meta[name="sub-navigation"]');
+  if (subnav && subnav.content.startsWith('/')) {
+    const block = buildBlock('sub-nav', []);
+    main.previousElementSibling.prepend(block);
+    decorateBlock(block);
+  }
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -218,6 +282,7 @@ function buildAutoBlocks(main, head) {
     buildHeroBlock(main);
     if (head) {
       buildSearchForm(main, head);
+      buildSubNavigation(main, head);
     }
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -246,11 +311,111 @@ export function decorateLinks(block) {
       }
 
       const url = new URL(link.href);
-      const external = !url.host.match('roadchoice.com') && !url.host.match('.hlx.(page|live)') && !url.host.match('localhost');
-      if (url.pathname.endsWith('.pdf') || external) {
+      const external = !url.host.match('roadchoice.com')
+      && !url.host.match('.hlx.(page|live)')
+      && !url.host.match('.aem.(page|live)')
+      && !url.host.match('localhost');
+      if (url.host.match('build.roadchoice.com') || url.pathname.endsWith('.pdf') || external) {
         link.target = '_blank';
       }
     });
+}
+
+function decorateSectionBackgrounds(main) {
+  const variantClasses = [
+    'black-bg',
+    'white-bg',
+    'primary-red-bg',
+    'primary-medium-gray-bg',
+    'secondary-red-bg',
+    'no-vertical-padding',
+  ];
+
+  main.querySelectorAll(':scope > .section').forEach((section) => {
+    // transform background color variants into BEM classnames
+    variantsClassesToBEM(section.classList, variantClasses, 'section');
+
+    // If the section contains a background image
+    const src = section.dataset.backgroundImage;
+
+    if (src) {
+      const picture = createOptimizedPicture(src, '', false);
+      section.prepend(picture);
+      section.classList.add('section--with-background');
+    }
+  });
+}
+
+const createInpageNavigation = (main) => {
+  const navItems = [];
+  const tabItemsObj = [];
+
+  // Extract the inpage navigation info from sections
+  [...main.querySelectorAll(':scope > div')].forEach((section) => {
+    const title = section.dataset.inpage;
+    if (title) {
+      const countDuplcated = tabItemsObj.filter((item) => item.title === title)?.length || 0;
+      const order = parseFloat(section.dataset.inpageOrder);
+      const anchorID = (countDuplcated > 0) ? slugify(`${section.dataset.inpage}-${countDuplcated}`) : slugify(section.dataset.inpage);
+      const obj = {
+        title,
+        id: anchorID,
+      };
+
+      if (order) {
+        obj.order = order;
+      }
+
+      tabItemsObj.push(obj);
+
+      // Set section with ID
+      section.dataset.inpageid = anchorID;
+    }
+  });
+
+  // Sort the object by order
+  const sortedObject = tabItemsObj.slice().sort((obj1, obj2) => {
+    const order1 = obj1.order ?? Infinity; // Fallback to a large number if 'order' is not present
+    const order2 = obj2.order ?? Infinity;
+
+    return order1 - order2;
+  });
+
+  // From the array of objects create the DOM
+  sortedObject.forEach((item) => {
+    const subnavItem = createElement('div');
+    const subnavLink = createElement('button', {
+      props: {
+        'data-id': item.id,
+        title: item.title,
+      },
+    });
+
+    subnavLink.textContent = item.title;
+
+    subnavItem.append(subnavLink);
+    navItems.push(subnavItem);
+  });
+
+  return navItems;
+};
+
+export function buildInpageNavigationBlock(main, classname) {
+  const items = createInpageNavigation(main);
+
+  if (items.length > 0) {
+    const section = createElement('div');
+    Object.assign(section.style, {
+      height: '48px',
+      overflow: 'hidden',
+    });
+
+    section.append(buildBlock(classname, { elems: items }));
+    // insert in second position, assumption is that Hero should be first
+    main.insertBefore(section, main.children[1]);
+
+    decorateBlock(section.querySelector(`.${classname}`));
+  }
 }
 
 /**
@@ -259,12 +424,21 @@ export function decorateLinks(block) {
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main, head) {
+  if (head) {
+    const pageStyle = head.querySelector('[name="style"]')?.content;
+    if (pageStyle) {
+      pageStyle.split(',')
+        .map((style) => toClassName(style.trim()))
+        .forEach((style) => main.classList.add(style));
+    }
+  }
   // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main, head);
   decorateSections(main);
   decorateBlocks(main);
+  decorateSectionBackgrounds(main);
   decorateLinks(main);
 }
 
@@ -303,33 +477,14 @@ async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
+  const { head } = doc;
   if (main) {
-    decorateMain(main, doc.head);
+    decorateMain(main, head);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
 
   await getPlaceholders();
-}
-
-/**
- * Adds the favicon.
- * @param {string} href The favicon URL
- */
-export function addFavIcon(href) {
-  const link = createElement('link', {
-    props: {
-      rel: 'icon',
-      type: 'image/svg+xml',
-      href,
-    },
-  });
-  const existingLink = document.querySelector('head link[rel="icon"]');
-  if (existingLink) {
-    existingLink.parentElement.replaceChild(link, existingLink);
-  } else {
-    document.getElementsByTagName('head')[0].appendChild(link);
-  }
 }
 
 /**
@@ -346,12 +501,15 @@ async function loadLazy(doc) {
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
-
   const header = doc.querySelector('header');
   const subnav = header.querySelector('.block.sub-nav');
 
-  loadHeader(header);
-  loadFooter(doc.querySelector('footer'));
+  if (!disableHeader) {
+    loadHeader(header);
+  }
+  if (!disableFooter) {
+    loadFooter(doc.querySelector('footer'));
+  }
 
   if (subnav) {
     loadBlock(subnav);
@@ -365,16 +523,6 @@ async function loadLazy(doc) {
   sampleRUM.observe(main.querySelectorAll('picture > img'));
 }
 
-/**
- * Loads everything that happens a lot later,
- * without impacting the user experience.
- */
-function loadDelayed() {
-  // eslint-disable-next-line import/no-cycle
-  window.setTimeout(() => import('./delayed.js'), 3000);
-  // load anything that can be postponed to the latest here
-}
-
 async function loadPage() {
   await loadEager(document);
   await loadLazy(document);
@@ -383,54 +531,9 @@ async function loadPage() {
 
 loadPage();
 
-/** Helper functions */
-// video helpers
-
-/**
- * Checks if the link is an embedded video link from YouTube
- * @param {Element} link the link to check
- * @returns {boolean} true if the link is a YouTube video link
- */
-export function isVideoLink(link) {
-  const linkString = link.getAttribute('href');
-  return (linkString.includes('youtube.com/embed/'));
-}
-
-/**
- * Creates an iframe element with the specified URL and appends it to the specified parent element.
- * @param {string} url - The URL to load in the iframe.
- * @param {Object} options - An object containing optional parameters.
- * @param {HTMLElement} options.parentEl - The parent element to append the iframe to.
- * @param {string[]} options.classes - An array of CSS class names to apply to the iframe.
- * @returns {HTMLIFrameElement} The created iframe element.
-*/
-export function createIframe(url, { parentEl, classes = [] }) {
-  // iframe must be recreated every time otherwise the new history record would be created
-  const iframe = createElement('iframe', {
-    classes,
-    props: {
-      frameborder: '0',
-      allowfullscreen: 'allowfullscreen',
-      src: url,
-    },
-  });
-
-  if (parentEl) {
-    parentEl.appendChild(iframe);
-  }
-
-  return iframe;
-}
-
 /* this function load script only when it wasn't loaded yet */
 const scriptMap = new Map();
 
-/**
- * Loads script and returns a promise that resolves when the script is loaded.
- * @param {string} url - The URL of the script to load.
- * @param {Object} attrs - An object containing optional parameters.
- * @returns {Promise} A promise that resolves when the script is loaded.
- */
 export function loadScriptIfNotLoadedYet(url, attrs) {
   if (scriptMap.has(url)) {
     return scriptMap.get(url).promise;
@@ -443,11 +546,11 @@ export function loadScriptIfNotLoadedYet(url, attrs) {
 
 /**
  * Creates a new block element with the specified name and content, and loads it into the page.
+ *
  * @param {string} blockName - block name with '-' instead of spaces
  * @param {string} blockContent - the content that will be set as block inner HTML
  * @param {object} options - other options like variantsClasses
- * @param {string[]} options.variantsClasses - An array of CSS class names to apply to the block.
- * @returns {HTMLElement} The created block element.
+ * @returns
  */
 export function loadAsBlock(blockName, blockContent, options = {}) {
   const { variantsClasses = [] } = options;
@@ -557,196 +660,12 @@ export function debounce(func, timeout = 200) {
 }
 
 /**
- * Returns the children of an element
  * @param {NodeList} elements list of tested elements
- * @param {String} childrenCheck check that will be ran for every element list
+ * @param {String} childrenCheck check that will be run for every element list
+ * @param {boolean} [isOpposite=false] Flag to contemplate an edge case that is the opposite case
  * @returns list of elements that pass the children check
  */
-export function getAllElWithChildren(elements, childrenCheck) {
+export function getAllElWithChildren(elements, childrenCheck, isOpposite = false) {
+  if (isOpposite) return [...elements].filter((el) => !el.querySelector(childrenCheck));
   return [...elements].filter((el) => el.querySelector(childrenCheck));
 }
-
-/**
- * Adds attributes to all anchors and buttons that start with properties between [ brackets ]
- * @param {NodeList} links list of links to check if have properties to add as attributes
- */
-export function checkLinkProps(links) {
-  links.forEach((link) => {
-    const linkText = link.innerText;
-    if (linkText[0] !== '[') return;
-    const brackets = linkText.match(/^\[(.*?)\]/);
-    const rawProperties = brackets && brackets[1];
-    const propertyArray = rawProperties?.split(',');
-    propertyArray?.forEach((prop) => {
-      prop.trimStart();
-      /* Check if this link should open in new tab */
-      if (prop === 'new-tab') {
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-      }
-    });
-    const firstDashIndex = linkText.indexOf(']');
-    const selectedText = linkText.slice(firstDashIndex + 1);
-    link.title = selectedText;
-    link.innerText = selectedText;
-  });
-}
-
-const allLinks = [...document.querySelectorAll('a'), ...document.querySelectorAll('button')];
-checkLinkProps(allLinks);
-
-// fetch data helpers
-
-/**
- * Returns a list of properties listed in the block
- * @param {string} route get the Json data from the route
- * @returns {Object} the json data object
-*/
-export const getJsonFromUrl = async (route) => {
-  try {
-    const response = await fetch(route, {
-      method: 'GET',
-      headers: {
-        'Accept-Encoding': 'gzip',
-      },
-    });
-    if (!response.ok) return null;
-    const json = await response.json();
-    return json;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('getJsonFromUrl:', { error });
-  }
-  return null;
-};
-
-/**
- * Save the fetched data in a temporary array
-*/
-const tempData = [];
-/**
- * The default limit of the fetched data
- */
-export const defaultLimit = 100_000;
-
-/**
- * Returns a list of properties listed in the block
- * @param {Object} props the block props
- * @param {string} props.url get the Json data from the route
- * @param {number} props.offset the offset of the data
- * @param {number} props.limit the limit of the data
- * @returns {Object} the json data object
-*/
-const getInitialJSONData = async (props) => {
-  try {
-    const { url, offset = 0, limit = null } = props;
-    const nextOffset = offset > 0 ? `?offset=${offset}` : '';
-    const nextLimit = limit ? `${offset > 0 ? '&' : '?'}limit=${limit}` : '';
-    const results = await fetch(`${url}${nextOffset}${nextLimit}`, {
-      method: 'GET',
-      headers: {
-        'Accept-Encoding': 'gzip',
-      },
-    });
-    const json = await results.json();
-    return json;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('getInitialJSONData:', { error });
-    return null;
-  }
-};
-
-/**
- * Returns a more data if the limit is reached
- * @param {string} url get the Json data from the route
- * @param {number} total the total of the data
- * @param {number} offset the offset of the data
- * @param {number} limit the limit of the data
- * @returns {Object} the json data object
- * @example getMoreJSONData('https://roadchoice.com/api/news', 1000, 0, 100_000)
-*/
-async function getMoreJSONData(url, total, offset = 0, limit = defaultLimit) {
-  try {
-    const newOffset = offset + limit;
-    const json = await getInitialJSONData({ url, offset: newOffset, limit });
-    const isLastCall = json.offset + limit >= json.total;
-    if (isLastCall) {
-      const lastData = [...tempData, ...json.data];
-      tempData.length = 0;
-      return lastData;
-    }
-    tempData.push(...json.data);
-    return getMoreJSONData(total, newOffset);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('getMoreJSONData:', { error });
-    return null;
-  }
-}
-
-/**
- * Return the data from the url if it has more than the default limit
- * @param {Object} props the block props
- * @param {string} props.url get the Json data from the route
- * @param {number} props.offset the offset of the data
- * @param {number} props.limit the limit of the data
- * @returns {Object} the json data object
- * @example getLongJSONData({ url:'https://roadchoice.com/api/news', limit: 100_000, offset: 1000})
- */
-export const getLongJSONData = async (props) => {
-  const { url } = props;
-  const json = await getInitialJSONData(props);
-  if (!json) return null;
-  const initialData = [...json.data];
-  let moreData;
-  if (json.total > json.limit) {
-    moreData = await getMoreJSONData(url, json.total);
-  }
-  return moreData ? [...initialData, ...moreData] : initialData;
-};
-
-/**
- * Launch the search worker to load all the products
- * @returns {Worker} the search worker
- */
-export function loadWorker() {
-  // updated
-  const worker = new Worker('/blocks/search/worker.js', { type: 'module' });
-  // this just launch the worker, and the message listener is triggered in another script
-  worker.postMessage('run');
-  // this enable the search in any page
-  worker.onmessage = (e) => { window.allProducts = e.data; };
-  return worker;
-}
-
-/**
- * checks for p elements for different configurations
- * space -> [*space*]
- * button -> [*button*] (id) text content
-*/
-//  EXAMPLES:
-//  - white spacing required in document -> [*space*]
-//  - button with id -> [*button*] (cookie preference) Cookie preference center
-
-(() => {
-  const pElements = document.querySelectorAll('p');
-  pElements.forEach((el) => {
-    if (el.textContent === '[*space*]') {
-      const spaceSpan = createElement('span', { classes: 'space' });
-      el.replaceWith(spaceSpan);
-    }
-    if (el.textContent.includes('[*button*]')) {
-      const id = el.textContent.match(/\((.*?)\)/)[1].toLowerCase().replace(/\s/g, '-');
-      const textContent = el.textContent.split(')')[1].trim();
-      const newBtn = createElement('a', {
-        classes: ['button', 'primary'],
-        props: { id },
-        textContent,
-      });
-      el.textContent = '';
-      el.classList.add('button-container');
-      el.appendChild(newBtn);
-    }
-  });
-})();

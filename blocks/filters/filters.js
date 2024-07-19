@@ -1,10 +1,11 @@
-import { getTextLabel, createElement } from '../../scripts/scripts.js';
+import { getTextLabel, createElement } from '../../scripts/common.js';
 
+const blockName = 'filters';
 let products;
-const titleContent = getTextLabel('Categories');
 const isSearchResult = document.querySelector('.search-results') !== null;
 const urlCategory = new URLSearchParams(window.location.search).get('cat');
 const total = +sessionStorage.getItem('total-results-amount') || null;
+const categoriesText = getTextLabel('categories_label');
 
 if (isSearchResult) products = JSON.parse(sessionStorage.getItem('results')) || [];
 
@@ -35,8 +36,9 @@ const reduceCategories = (cats) => {
 };
 
 const buildFilter = (cats) => {
-  const section = createElement('div', { classes: 'filter-section' });
-  const title = createElement('h3', { classes: 'title', textContent: titleContent });
+  const section = createElement('div', { classes: `${blockName}-section` });
+  const title = createElement('h3', { classes: 'title' });
+  title.textContent = categoriesText;
   const list = createElement('ul', { classes: 'list' });
   const currentUrl = new URL(window.location.href);
   const urlParams = new URLSearchParams(currentUrl.search);
@@ -49,8 +51,8 @@ const buildFilter = (cats) => {
     const link = createElement('a', {
       classes: 'categories-link',
       props: { href: filterUrl },
-      textContent: `${category.toLowerCase()} (${amount})`,
     });
+    link.textContent = `${category.toLowerCase()} (${amount})`;
     item.appendChild(link);
     list.appendChild(item);
   });
@@ -60,7 +62,7 @@ const buildFilter = (cats) => {
 };
 
 const decorateFilter = (block) => {
-  const filtersSection = createElement('div', { classes: 'filters-wrapper' });
+  const filtersSection = createElement('div', { classes: `${blockName}-wrapper` });
 
   const categories = reduceCategories(products);
 

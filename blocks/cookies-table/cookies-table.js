@@ -1,16 +1,14 @@
-import {
-  createElement,
-  getJsonFromUrl,
-} from '../../scripts/scripts.js';
+import { createElement, getJsonFromUrl } from '../../scripts/common.js';
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
 
+const blockName = 'cookies-table';
 const rowsToDelete = ['type', 'bold'];
 
 const buildHeaders = (headers) => {
-  const tableRow = createElement('tr', { classes: 'cookie-table-row' });
+  const tableRow = createElement('tr', { classes: `${blockName}-row` });
   headers.forEach((header, idx) => {
     if (rowsToDelete.includes(header)) return null;
-    const head = createElement('th', { classes: ['cookie-table-head', `t-${idx}`] });
+    const head = createElement('th', { classes: [`${blockName}-head`, `t-${idx}`] });
     head.textContent = header.replace('-', ' ');
     tableRow.appendChild(head);
     return null;
@@ -21,12 +19,12 @@ const buildHeaders = (headers) => {
 const buildData = (data) => {
   const tableRows = [];
   data.forEach((e) => {
-    const tableRow = createElement('tr', { classes: 'cookie-table-row' });
+    const tableRow = createElement('tr', { classes: `${blockName}-row` });
     const boldValue = e[e.bold];
     rowsToDelete.forEach((row) => delete e[row]);
     const values = Object.values(e);
     values.forEach((value, idx) => {
-      const cell = createElement('td', { classes: ['cookie-table-cell', `t-${idx}`] });
+      const cell = createElement('td', { classes: [`${blockName}-cell`, `t-${idx}`] });
       if (value === boldValue) cell.classList.add('bold-red');
       cell.textContent = value.replace('-', ' ');
       tableRow.appendChild(cell);
@@ -46,7 +44,7 @@ export default async function decorate(block) {
   const selectedCookies = allCookies.filter((cookie) => cookie.type === type);
   const headers = Object.keys(selectedCookies[0]);
 
-  const table = createElement('table', { classes: 'cookie-table' });
+  const table = createElement('table');
 
   const tableHeaders = buildHeaders(headers);
   const tableData = buildData(selectedCookies);

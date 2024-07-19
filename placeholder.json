@@ -1,22 +1,22 @@
 {
-  "total": 21,
+  "total": 26,
   "offset": 0,
-  "limit": 21,
+  "limit": 26,
   "data": [
     {
-      "Key": "brand name",
+      "Key": "brand_name",
       "Text": "Road Choice"
     },
     {
-      "Key": "recommendations title",
+      "Key": "recommendations_title",
       "Text": "Blog[/]You may also like..."
     },
     {
-      "Key": "read more",
+      "Key": "read_more",
       "Text": "READ MORE"
     },
     {
-      "Key": "blog pagination number",
+      "Key": "blog_pagination_number",
       "Text": "There are [$] results"
     },
     {
@@ -24,56 +24,76 @@
       "Text": "First[/]Previous[/]Next[/]Last"
     },
     {
-      "Key": "Cross-Reference No",
+      "Key": "cross-reference_number",
       "Text": "Cross-Reference No"
     },
     {
-      "Key": "Part No",
+      "Key": "part_number_or_description",
       "Text": "Part No or Description"
     },
     {
-      "Key": "Part Number Label",
+      "Key": "part_number_slash_description",
       "Text": "Part Number/Description"
     },
     {
-      "Key": "search results title",
+      "Key": "search_results_title",
       "Text": "Search Results for"
     },
     {
-      "Key": "catalog-title",
-      "Text": "Catalog[/]Spanish[/]French[/]PRODUCT SHEETS AND MORE"
-    },
-    {
-      "Key": "part number",
+      "Key": "part_number",
       "Text": "Part Number"
     },
     {
-      "Key": "pagination text",
+      "Key": "pagination_text",
       "Text": "Showing top [$] results"
     },
     {
-      "Key": "pagination button",
+      "Key": "pagination_button",
       "Text": "Show More"
     },
     {
-      "Key": "Categories",
+      "Key": "categories_label",
       "Text": "Categories"
     },
     {
-      "Key": "no results title",
-      "Text": "SORRY, YOUR SEARCH FOR \"[$]\" RETURNED NO RESULTS!"
+      "Key": "no_results_title",
+      "Text": "SORRY, YOUR SEARCH FOR [$] RETURNED NO RESULTS!"
     },
     {
-      "Key": "no results subtitle",
+      "Key": "no_results_subtitle",
       "Text": "LET'S REFINE, OR TRY SEARCHING BY CROSS-REFERENCE INSTEAD."
     },
     {
-      "Key": "no results need help",
+      "Key": "no_results_need_help",
       "Text": "NEED HELP FINDING YOUR PART?"
     },
     {
-      "Key": "no results contact us",
+      "Key": "no_results_contact_us",
       "Text": "contact us at"
+    },
+    {
+      "Key": "category_filters_title",
+      "Text": "Filters"
+    },
+    {
+      "Key": "category_filters_clear_button",
+      "Text": "Clear Filters"
+    },
+    {
+      "Key": "category_filters_apply_button",
+      "Text": "Apply"
+    },
+    {
+      "Key": "loading_label",
+      "Text": "Loading..."
+    },
+    {
+      "Key": "low_res_video_message",
+      "Text": "For a premium high resolution experience, please accept cookies."
+    },
+    {
+      "Key": "change_cookie_settings",
+      "Text": "Change cookie settings"
     },
     {
       "Key": "en",

@@ -1,9 +1,10 @@
-/* eslint-disable object-curly-newline */
-import { createElement, getJsonFromUrl as getFiltersData, getTextLabel } from '../../scripts/scripts.js';
+import { createElement, getJsonFromUrl, getTextLabel } from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/lib-franklin.js';
 
 const langLocale = getMetadata('i18n');
 const i18nPath = langLocale ? `/${langLocale}` : '';
+
+const blockName = 'search';
 let isCrossRefActive = true;
 let noOthersItems;
 const modelsItems = [];
@@ -15,9 +16,9 @@ let fitInStorage = true;
 export const fitAmount = 5000;
 
 const PLACEHOLDERS = {
-  crossReference: getTextLabel('Cross-Reference No'),
-  partNumber: getTextLabel('Part No'),
-  partNumberLabel: getTextLabel('Part Number Label'),
+  crossReference: getTextLabel('cross-reference_number'),
+  partNumber: getTextLabel('part_number_or_description'),
+  partNumberLabel: getTextLabel('part_number_slash_description'),
 };
 
 const TEMPLATES = {
@@ -88,18 +89,18 @@ function addSearchByListeners(wrapper, form) {
   wrapper.onclick = (e) => {
     if (e.target.classList.contains('active')) return;
     // swap between search-by buttons
-    form.querySelector('.search__cross-reference__btn').classList.toggle('active', !isCrossRefActive);
-    form.querySelector('.search__part-number__btn').classList.toggle('active', isCrossRefActive);
+    form.querySelector(`.${blockName}__cross-reference__btn`).classList.toggle('active', !isCrossRefActive);
+    form.querySelector(`.${blockName}__part-number__btn`).classList.toggle('active', isCrossRefActive);
     isCrossRefActive = !isCrossRefActive;
     // swap inputs and filters
-    form.querySelector('.search__filters-input__container').classList.toggle('hide', isCrossRefActive);
-    form.querySelector('.search__input-cr__container').classList.toggle('hide', !isCrossRefActive);
+    form.querySelector(`.${blockName}__filters-input__container`).classList.toggle('hide', isCrossRefActive);
+    form.querySelector(`.${blockName}__input-cr__container`).classList.toggle('hide', !isCrossRefActive);
     // remove the value from the not active input
-    form.querySelector(`.search__input-${isCrossRefActive ? 'pn' : 'cr'}__input`).value = '';
+    form.querySelector(`.${blockName}__input-${isCrossRefActive ? 'pn' : 'cr'}__input`).value = '';
     // reset filters
     if (isCrossRefActive) {
-      form.querySelector('.search__make-filter__select').selectedIndex = 0;
-      resetModelsFilter(form.querySelector('.search__model-filter__select'));
+      form.querySelector(`.${blockName}__make-filter__select`).selectedIndex = 0;
+      resetModelsFilter(form.querySelector(`.${blockName}__model-filter__select`));
     }
   };
 }
@@ -117,10 +118,10 @@ function populateFilter(select, items) {
 }
 
 async function getAndApplyFiltersData(form) {
-  const makeSelect = form.querySelector('.search__make-filter__select');
-  const modelsSelect = form.querySelector('.search__model-filter__select');
+  const makeSelect = form.querySelector(`.${blockName}__make-filter__select`);
+  const modelsSelect = form.querySelector(`.${blockName}__model-filter__select`);
   const makeItems = [];
-  const filters = await getFiltersData(FILTERS_DATA);
+  const filters = await getJsonFromUrl(FILTERS_DATA);
   const { data } = filters;
   if (!data) return;
   data.forEach((item) => {
@@ -191,7 +192,14 @@ function filterByBasePartNumber(results) {
   return filteredResults;
 }
 
-function filterPNByColumn({ column, data, value, make, model, results }) {
+function filterPNByColumn({
+  column,
+  data,
+  value,
+  make,
+  model,
+  results,
+}) {
   let tempResults = data.filter((item) => new RegExp(`.*${value.trim()}.*`, 'i').test(item[column]));
   if (make === 'others' && tempResults.length > 0) {
     tempResults = filterByOthersMake(tempResults, make);
@@ -211,11 +219,15 @@ export function searchPartNumValue(value, make, model, data = pnData) {
   const results = new Set();
   if (value.trim() === '' && make === 'null' && model === 'null') return [];
   partNumberBrands.forEach((brand) => {
-    filterPNByColumn({ column: brand, data, value, make, model, results });
+    filterPNByColumn({
+      column: brand, data, value, make, model, results,
+    });
   });
   // search by Description aka Part Name
   if (results.size === 0) {
-    filterPNByColumn({ column: 'Part Name', data, value, make, model, results });
+    filterPNByColumn({
+      column: 'Part Name', data, value, make, model, results,
+    });
   }
   return [...results];
 }
@@ -232,9 +244,9 @@ function formListener(form) {
     const ssData = ['query', 'results', 'amount'];
     const ssDataItems = [];
     const items = [...form];
-    const value = getFieldValue(`search__input-${isCrossRefActive ? 'cr' : 'pn'}__input`, items);
-    const makeFilterValue = getFieldValue('search__make-filter__select', items);
-    const modelFilterValue = getFieldValue('search__model-filter__select', items);
+    const value = getFieldValue(`${blockName}__input-${isCrossRefActive ? 'cr' : 'pn'}__input`, items);
+    const makeFilterValue = getFieldValue(`${blockName}__make-filter__select`, items);
+    const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
 
     if (!crData || !pnData) return;
     ssData.forEach((item) => sessionStorage.removeItem(item));
@@ -270,15 +282,15 @@ function formListener(form) {
 }
 
 export default function decorate(block) {
-  const formWrapper = createElement('div', { classes: 'search-wrapper' });
-  const form = createElement('form', { classes: 'search-form' });
-  const pnContainer = createElement('div', { classes: ['search__filters-input__container', 'hide'] });
+  const formWrapper = createElement('div', { classes: `${blockName}-wrapper` });
+  const form = createElement('form', { classes: `${blockName}-form` });
+  const pnContainer = createElement('div', { classes: [`${blockName}__filters-input__container`, 'hide'] });
   form.innerHTML = TEMPLATES.searchBy + TEMPLATES.inputCR;
   // Part number input and its filters are hidden by default
   pnContainer.innerHTML = TEMPLATES.filters + TEMPLATES.inputPN;
   form.appendChild(pnContainer);
   // add listeners and fill filters with data
-  addSearchByListeners(form.querySelector('.search__buttons__wrapper'), form);
+  addSearchByListeners(form.querySelector(`.${blockName}__buttons__wrapper`), form);
   getAndApplyFiltersData(form);
   formListener(form);
   // insert templates to form

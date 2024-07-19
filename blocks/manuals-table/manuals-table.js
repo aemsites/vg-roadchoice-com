@@ -1,3 +1,5 @@
+const blockName = 'manuals-table';
+
 export default function decorate(block) {
   const tableRows = block.querySelectorAll(':scope > div');
   [...tableRows].forEach((row) => {
@@ -6,7 +8,7 @@ export default function decorate(block) {
     [...tableColumns].forEach((column) => {
       const link = column.querySelector(':scope > a');
       column.removeAttribute('data-valign');
-      column.className = 'manuals-table-column';
+      column.className = `${blockName}-column`;
       if (oneChild) column.parentElement.classList.add('one-child');
       if (!link) {
         column.previousElementSibling.classList.add('next-empty');

@@ -1,4 +1,4 @@
-import { createElement } from '../../scripts/scripts.js';
+import { createElement } from '../../scripts/common.js';
 
 const blockName = 'cards';
 
@@ -44,7 +44,7 @@ const buildCards = (block) => {
 };
 
 const buildResourcesCards = (block) => {
-  const ul = createElement('ul', { classes: 'cards-list' });
+  const ul = createElement('ul', { classes: `${blockName}-list` });
 
   [...block.children].forEach((row) => {
     const image = row.querySelector('picture');

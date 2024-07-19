@@ -1,5 +1,7 @@
-import { checkLinkProps, createElement } from '../../scripts/scripts.js';
+import { checkLinkProps, createElement } from '../../scripts/common.js';
 import { decorateIcons, getMetadata } from '../../scripts/lib-franklin.js';
+
+const blockName = 'footer';
 
 /**
  * loads and decorates the footer
@@ -17,7 +19,7 @@ export default async function decorate(block) {
     const html = await resp.text();
 
     // decorate footer DOM
-    const footer = document.createElement('div');
+    const footer = createElement('div');
     footer.innerHTML = html;
 
     decorateIcons(footer);
@@ -25,9 +27,9 @@ export default async function decorate(block) {
     const children = footer.querySelectorAll('div');
     const [social, internal, privacy] = children;
 
-    social.classList.add('footer-social-section');
-    internal.classList.add('footer-internal-section');
-    privacy.classList.add('footer-privacy-section');
+    social.classList.add(`${blockName}-social-section`);
+    internal.classList.add(`${blockName}-internal-section`);
+    privacy.classList.add(`${blockName}-privacy-section`);
 
     social.querySelectorAll('a').forEach((link) => {
       link.target = '_blank';

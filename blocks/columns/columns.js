@@ -1,4 +1,6 @@
-import { createElement } from '../../scripts/scripts.js';
+import { createElement } from '../../scripts/common.js';
+
+const blockName = 'columns';
 
 const addAnchorWrapper = (pic) => {
   const parent = pic.parentElement;
@@ -47,7 +49,7 @@ const buildThreeCols = (pic) => {
 
 export default function decorate(block) {
   const cols = [...block.firstElementChild.children];
-  block.classList.add(`columns-${cols.length}-cols`);
+  block.classList.add(`${blockName}-${cols.length}-cols`);
 
   const isThreeCols = cols.length === 3;
 
@@ -68,7 +70,7 @@ export default function decorate(block) {
         const picWrapper = pic.closest('div');
         if (picWrapper && picWrapper.children.length === 1) {
           // picture is only content in column
-          picWrapper.classList.add('columns-img-col');
+          picWrapper.classList.add(`${blockName}-img-col`);
         }
       }
     });
