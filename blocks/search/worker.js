@@ -4,9 +4,9 @@
  * @property {string} imgData - Images Data URL
  */
 const URLs = {
-  crData: '/sadcross-reference-data/cr-data.json',
-  pnData: '/asdproduct-data/road-choice-make-model-part-filter-options.json',
-  imgData: '/asdproduct-images/road-choice-website-images.json',
+  crData: '/cross-reference-data/cr-data.json',
+  pnData: '/product-data/road-choice-make-model-part-filter-options.json',
+  imgData: '/product-images/road-choice-website-images.json',
 };
 
 const limit = 100_000;
