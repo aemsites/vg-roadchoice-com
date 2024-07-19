@@ -5,6 +5,7 @@ import {
   loadBlocks,
   loadHeader,
   loadFooter,
+  getMetadata,
 } from './lib-franklin.js';
 
 let placeholders = null;
@@ -645,9 +646,11 @@ export const getLongJSONData = async (props) => {
  * @returns {Worker} the search worker
  */
 export function loadWorker() {
+  const langLocale = getMetadata('i18n');
+  const rootLangPath = langLocale ? `/${langLocale}` : '';
   const worker = new Worker('../blocks/search/worker.js');
   // this just launch the worker, and the message listener is triggered in another script
-  worker.postMessage('run');
+  worker.postMessage({ rootLangPath });
   // this enable the search in any page
   worker.onmessage = (e) => {
     if (e?.data) {

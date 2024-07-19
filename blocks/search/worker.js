@@ -1,17 +1,12 @@
-import { getMetadata } from '../../scripts/lib-franklin.js';
-
-const langLocale = getMetadata('i18n');
-const i18nPath = langLocale ? `/${langLocale}` : '';
-
 /**
  * @property {string} crData - Cross Reference Data URL
  * @property {string} pnData - Part Number Data URL
  * @property {string} imgData - Images Data URL
  */
 const URLs = {
-  crData: `${i18nPath}/sadcross-reference-data/cr-data.json`,
-  pnData: `${i18nPath}/asdproduct-data/road-choice-make-model-part-filter-options.json`,
-  imgData: `${i18nPath}/asdproduct-images/road-choice-website-images.json`,
+  crData: '/sadcross-reference-data/cr-data.json',
+  pnData: '/asdproduct-data/road-choice-make-model-part-filter-options.json',
+  imgData: '/asdproduct-images/road-choice-website-images.json',
 };
 
 const limit = 100_000;
@@ -63,10 +58,11 @@ async function getData(url) {
   return [];
 }
 
-onmessage = () => {
+onmessage = ({ data }) => {
+  const { rootLangPath } = data;
   const postMessages = Object.keys(URLs);
   postMessages.forEach(async (key) => {
-    const url = URLs[key];
+    const url = `${rootLangPath}/${URLs[key]}`;
     postMessageData[key] = await getData(url);
     postMessage(postMessageData);
   });
