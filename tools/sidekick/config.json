@@ -3,11 +3,30 @@
   "host": "www.roadchoice.com",
   "plugins": [
     {
+      "id": "tagger",
+      "title": "Tagger",
+      "environments": [ "edit" ],
+      "url": "/tools/tagger/index.html"
+    },
+    {
       "id": "library",
       "title": "Library",
-      "environments": ["edit"],
-      "url": "/tools/sidekick/library.html",
-      "includePaths": ["**.docx**"]
+      "environments": [ "edit" ],
+      "url": "https://main--vg-roadchoice-com--hlxsites.hlx.live/tools/sidekick/library.html",
+      "includePaths": [ "**.docx**" ]
+    },
+    {
+      "id": "asset-library",
+      "title": "My Assets",
+      "environments": [
+        "edit"
+      ],
+      "url": "https://experience.adobe.com/solutions/CQ-assets-selectors/static-assets/resources/franklin/asset-selector.html",
+      "isPalette": true,
+      "includePaths": [
+        "**.docx**"
+      ],
+      "paletteRect": "top: 50px; bottom: 10px; right: 10px; left: auto; width:400px; height: calc(100vh - 60px)"
     }
   ]
 }

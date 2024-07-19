@@ -1,5 +1,5 @@
 import productsWorker from '../../scripts/delayed.js';
-import { createElement } from '../../scripts/scripts.js';
+import { createElement, getTextLabel } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 
 let amount = JSON.parse(sessionStorage.getItem('amount'));
@@ -8,6 +8,7 @@ let isRendered = false;
 let hasImagesData = false;
 let imgData;
 const searchType = 'parts';
+const loadingLabel = getTextLabel('loading_label');
 
 productsWorker.onmessage = ({ data }) => {
   if (products && data.imgData && !hasImagesData) {
@@ -50,7 +51,8 @@ const addImagesHandler = ({ productList, loadingElement }) => {
 const renderBlock = async (block) => {
   const resultsWrapper = createElement('div', { classes: 'results-wrapper' });
   const productList = createElement('ul', { classes: 'results-list' });
-  const loadingElement = createElement('div', { classes: 'loading', textContent: 'Loading...' });
+  const loadingElement = createElement('div', { classes: 'loading' });
+  loadingElement.textContent = loadingLabel;
 
   resultsWrapper.append(productList, loadingElement);
   block.append(resultsWrapper);

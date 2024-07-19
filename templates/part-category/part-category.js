@@ -2,7 +2,7 @@ import {
   createElement,
   getLongJSONData,
   defaultLimit,
-} from '../../scripts/scripts.js';
+} from '../../scripts/common.js';
 
 const categoryMaster = '/product-data/rc-attribute-master-file.json';
 const amount = 12;
@@ -103,7 +103,8 @@ export default async function decorate(doc) {
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
-  const title = createElement('h1', { classes: 'part-category-title', textContent: category.replaceAll('-', ' ') });
+  const title = createElement('h1', { classes: 'part-category-title' });
+  title.textContent = category.replaceAll('-', ' ');
   const section = [...main.children]
     .filter((child) => !['breadcrumb-container', 'search-container']
       .some((el) => child.classList.contains(el)))[0];
@@ -124,9 +125,9 @@ export default async function decorate(doc) {
       const { className } = lastElLink;
       const link = createElement('a', {
         classes: className,
-        textContent: category.replaceAll('-', ' '),
         props: { href: `${url.origin}/part-category/?category=${category}` },
       });
+      link.textContent = category.replaceAll('-', ' ');
       const breadcrumbItem = createElement('li', {
         classes: ['breadcrumb-item', `breadcrumb-item-${length}`],
       });

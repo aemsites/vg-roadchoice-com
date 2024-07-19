@@ -1,10 +1,13 @@
-import { createElement, getAllElWithChildren } from '../../scripts/scripts.js';
+import { getAllElWithChildren } from '../../scripts/scripts.js';
+import { createElement } from '../../scripts/common.js';
+
+const blockName = 'find-dealer';
 
 export default function decorate(block) {
   const container = block.querySelector(':scope > div');
-  const inputWrapper = createElement('div', { classes: 'find-dealer-input-wrapper' });
+  const inputWrapper = createElement('div', { classes: `${blockName}-input-wrapper` });
   const input = createElement('input', {
-    classes: 'find-dealer-input',
+    classes: `${blockName}-input`,
     props: {
       title: 'code',
       type: 'text',
@@ -12,7 +15,7 @@ export default function decorate(block) {
     },
   });
   const searchButton = createElement('button', {
-    classes: ['find-dealer-button', 'fa', 'fa-search'],
+    classes: [`${blockName}-button`, 'fa', 'fa-search'],
     props: {
       type: 'button',
     },
@@ -22,7 +25,7 @@ export default function decorate(block) {
     url.searchParams.set('whereToBuy', value);
     window.location.href = url.toString();
   };
-  container.className = 'find-dealer-form-container';
+  container.className = `${blockName}-form-container`;
   input.onkeydown = (e) => {
     if (e.key === 'Enter') {
       navigateTo(e.target.value);
@@ -36,10 +39,10 @@ export default function decorate(block) {
   };
 
   [...container.children].forEach((element, i) => {
-    element.className = `find-dealer-col-${i + 1}`;
+    element.className = `${blockName}-col-${i + 1}`;
   });
   if (getAllElWithChildren(container.firstElementChild.children, 'p').length < 1) {
-    const p = createElement('p', { classes: 'find-dealer-text' });
+    const p = createElement('p', { classes: `${blockName}-text` });
     const col1 = container.firstElementChild;
     p.textContent = col1.textContent;
     col1.textContent = '';

@@ -2,14 +2,15 @@ import {
   createElement,
   getTextLabel,
   getJsonFromUrl,
-} from '../../scripts/scripts.js';
+} from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/lib-franklin.js';
 
-const title = getTextLabel('recommendations title');
-const linkText = getTextLabel('read more');
-const [homeTitle, recommendationsTitle] = title.split('[/]');
+const blockName = 'recommendations';
 const category = getMetadata('category');
+const title = getTextLabel('recommendations_title');
+const linkText = getTextLabel('read_more');
 
+const [homeTitle, recommendationsTitle] = title.split('[/]');
 const isBlogArticle = document.querySelector('.blog-article');
 
 export const getLimit = (block) => {
@@ -59,7 +60,7 @@ export default async function decorate(block) {
 
   const noArticles = selectedArticles.length === 0;
 
-  const recommendationsContent = createElement('div', { classes: ['recommendations-content'] });
+  const recommendationsContent = createElement('div', { classes: `${blockName}-content` });
   const titleSection = createElement('div', { classes: ['title-section'] });
 
   const titleElement = createElement('h3', { classes: ['title'] });
@@ -73,7 +74,7 @@ export default async function decorate(block) {
     titleSection.appendChild(titleElement);
   }
 
-  const recommendationsList = createElement('ul', { classes: ['recommendations-list'] });
+  const recommendationsList = createElement('ul', { classes: `${blockName}-list` });
 
   selectedArticles.forEach((art) => {
     const article = createElement('li', { classes: ['article'] });

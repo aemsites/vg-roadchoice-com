@@ -5,13 +5,13 @@ import {
   searchPartNumValue,
 } from '../../blocks/search/search.js';
 import productsWorker from '../../scripts/delayed.js';
-import { getTextLabel, createElement } from '../../scripts/scripts.js';
+import { getTextLabel, createElement } from '../../scripts/common.js';
 
-const titleContent = getTextLabel('search results title');
-const noResultsContent = getTextLabel('no results title');
-const subTitleText = getTextLabel('no results subtitle');
-const needHelp = getTextLabel('no results need help');
-const contactUsText = getTextLabel('no results contact us');
+const titleContent = getTextLabel('search_results_title');
+const noResultsContent = getTextLabel('no_results_title');
+const subTitleText = getTextLabel('no_results_subtitle');
+const needHelp = getTextLabel('no_results_need_help');
+const contactUsText = getTextLabel('no_results_contact_us');
 const amount = amountOfProducts;
 const urlParams = new URLSearchParams(window.location.search);
 let query = {};

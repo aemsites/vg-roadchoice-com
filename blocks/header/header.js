@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import { getMetadata } from '../../scripts/lib-franklin.js';
-import { createElement } from '../../scripts/scripts.js';
+import { createElement } from '../../scripts/common.js';
 
 // media query match that indicates mobile/tablet width
 const MQ = window.matchMedia('(min-width: 992px)');
