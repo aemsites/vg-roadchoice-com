@@ -21,10 +21,18 @@ const tempData = [];
 async function getInitialJSONData(props) {
   const { url, offset = 0, limit: newLimit = null } = props;
   const nextOffset = offset > 0 ? `?offset=${offset}` : '';
-  const nextLimit = limit ? `${offset > 0 ? '&' : '?'}limit=${newLimit}` : '';
-  const results = await fetch(`${url}${nextOffset}${nextLimit}`);
-  const json = await results.json();
-  return json;
+  const nextLimit = newLimit ? `${offset > 0 ? '&' : '?'}limit=${newLimit}` : '';
+  try {
+    const results = await fetch(`${url}${nextOffset}${nextLimit}`);
+    if (!results.ok) {
+      throw new Error(`HTTP error! status: ${results.status}`);
+    }
+    const json = await results.json();
+    return json;
+  } catch (error) {
+    console.error('Error fetching JSON data:', error);
+    return null;
+  }
 }
 
 async function getMoreJSONData(url, total, offset = 0) {
@@ -42,12 +50,17 @@ async function getMoreJSONData(url, total, offset = 0) {
 
 async function getData(url) {
   const jsonData = await getInitialJSONData({ url, limit });
-  const initialData = [...jsonData.data];
-  let moreData;
-  if (jsonData.data.length < jsonData.total) {
-    moreData = await getMoreJSONData(url, jsonData.total);
+
+  if (jsonData) {
+    const initialData = [...jsonData.data];
+    let moreData;
+    if (jsonData.data.length < jsonData.total) {
+      moreData = await getMoreJSONData(url, jsonData.total);
+    }
+    return moreData ? [...initialData, ...moreData] : initialData;
   }
-  return moreData ? [...initialData, ...moreData] : initialData;
+
+  return [];
 }
 
 onmessage = () => {

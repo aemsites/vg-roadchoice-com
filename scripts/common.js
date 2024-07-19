@@ -14,7 +14,7 @@ export async function getPlaceholders() {
 }
 
 export function getTextLabel(key) {
-  return placeholders.data.find((el) => el.Key === key)?.Text || key;
+  return placeholders?.data.find((el) => el.Key === key)?.Text || key;
 }
 
 /**
@@ -650,7 +650,9 @@ export function loadWorker() {
   worker.postMessage('run');
   // this enable the search in any page
   worker.onmessage = (e) => {
-    window.allProducts = e.data;
+    if (e?.data) {
+      window.allProducts = e.data;
+    }
   };
   return worker;
 }
