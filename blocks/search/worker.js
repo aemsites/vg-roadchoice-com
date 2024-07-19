@@ -62,7 +62,7 @@ onmessage = ({ data }) => {
   const { rootLangPath } = data;
   const postMessages = Object.keys(URLs);
   postMessages.forEach(async (key) => {
-    const url = `${rootLangPath}/${URLs[key]}`;
+    const url = `${rootLangPath}${URLs[key]}`;
     postMessageData[key] = await getData(url);
     postMessage(postMessageData);
   });
