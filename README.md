@@ -1,9 +1,20 @@
 # Road Choice
-Franklin site for roadchoice.com
+EDS site for roadchoice.com
 
 ## Environments
 - Preview: https://main--vg-roadchoice-com--volvogroup.aem.page
-- Live: https://main--vg-roadchoice-com--volvogroup.aem.live/
+- Live: https://main--vg-roadchoice-com--volvogroup.aem.live
+
+### Other markets:
+
+#### Canada:
+- Preview: https://main--roadchoice-ca--volvogroup.aem.page
+- Live: https://main--roadchoice-ca--volvogroup.aem.live
+
+#### Mexico:
+- Preview: https://main--roadchoice-mx--volvogroup.aem.page
+- Live: https://main--roadchoice-mx--volvogroup.aem.live
+
 
 ## Installation
 
