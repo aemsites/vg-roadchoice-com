@@ -2,8 +2,8 @@
 Franklin site for roadchoice.com
 
 ## Environments
-- Preview: https://main--vg-roadchoice-com--hlxsites.aem.page/
-- Live: https://main--vg-roadchoice-com--hlxsites.aem.live/
+- Preview: https://main--vg-roadchoice-com--volvogroup.aem.page
+- Live: https://main--vg-roadchoice-com--volvogroup.aem.live/
 
 ## Installation
 
