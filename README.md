@@ -1,5 +1,5 @@
 # Road Choice
-EDS site for roadchoice.com
+Helix v5 sites for roadchoice.com
 
 ## Environments
 - Preview: https://main--vg-roadchoice-com--volvogroup.aem.page
@@ -7,11 +7,11 @@ EDS site for roadchoice.com
 
 ### Other markets:
 
-#### Canada:
+#### Roadchoice.ca:
 - Preview: https://main--roadchoice-ca--volvogroup.aem.page
 - Live: https://main--roadchoice-ca--volvogroup.aem.live
 
-#### Mexico:
+#### Roadchoice.mx:
 - Preview: https://main--roadchoice-mx--volvogroup.aem.page
 - Live: https://main--roadchoice-mx--volvogroup.aem.live
 
