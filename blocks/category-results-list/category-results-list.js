@@ -1,4 +1,4 @@
-import productsWorker from '../../scripts/delayed.js';
+import { getProductsWorker } from '../../scripts/delayed.js';
 import { createElement, getTextLabel } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 
@@ -9,6 +9,7 @@ let hasImagesData = false;
 let imgData;
 const searchType = 'parts';
 const loadingLabel = getTextLabel('loading_label');
+const productsWorker = getProductsWorker();
 
 productsWorker.onmessage = ({ data }) => {
   if (products && data.imgData && !hasImagesData) {

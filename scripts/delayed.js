@@ -106,7 +106,8 @@ async function loadArtibot() {
 // Roadchoice specific code ↓
 // This Worker loads all the product information into de global object window
 const productsWorker = loadWorker();
-export default productsWorker;
+// eslint-disable-next-line import/prefer-default-export
+export const getProductsWorker = () => productsWorker;
 
 // This searches for id="cookie-preference" button and displays the cookie preference center.
 const preferenceBtn = document.querySelector('#cookie-preference');

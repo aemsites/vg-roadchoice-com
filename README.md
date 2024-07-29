@@ -2,15 +2,19 @@
 Helix v5 sites for roadchoice.com
 
 ## Environments
-- Roadchoice.com:
-  - Preview: https://main--vg-roadchoice-com--volvogroup.aem.page/
-  - Live: https://main--vg-roadchoice-com--volvogroup.aem.live/
-- Roadchoice.ca:
-  - Preview: https://main--roadchoice-ca--volvogroup.aem.page/
-  - Live: https://main--roadchoice-ca--volvogroup.aem.live/
-- Roadchoice.mx:
-  - Preview: https://main--roadchoice-mx--volvogroup.aem.page/
-  - Live: https://main--roadchoice-mx--volvogroup.aem.live/
+- Preview: https://main--vg-roadchoice-com--volvogroup.aem.page
+- Live: https://main--vg-roadchoice-com--volvogroup.aem.live
+
+### Other markets:
+
+#### Roadchoice.ca:
+- Preview: https://main--roadchoice-ca--volvogroup.aem.page
+- Live: https://main--roadchoice-ca--volvogroup.aem.live
+
+#### Roadchoice.mx:
+- Preview: https://main--roadchoice-mx--volvogroup.aem.page
+- Live: https://main--roadchoice-mx--volvogroup.aem.live
+
 
 ## Installation
 

@@ -4,7 +4,7 @@ import {
   searchCRPartNumValue,
   searchPartNumValue,
 } from '../../blocks/search/search.js';
-import productsWorker from '../../scripts/delayed.js';
+import { getProductsWorker } from '../../scripts/delayed.js';
 import { getTextLabel, createElement } from '../../scripts/common.js';
 
 const titleContent = getTextLabel('search_results_title');
@@ -90,6 +90,7 @@ export default async function decorate(doc) {
   const title = createElement('h1', { classes: 'title' });
   const titleText = ((searchType === 'cross') && `${titleContent} ${type}: "${value}"`)
     || `${titleContent} ${isTextNull(query.make)} ${isTextNull(query.model)} ${value} ${type}`;
+  const productsWorker = getProductsWorker();
 
   productsWorker.onmessage = ({ data }) => {
     if (data.crData && data.pnData && data.imgData) {

@@ -1,35 +1,49 @@
 {
-  "name": "@adobe/helix-project-boilerplate",
+  "name": "roadchoice",
   "private": true,
   "version": "3.0.0",
-  "description": "Starter project for Adobe Helix",
+  "description": "",
+  "engines": {
+    "node": ">=v20.15.1 <23",
+    "npm": ">=10.7.0"
+  },
   "scripts": {
     "lint:js": "eslint .",
     "lint:css": "stylelint blocks/**/*.css styles/*.css",
-    "lint": "npm run lint:js && npm run lint:css"
+    "lint:js:fix": "eslint . --fix",
+    "lint:css:fix": "stylelint blocks/**/*.css styles/*.css --fix",
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:fix": "npm run lint:js:fix && npm run lint:css:fix",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.js": "npm run lint:js",
+    "*.css": "npm run lint:css"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adobe/helix-project-boilerplate.git"
+    "url": "git+https://github.com/aemsites/vg-roadchoice-com/"
   },
   "author": "Adobe",
-  "license": "Apache License 2.0",
+  "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/adobe/helix-project-boilerplate/issues"
+    "url": "https://github.com/aemsites/vg-roadchoice-com/issues"
   },
-  "homepage": "https://github.com/adobe/helix-project-boilerplate#readme",
+  "homepage": "https://github.com/aemsites/vg-roadchoice-com/#readme",
   "devDependencies": {
-    "@babel/core": "7.21.0",
-    "@babel/eslint-parser": "7.19.1",
+    "@babel/core": "7.24.9",
+    "@babel/eslint-parser": "7.24.8",
     "chai": "4.3.7",
-    "eslint": "8.35.0",
+    "eslint": "8.57.0",
     "eslint-config-airbnb-base": "15.0.0",
-    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-import": "2.29.1",
     "@esm-bundle/chai": "4.3.4-fix.0",
     "@web/test-runner": "0.15.1",
     "@web/test-runner-commands": "0.6.5",
+    "husky": "^9.1.1",
+    "lint-staged": "^15.2.7",
     "sinon": "15.0.1",
-    "stylelint": "15.2.0",
-    "stylelint-config-standard": "30.0.1"
+    "stylelint": "16.7.0",
+    "stylelint-config-standard": "36.0.1"
   }
 }
