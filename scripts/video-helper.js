@@ -148,12 +148,14 @@ const createVideoElement = (src, className, props) => {
   const source = createElement('source', { props: { src, type: 'video/mp4' } });
   video.appendChild(source);
 
-  if (props.muted) {
+  if (props.muted === true) {
     video.muted = props.muted;
   }
 
-  if (props.autoplay) {
+  if (props.autoplay === true) {
     video.autoplay = props.autoplay;
+  } else {
+    video.removeAttribute('autoplay');
   }
 
   if (props) {
@@ -228,6 +230,10 @@ const setVideoEvents = (video, playPauseButton, props) => {
   const playIcon = playPauseButton.querySelector('.icon-play-video');
   const pauseIcon = playPauseButton.querySelector('.icon-pause-video');
 
+  if (props.autoplay === false) {
+    togglePlayPauseIcon(true, playIcon, pauseIcon, playPauseButton);
+  }
+
   playPauseButton.addEventListener('click', () => {
     video[video.paused ? 'play' : 'pause']();
   });
@@ -236,7 +242,7 @@ const setVideoEvents = (video, playPauseButton, props) => {
   video.addEventListener('pause', () => togglePlayPauseIcon(true, playIcon, pauseIcon, playPauseButton));
 
   // Fallback to make sure the video is automatically played
-  if (props.autoplay) {
+  if (props.autoplay === true) {
     video.addEventListener('loadedmetadata', () => {
       setTimeout(() => {
         if (video.paused) {
@@ -246,6 +252,8 @@ const setVideoEvents = (video, playPauseButton, props) => {
         }
       }, 500);
     }, { once: true });
+  } else {
+    video.removeAttribute('autoplay');
   }
 };
 
@@ -261,8 +269,12 @@ const setVideoEvents = (video, playPauseButton, props) => {
 const createAndConfigureVideo = (src, className, props, block) => {
   const video = createVideoElement(src, className, props);
   const playPauseButton = createPlayPauseButton();
-  block.prepend(video);
-  block.insertBefore(playPauseButton, video.nextSibling);
+
+  if (block) {
+    block.prepend(video);
+    block.insertBefore(playPauseButton, video.nextSibling);
+  }
+
   setVideoEvents(video, playPauseButton, props);
   return video;
 };

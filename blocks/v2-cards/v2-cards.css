@@ -1,0 +1,115 @@
+.v2-cards {
+  --card-container-gap: 24px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-container-gap);
+  justify-content: center;
+  margin: auto;
+}
+
+.v2-cards__card-item {
+  color: var(--text-color);
+}
+
+.v2-cards--no-background .v2-cards__card-item {
+  background: transparent;
+}
+
+.v2-cards__picture-wrapper {
+  padding: 0;
+}
+
+.v2-cards__text-wrapper {
+  padding: 24px 0;
+}
+
+.v2-cards--no-background .v2-cards__text-wrapper {
+  padding: 40px 0 0;
+}
+
+.v2-cards__picture {
+  display: flex;
+}
+
+.v2-cards__image {
+  width: 100%;
+  object-fit: cover;
+}
+
+.v2-cards--image-aspect-ratio-7-5 .v2-cards__image {
+  aspect-ratio: 7/5;
+}
+
+.v2-cards__heading {
+  font-size: var(--heading-font-size-xs);
+  margin: 0 0 7px;
+}
+
+.v2-cards--large-heading .v2-cards__heading {
+  font-size: var(--heading-font-size-s);
+}
+
+.v2-cards__text-wrapper p {
+  margin: 0;
+  font-family: var(--body-ff);
+  font-size: var(--body-font-size-s);
+  font-style: normal;
+  letter-spacing: 0.16px;
+}
+
+.v2-cards__text-wrapper .v2-cards__button-container {
+  margin-top: 16px;
+}
+
+.v2-cards__text-wrapper .v2-cards__button-container a {
+  width: 100%;
+  text-align: center;
+}
+
+.v2-cards__button-container .v2-cards__button:any-link {
+  align-items: flex-start;
+}
+
+.v2-cards__button-container .icon {
+  stroke: currentcolor;
+  width: 16px;
+  height: 16px;
+}
+
+.v2-cards__button-container .icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (min-width: 744px) {
+  .v2-cards {
+    --card-container-gap: 24px;
+
+    flex-flow: row wrap;
+    justify-content: center;
+  }
+
+  .v2-cards__card-item {
+    max-width: calc((100% - 48px) / 3);
+  }
+
+  .v2-cards--horizontal .v2-cards__card-item {
+    max-width: 720px;
+    display: flex;
+    gap: 46px;
+  }
+
+  .v2-cards--horizontal .v2-cards__picture-wrapper,
+  .v2-cards--horizontal .v2-cards__text-wrapper {
+    width: 50%;
+  }
+
+  .v2-cards--horizontal .v2-cards__picture-wrapper {
+    display: flex;
+  }
+
+  .v2-cards--horizontal .v2-cards__picture {
+    margin: auto;
+  }
+}
