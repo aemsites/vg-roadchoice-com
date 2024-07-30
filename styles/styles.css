@@ -120,8 +120,15 @@
   --nav-font-size: 17px;
   --nav-text-color: #808184;
   --nav-background: var(--primary-light-gray);
-}
 
+  /* Motions */
+  --duration-small: 160ms;
+  --duration-medium: 240ms;
+  --duration-large: 320ms;
+  --easing-entrance: cubic-bezier(0, 0, 0.4, 1);
+  --easing-exit: cubic-bezier(0.2, 0, 1, 1);
+  --easing-standard: cubic-bezier(0.2, 0, 0.1, 1);
+}
 
 @media (min-width: 992px) {
   :root {

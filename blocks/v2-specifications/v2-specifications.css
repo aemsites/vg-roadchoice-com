@@ -1,0 +1,171 @@
+.v2-specifications__list--with-text > div > *:first-child,
+.v2-specifications__list--with-pictures > div > *:first-child,
+.v2-specifications__list--with-link > div > *:first-child {
+  margin-top: 0;
+}
+
+.v2-specifications__list--with-text > div > *:last-child,
+.v2-specifications__list--with-pictures > div > *:last-child,
+.v2-specifications__list--with-link > div > *:last-child {
+  margin-bottom: 0;
+}
+
+.v2-specifications__list--with-text,
+.v2-specifications__list--with-pictures {
+  display: grid;
+  font-family: var(--body-ff);
+  font-size: var(--body-font-size-s);
+  margin: 0 0 0 12px;
+  gap: 8px;
+}
+
+.v2-specifications__list--with-link {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  margin: 8px 0;
+  gap: 8px;
+}
+
+.v2-specifications__list--with-link div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--c-light-gray);
+  padding: 12px;
+  gap: 12px;
+}
+
+.v2-specifications__list--with-text:first-child,
+.v2-specifications__list--with-pictures:first-child,
+.v2-specifications__list--with-link:first-child {
+  margin-top: 0;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.v2-specifications__list--with-pictures {
+  gap: 40px;
+  grid-template-columns: 1fr;
+}
+
+.v2-specifications__list--with-link strong,
+.v2-specifications__list--with-link .button-container a,
+.v2-specifications__list--with-pictures strong {
+  font-family: var(--body-ff-bold);
+  display: block;
+  font-size: var(--body-font-size-xs);
+  line-height: normal;
+}
+
+.v2-specifications__list--subtitle {
+  margin-bottom: 24px;
+  margin-top: 24px;
+}
+
+/* With Text */
+/* stylelint-disable-next-line no-descending-specificity */
+.v2-specifications__list--with-text {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.v2-specifications__list--with-text strong {
+  font-family: var(--body-ff-bold);
+  font-size: var(--heading-font-size-xs);
+  letter-spacing: 1.92px;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.v2-specifications__list--with-text p {
+  margin: 0;
+}
+
+/* With images */
+.v2-specifications__list--with-pictures img {
+  display: block;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+/* With downloads */
+.v2-specifications__list--with-link .icon-download svg {
+  height: 16px;
+  width: 16px;
+}
+
+.v2-specifications__list--with-link p {
+  margin: 8px 0 0;
+}
+
+@media (min-width: 744px) {
+  .v2-specifications__list--with-link strong,
+  .v2-specifications__list--with-link .button-container a,
+  .v2-specifications__list--with-pictures strong {
+    font-size: var(--body-font-size-s);
+  }
+
+  .v2-specifications__list--with-pictures {
+    gap: 40px 16px;
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 40px;
+  }
+
+  .v2-specifications__list--with-link div {
+    padding: 8px 16px;
+    margin-left: 12px;
+  }
+
+  .v2-specifications__list--with-pictures,
+  .v2-specifications__list--with-text {
+    margin: 0 0 0 24px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .v2-specifications__list--with-text,
+  .v2-specifications__list--with-link {
+    grid-template-columns:repeat(4, 1fr);
+    padding: 8px 0;
+  }
+
+  .v2-specifications__list--with-text {
+    gap: 40px 16px;
+  }
+
+  .v2-specifications__list--with-text:has(> :nth-child(5)) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .v2-specifications__list--with-text p {
+    margin-top: 8px;
+  }
+
+  .v2-specifications__list--with-pictures {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Remove accordion in Desktop */
+  .v2-specifications .v2-accordion__button {
+    pointer-events: none;
+  }
+
+  .v2-specifications .v2-accordion__button .v2-accordion__icon,
+  .v2-specifications .v2-accordion__button .v2-accordion__close {
+    display: none;
+  }
+
+  .v2-specifications .v2-accordion__item-close .v2-accordion__content {
+    height: 100%;
+    opacity: 1;
+    overflow: auto;
+  }
+
+  .v2-specifications .v2-accordion__item {
+    padding: 24px 0;
+  }
+
+  .v2-specifications .v2-accordion__item:first-child {
+    padding-top: 10px;
+  }
+}
