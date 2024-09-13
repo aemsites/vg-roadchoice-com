@@ -25,6 +25,7 @@ async function getInitialJSONData(props) {
     const json = await results.json();
     return json;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching JSON data:', error);
     return null;
   }
