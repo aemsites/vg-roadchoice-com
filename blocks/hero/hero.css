@@ -75,16 +75,16 @@
     align-items: start;
     margin-left: 50px;
   }
-  
+
   .hero--text-left .hero__subtitle {
     text-align: left;
   }
-  
+
   .hero--text-right .hero__content {
     align-items: end;
     margin-right: 50px;
   }
-  
+
   .hero--text-right .hero__subtitle {
     text-align: right;
   }
