@@ -50,6 +50,7 @@
   right: 0;
   object-fit: cover;
   box-sizing: border-box;
+  inset: 0;
 }
 
 .hero img {
