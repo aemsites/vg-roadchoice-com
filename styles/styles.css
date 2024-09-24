@@ -69,6 +69,7 @@
   --text-color: var(--secondary-black);
   --button-active: var(--primary-red);
   --button-hover: var(--secondary-red);
+  --border-focus: #015FCC
 
   /* FONTS */
 
