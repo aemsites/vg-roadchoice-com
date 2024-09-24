@@ -41,12 +41,24 @@
   font-size: var(--body-font-size-l);
 }
 
+.hero .video__playback-button {
+  --playback-button-size: 32px;
+
+  margin: 10px;
+  top: unset;
+  bottom: 0;
+}
+
+.hero video,
 .hero picture {
   position: absolute;
   z-index: -1;
   inset: 0;
   object-fit: cover;
   box-sizing: border-box;
+  height: 100%;
+  object-position: center;
+  width: 100%;
 }
 
 .hero img {
