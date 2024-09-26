@@ -10,8 +10,15 @@ import {
 
 let placeholders = null;
 
+export const getLanguagePath = () => {
+  const { pathname } = new URL(window.location.href);
+  const langCodeMatch = pathname.match('^(/[a-z]{2}(-[a-z]{2})?/).*');
+  return langCodeMatch ? langCodeMatch[1] : '/';
+};
+
 export async function getPlaceholders() {
-  placeholders = await fetch('/placeholder.json').then((resp) => resp.json());
+  const url = `${getLanguagePath()}placeholder.json`;
+  placeholders = await fetch(url).then((resp) => resp.json());
 }
 
 export function getTextLabel(key) {
@@ -283,8 +290,11 @@ export const slugify = (text) => (
     .replace(/--+/g, '-')
 );
 
+/**
+ * loads the constants file where configuration values are stored
+ */
 async function getConstantValues() {
-  const url = '/constants.json';
+  const url = `${getLanguagePath()}constants.json`;
   let constants;
   try {
     const response = await fetch(url).then((resp) => resp.json());

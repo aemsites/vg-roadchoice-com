@@ -1,27 +1,47 @@
-/* block specific CSS goes here */
+:root {
+  --content-max-width: 900px;
+}
 
-main .hero-container > div {
+.hero-container > div {
   max-width: unset;
 }
 
-main .hero-container {
+.section.hero-container {
   padding: 0;
+  margin: 0;
+  max-width: unset;
+  width: 100%;
 }
 
-main .hero {
+.hero {
   position: relative;
   padding: 32px;
-  min-height: 300px;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-main .hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: white;
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-main .hero picture {
+.hero__heading {
+  color: var(--primary-white);
+  max-width: var(--content-max-width);
+  text-align: center;
+}
+
+.hero__subtitle {
+  color: var(--primary-white);
+  text-align: center;
+  max-width: calc(var(--content-max-width) / 2);
+  font-size: var(--body-font-size-l);
+}
+
+.hero picture {
   position: absolute;
   z-index: -1;
   inset: 0;
@@ -29,8 +49,40 @@ main .hero picture {
   box-sizing: border-box;
 }
 
-main .hero img {
+.hero img {
   object-fit: cover;
   width: 100%;
   height: 100%;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* Variants */
+.hero.hero--text-black .hero__heading,
+.hero.hero--text-black .hero__subtitle {
+  color: var(--primary-black);
+}
+
+@media (min-width: 768px) {
+  .hero--text-left .hero__content {
+    align-items: start;
+    margin-left: 50px;
+  }
+
+  .hero--text-left .hero__subtitle {
+    text-align: left;
+  }
+
+  .hero--text-right .hero__content {
+    align-items: end;
+    margin-right: 50px;
+  }
+
+  .hero--text-right .hero__subtitle {
+    text-align: right;
+  }
 }

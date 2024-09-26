@@ -1,4 +1,22 @@
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <script src="/scripts/lib-franklin.js" type="module"></script>
 <script src="/scripts/scripts.js" type="module"></script>
-<link rel="stylesheet" href="/styles/styles.css"/>
+<script type="module">
+  import { getLanguagePath } from '/scripts/common.js';
+
+  try {
+    const dynamicUrl = `${getLanguagePath()}constants.json`;
+
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.href = dynamicUrl;
+    link.as = 'fetch';
+    link.type = 'application/json';
+    link.crossorigin = 'anonymous';
+
+    document.head.appendChild(link);
+  } catch (error) {
+    console.log(error);
+  }
+</script>
+<link rel="stylesheet" href="/styles/styles.css" />
