@@ -2,6 +2,7 @@ import {
   getImageURLs,
   createResponsivePicture,
   variantsClassesToBEM,
+  decorateIcons,
 } from '../../scripts/common.js';
 import {
   isVideoLink,
@@ -88,4 +89,5 @@ export default async function decorate(block) {
   });
 
   block.parentElement.classList.add('full-width');
+  decorateIcons(block);
 }

@@ -197,7 +197,7 @@ const createIframeElement = (src, className, props, videoId) => {
  */
 const createPlayPauseButton = () => {
   const button = createElement('button', {
-    props: { type: 'button', class: 'v2-video__playback-button' },
+    props: { type: 'button', class: 'video__playback-button' },
   });
   const pauseIcon = createElement('span', { classes: ['icon', 'icon-pause-video'] });
   const playIcon = createElement('span', { classes: ['icon', 'icon-play-video'] });
