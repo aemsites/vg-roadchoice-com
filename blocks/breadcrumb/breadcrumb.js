@@ -6,21 +6,29 @@ const url = new URL(window.location.href);
 const categoryText = 'part-category';
 const brandName = getTextLabel('brand_name');
 
-const pageName = getMetadata('og:title');
-
 export default async function decorate(block) {
+  const locale = getMetadata('locale');
+  const pageName = getMetadata('og:title');
   const breadcrumbContent = createElement('div', { classes: `${blockName}-content` });
   const breadcrumbList = createElement('ul', { classes: `${blockName}-list` });
   const currentUrl = url.pathname;
   const hasLastSlash = currentUrl[currentUrl.length - 1] === '/';
   const isMainCategory = currentUrl.includes(categoryText) && url.searchParams.get('category') === null;
-
-  const routes = currentUrl.split('/');
-  if (routes[0].length === 0) routes[0] = '/';
-  if (routes.at(-1).length === 0) routes.pop();
-
-  const amountOfLevels = routes.length - 1;
   const isBlogArticle = document.querySelector('.blog-article');
+  const routes = currentUrl.split('/');
+
+  if (routes[1]?.toLocaleLowerCase() === locale?.toLocaleLowerCase()) {
+    routes.splice(0, 1);
+  }
+
+  if (routes[0].length === 0) {
+    routes[0] = '/';
+  }
+
+  // In case the currentUrl ends in '/', let's remove the last empty route
+  if (routes.at(-1).length === 0) {
+    routes.pop();
+  }
 
   let tempUrl = '';
   routes.forEach((path, idx) => {
@@ -28,18 +36,24 @@ export default async function decorate(block) {
       tempUrl += `${path}/`;
       return;
     }
-    const lastItem = idx === amountOfLevels;
+    const isFirstItem = idx === 0;
+    const isLastItem = idx === routes.length - 1;
     const item = createElement('li', { classes: [`${blockName}-item`, `${blockName}-item-${idx}`] });
     const link = createElement('a', { classes: `${blockName}-link` });
-    tempUrl += idx === 0 ? path : `${path}${!lastItem || (lastItem && hasLastSlash) ? '/' : ''}`;
 
-    link.href = idx === 0 ? url.origin : `${url.origin}${tempUrl}`;
-    if (idx === amountOfLevels && isBlogArticle) {
+    tempUrl += path;
+    if ((isLastItem && hasLastSlash) || !isLastItem) {
+      tempUrl += '/';
+    }
+
+    link.href = `${url.origin}/${tempUrl}`;
+
+    if (isLastItem && isBlogArticle) {
       link.href = `${url.origin}/blog/${path}`;
       link.innerHTML = `${pageName.toLowerCase()} /`;
       link.classList.add('active-link');
     } else {
-      link.innerHTML = idx === 0 ? brandName : path.replaceAll('-', ' ');
+      link.innerHTML = isFirstItem ? brandName : path.replaceAll('-', ' ');
     }
 
     item.appendChild(link);
