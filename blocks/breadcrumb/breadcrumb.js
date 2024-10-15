@@ -21,10 +21,6 @@ export default async function decorate(block) {
     routes.splice(0, 1);
   }
 
-  if (routes[0].length === 0) {
-    routes[0] = '/';
-  }
-
   // In case the currentUrl ends in '/', let's remove the last empty route
   if (routes.at(-1).length === 0) {
     routes.pop();
@@ -42,18 +38,20 @@ export default async function decorate(block) {
     const link = createElement('a', { classes: `${blockName}-link` });
 
     tempUrl += path;
-    if ((isLastItem && hasLastSlash) || !isLastItem) {
+    if ((isLastItem && hasLastSlash) || (!isLastItem && tempUrl !== '')) {
       tempUrl += '/';
     }
 
-    link.href = `${url.origin}/${tempUrl}`;
-
     if (isLastItem && isBlogArticle) {
       link.href = `${url.origin}/blog/${path}`;
-      link.innerHTML = `${pageName.toLowerCase()} /`;
-      link.classList.add('active-link');
+      link.innerHTML = pageName.toLowerCase();
     } else {
+      link.href = `${url.origin}/${tempUrl}`;
       link.innerHTML = isFirstItem ? brandName : path.replaceAll('-', ' ');
+    }
+
+    if (isLastItem) {
+      link.classList.add('active-link');
     }
 
     item.appendChild(link);
