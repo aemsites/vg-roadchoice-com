@@ -58,8 +58,11 @@ const renderBlock = async (block) => {
   resultsWrapper.append(productList, loadingElement);
   block.append(resultsWrapper);
 
-  if (!hasImagesData) addImagesHandler({ productList, loadingElement });
-  else getImagesData({ productList, loadingElement, detail: imgData });
+  if (hasImagesData) {
+    getImagesData({ productList, loadingElement, detail: imgData })
+  } else {
+    addImagesHandler({ productList, loadingElement })
+  }
 };
 
 const isRenderedCheck = (block) => {

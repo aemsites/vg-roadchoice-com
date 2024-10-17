@@ -4,6 +4,7 @@ import {
   getJsonFromUrl,
   getLongJSONData,
   defaultLimit,
+  getLocaleContextedUrl,
 } from '../../scripts/common.js';
 import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 
@@ -47,7 +48,7 @@ async function fetchPartImages(sku) {
   const placeholderImage = '/product-images/rc-placeholder-image.png';
   try {
     const data = await getLongJSONData({
-      url: '/product-images/road-choice-website-images.json',
+      url: getLocaleContextedUrl('/product-images/road-choice-website-images.json'),
       limit: defaultLimit,
     });
     const images = findPartImagesBySKU(data, sku);
@@ -166,7 +167,7 @@ function groupByLanguage(data) {
 async function fetchCategoryKeys(category) {
   try {
     const json = await getLongJSONData({
-      url: '/product-data/rc-attribute-master-file.json',
+      url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
       limit: defaultLimit,
     });
     if (!json || json.length === 0) return [];

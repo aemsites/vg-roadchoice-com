@@ -38,7 +38,7 @@ export function createElement(tagName, options = {}) {
   const elem = document.createElement(tagName);
   const isString = typeof classes === 'string';
   if (classes || (isString && classes !== '') || (!isString && classes.length > 0)) {
-    const classesArr = isString ? [classes] : classes;
+    const classesArr = isString ? [...(classes?.split(' ') || [])] : classes;
     elem.classList.add(...classesArr);
   }
   if (!isString && classes.length === 0) elem.removeAttribute('class');
@@ -656,9 +656,10 @@ export const getLongJSONData = async (props) => {
  * @returns {Worker} the search worker
  */
 export function loadWorker() {
-  const langLocale = getMetadata('i18n');
-  const rootLangPath = langLocale ? `/${langLocale}` : '';
-  const worker = new Worker('../blocks/search/worker.js');
+  const curUrl = new URL(window.location.href);
+  const langLocale = getMetadata('locale');
+  const rootLangPath = langLocale ? `/${langLocale.toLocaleLowerCase()}` : '';
+  const worker = new Worker(`${curUrl.origin}/blocks/search/worker.js`);
   // this just launch the worker, and the message listener is triggered in another script
   worker.postMessage({ rootLangPath });
   // this enable the search in any page
@@ -725,6 +726,34 @@ export function checkLinkProps(links) {
     link.title = selectedText;
     link.innerText = selectedText;
   });
+}
+
+/**
+ * Resolves a given url to a document to the language/folder context
+ * by adding the locale to the url if it doesn't have it and should have
+ * @param {string} urlPathToConvert the url path to convert
+ */
+export function getLocaleContextedUrl(urlPathToConvert) {
+  const locationUrl = new URL(window.location.href);
+  const locale = getMetadata('locale');
+  const localeRegexToMatch = new RegExp(`/${locale}/`, 'i');
+  const localeInPageUrlRegex = new RegExp(`^/${locale}/`, 'i');
+  let pageUrl = urlPathToConvert.startsWith('/') ? urlPathToConvert : `/${urlPathToConvert}`;
+  const urlPattern = /^(https?:\/\/)/;
+
+  if (urlPattern.test(urlPathToConvert)) {
+    return urlPathToConvert;
+  }
+
+  if (!locale) {
+    return pageUrl;
+  }
+
+  if (localeRegexToMatch.test(locationUrl.pathname) && !localeInPageUrlRegex.test(pageUrl)) {
+    pageUrl = `/${locale.toLocaleLowerCase()}${pageUrl}`;
+  }
+
+  return pageUrl;
 }
 
 const allLinks = [...document.querySelectorAll('a'), ...document.querySelectorAll('button')];
