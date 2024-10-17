@@ -656,12 +656,13 @@ export const getLongJSONData = async (props) => {
  * @returns {Worker} the search worker
  */
 export function loadWorker() {
-  const curUrl = new URL(window.location.href);
+  const currentUrl = new URL(window.location.href);
+  const { pathname } = currentUrl;
   const langLocale = getMetadata('locale');
   const rootLangPath = langLocale ? `/${langLocale.toLocaleLowerCase()}` : '';
-  const worker = new Worker(`${curUrl.origin}/blocks/search/worker.js`);
+  const worker = new Worker(`${currentUrl.origin}/blocks/search/worker.js`);
   // this just launch the worker, and the message listener is triggered in another script
-  worker.postMessage({ rootLangPath });
+  worker.postMessage({ rootLangPath, pathname });
   // this enable the search in any page
   worker.onmessage = (e) => {
     if (e?.data) {

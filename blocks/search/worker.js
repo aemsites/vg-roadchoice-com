@@ -1,4 +1,20 @@
-let rootLangPath = '';
+let providedWorkerData = {};
+
+function getLocaleContextedUrl(urlPathToConvert) {
+  const localeRegexToMatch = new RegExp(`/${providedWorkerData.rootLangPath}/`, 'i');
+  const localeInPageUrlRegex = new RegExp(`^/${providedWorkerData.rootLangPath}/`, 'i');
+  let pageUrl = urlPathToConvert.startsWith('/') ? urlPathToConvert : `/${urlPathToConvert}`;
+
+  if (!providedWorkerData.rootLangPath) {
+    return pageUrl;
+  }
+
+  if (localeRegexToMatch.test(providedWorkerData.pathname) && !localeInPageUrlRegex.test(pageUrl)) {
+    pageUrl = `/${providedWorkerData.rootLangPath.toLocaleLowerCase()}${pageUrl}`;
+  }
+
+  return pageUrl;
+}
 
 /**
  * @property {string} crData - Cross Reference Data URL
@@ -6,9 +22,9 @@ let rootLangPath = '';
  * @property {string} imgData - Images Data URL
  */
 const URLs = {
-  crData: `${rootLangPath}/cross-reference-data/cr-data.json`,
-  pnData: `${rootLangPath}/product-data/road-choice-make-model-part-filter-options.json`,
-  imgData: `${rootLangPath}/product-images/road-choice-website-images.json`,
+  crData: getLocaleContextedUrl('/cross-reference-data/cr-data.json'),
+  pnData: getLocaleContextedUrl('/product-data/road-choice-make-model-part-filter-options.json'),
+  imgData: getLocaleContextedUrl('/product-images/road-choice-website-images.json'),
 };
 
 const limit = 100_000;
@@ -19,7 +35,7 @@ async function getInitialJSONData(props) {
   const { url, offset = 0, limit: newLimit = null } = props;
   const nextOffset = offset > 0 ? `?offset=${offset}` : '';
   const nextLimit = newLimit ? `${offset > 0 ? '&' : '?'}limit=${newLimit}` : '';
-  console.log('url: ', url);
+
   try {
     const results = await fetch(`${url}${nextOffset}${nextLimit}`);
     if (!results.ok) {
@@ -63,11 +79,11 @@ async function getData(url) {
 }
 
 onmessage = ({ data }) => {
-  rootLangPath = data.rootLangPath;
+  providedWorkerData = data;
 
   const postMessages = Object.keys(URLs);
   postMessages.forEach(async (key) => {
-    const url = `${rootLangPath}${URLs[key]}`;
+    const url = URLs[key];
     postMessageData[key] = await getData(url);
     postMessage(postMessageData);
   });
