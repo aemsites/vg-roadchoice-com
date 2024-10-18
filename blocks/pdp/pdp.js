@@ -32,7 +32,7 @@ async function getPDPData(pathSegments) {
   const { category, sku } = pathSegments;
 
   try {
-    const json = await getJsonFromUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`);
+    const json = await getJsonFromUrl(getLocaleContextedUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`));
     if (!json) return null;
     return findPartBySKU(json?.data, sku);
   } catch (error) {
@@ -45,7 +45,7 @@ function findPartImagesBySKU(parts, sku) {
 }
 
 async function fetchPartImages(sku) {
-  const placeholderImage = '/product-images/rc-placeholder-image.png';
+  const placeholderImage = getLocaleContextedUrl('/product-images/rc-placeholder-image.png');
   try {
     const data = await getLongJSONData({
       url: getLocaleContextedUrl('/product-images/road-choice-website-images.json'),
