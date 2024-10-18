@@ -1,35 +1,23 @@
-let providedWorkerData = {};
+const limit = 100_000;
+const postMessageData = {};
+const tempData = [];
 
-function getLocaleContextedUrl(urlPathToConvert) {
-  const localeRegexToMatch = new RegExp(`/${providedWorkerData.rootLangPath}/`, 'i');
-  const localeInPageUrlRegex = new RegExp(`^/${providedWorkerData.rootLangPath}/`, 'i');
+function getLocaleContextedUrl(urlPathToConvert, providedWorkerData = {}) {
+  const { rootLangPath = '', pathname = '' } = providedWorkerData;
+  const localeRegexToMatch = new RegExp(`${rootLangPath}/`, 'i');
+  const localeInPageUrlRegex = new RegExp(`^/${rootLangPath}/`, 'i');
   let pageUrl = urlPathToConvert.startsWith('/') ? urlPathToConvert : `/${urlPathToConvert}`;
 
-  if (!providedWorkerData.rootLangPath) {
+  if (!rootLangPath) {
     return pageUrl;
   }
 
-  if (localeRegexToMatch.test(providedWorkerData.pathname) && !localeInPageUrlRegex.test(pageUrl)) {
-    pageUrl = `/${providedWorkerData.rootLangPath.toLocaleLowerCase()}${pageUrl}`;
+  if (localeRegexToMatch.test(pathname) && !localeInPageUrlRegex.test(pageUrl)) {
+    pageUrl = `${rootLangPath.toLocaleLowerCase()}${pageUrl}`;
   }
 
   return pageUrl;
 }
-
-/**
- * @property {string} crData - Cross Reference Data URL
- * @property {string} pnData - Part Number Data URL
- * @property {string} imgData - Images Data URL
- */
-const URLs = {
-  crData: getLocaleContextedUrl('/cross-reference-data/cr-data.json'),
-  pnData: getLocaleContextedUrl('/product-data/road-choice-make-model-part-filter-options.json'),
-  imgData: getLocaleContextedUrl('/product-images/road-choice-website-images.json'),
-};
-
-const limit = 100_000;
-const postMessageData = {};
-const tempData = [];
 
 async function getInitialJSONData(props) {
   const { url, offset = 0, limit: newLimit = null } = props;
@@ -78,13 +66,20 @@ async function getData(url) {
   return [];
 }
 
-onmessage = ({ data }) => {
-  providedWorkerData = data;
+onmessage = function test({ data: providedWorkerData }) {
+  const URLs = {
+    crData: getLocaleContextedUrl('/cross-reference-data/cr-data.json', providedWorkerData),
+    pnData: getLocaleContextedUrl('/product-data/road-choice-make-model-part-filter-options.json', providedWorkerData),
+    imgData: getLocaleContextedUrl('/product-images/road-choice-website-images.json', providedWorkerData),
+  };
 
   const postMessages = Object.keys(URLs);
   postMessages.forEach(async (key) => {
     const url = URLs[key];
-    postMessageData[key] = await getData(url);
-    postMessage(postMessageData);
+
+    if (url) {
+      postMessageData[key] = await getData(url);
+      postMessage(postMessageData);
+    }
   });
 };
