@@ -48,9 +48,9 @@ const productCard = (product, searchType) => {
 
   const item = createElement('li', { classes: blockName });
 
-  const linkUrl = `/parts?category=${
+  const linkUrl = getLocaleContextedUrl(`/parts?category=${
     category.replace(/[^\w]/g, '-').toLowerCase()
-  }&sku=${partNumber}`;
+  }&sku=${partNumber}`);
   const imageLink = createElement('a', { classes: 'image-link', props: { href: linkUrl } });
 
   const productImageUrl = imgUrl;
