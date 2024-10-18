@@ -1,10 +1,16 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
+import globals from 'globals';
+import pluginJs from '@eslint/js';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default [
   {
-    files: ['**/*.js', '**/*.jsx']
+    files: ['**/*.js', '**/*.jsx', '**/*.mjs'],
+  },
+  {
+    ignores: [
+      '**/*.min.js',
+      'tools/importer/',
+    ]
   },
   {
     languageOptions: { globals: globals.browser }
