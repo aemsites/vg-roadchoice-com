@@ -38,7 +38,7 @@ const buildThreeCols = (pic) => {
       parent.append(link);
       const texts = parent.closest('div').querySelectorAll('p');
       texts.forEach((text) => text.remove());
-    } else if (!textCheck) {
+    } else {
       const wrapper = createElement('a', { props: { href: link.href } });
       wrapper.append(pic);
       parent.insertAdjacentElement('afterbegin', wrapper);

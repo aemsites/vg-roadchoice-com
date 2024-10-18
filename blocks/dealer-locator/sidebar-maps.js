@@ -610,12 +610,12 @@ $.fn.getOpenHours = function (pin) {
   var isLeasing = Object.keys(pin.hours)[0].toLowerCase() === 'leasing';
   var allTimes;
 
-  if (!isLeasing) {
-    var { Parts: parts, Sales: sales, Service: service } = pin.hours;
-    allTimes = [ parts[today], sales[today], service[today] ];
-  } else if (isLeasing) {
+  if (isLeasing) {
     var { Leasing: leasing } = pin.hours;
     allTimes = [ leasing[today] ];
+  } else {
+    var { Parts: parts, Sales: sales, Service: service } = pin.hours;
+    allTimes = [ parts[today], sales[today], service[today] ];
   }
 
   var earliestHour;
@@ -1891,29 +1891,7 @@ $.fn.filterNearbyPins = function () {
         if (jQuery.inArray(el, filteredArray) == -1) newList.push(el);
       });
     }
-    if (!toggled) {
-      $(this).css('background', '#484a4e');
-      tmpPinList2 = filteredArray;
-      $.fn.tmpPins(tmpPinList2);
-
-      newList.forEach(function (pin) {
-        for (i = 0; i < $markers.length; i++) {
-
-          if ($markers[i].id == pin.IDENTIFIER_VALUE) {
-
-            marker = $markers[i];
-            marker.setMap(null);
-          }
-        }
-      });
-      document.getElementById('filterElectricDealer').style.pointerEvents = 'none';
-      document.getElementById('filterDealer').style.pointerEvents = 'none';
-      document.getElementById('filterElectricDealerMobile').style.pointerEvents = 'none';
-      document.getElementById('filterDealerMobile').style.pointerEvents = 'none';
-      document.getElementById('dealer-tag').setAttribute("title", $hoverText);
-      document.getElementById('electric-tag').setAttribute("title", $hoverText);
-    }
-    else {
+    if (toggled) {
       $(this).css('background', '#000');
       $('.no-dealer-text').hide();
       $.fn.tmpPins(tmpPinList);
@@ -1936,6 +1914,27 @@ $.fn.filterNearbyPins = function () {
       document.getElementById('filterDealerMobile').style.pointerEvents = 'auto';
       document.getElementById('dealer-tag').removeAttribute("title", $hoverText);
       document.getElementById('electric-tag').removeAttribute("title", $hoverText);
+    } else {
+      $(this).css('background', '#484a4e');
+      tmpPinList2 = filteredArray;
+      $.fn.tmpPins(tmpPinList2);
+
+      newList.forEach(function (pin) {
+        for (i = 0; i < $markers.length; i++) {
+
+          if ($markers[i].id == pin.IDENTIFIER_VALUE) {
+
+            marker = $markers[i];
+            marker.setMap(null);
+          }
+        }
+      });
+      document.getElementById('filterElectricDealer').style.pointerEvents = 'none';
+      document.getElementById('filterDealer').style.pointerEvents = 'none';
+      document.getElementById('filterElectricDealerMobile').style.pointerEvents = 'none';
+      document.getElementById('filterDealerMobile').style.pointerEvents = 'none';
+      document.getElementById('dealer-tag').setAttribute("title", $hoverText);
+      document.getElementById('electric-tag').setAttribute("title", $hoverText);
     }
     return false;
   });
@@ -1963,28 +1962,7 @@ $.fn.filterNearbyPins = function () {
         if (jQuery.inArray(el, filteredDealerArray) == -1) newList.push(el);
       });
     }
-    if (!toggled) {
-      $(this).css('background', '#484a4e');
-      tmpPinList3 = filteredDealerArray;
-      $.fn.tmpPins(tmpPinList3);
-      newList.forEach(function (pin) {
-        for (i = 0; i < $markers.length; i++) {
-
-          if ($markers[i].id == pin.IDENTIFIER_VALUE) {
-
-            marker = $markers[i];
-            marker.setMap(null);
-          }
-        }
-      });
-      document.getElementById('filterDealer').style.pointerEvents = 'none';
-      document.getElementById('filterUptime').style.pointerEvents = 'none';
-      document.getElementById('filterDealerMobile').style.pointerEvents = 'none';
-      document.getElementById('filterUptimeMobile').style.pointerEvents = 'none';
-      document.getElementById('dealer-tag').setAttribute("title", $hoverText);
-      document.getElementById('uptime-tag').setAttribute("title", $hoverText);
-    }
-    else {
+    if (toggled) {
       $(this).css('background', '#000');
       $('.no-dealer-text').hide();
       $.fn.tmpPins(tmpPinList);
@@ -2008,6 +1986,26 @@ $.fn.filterNearbyPins = function () {
       document.getElementById('filterUptimeMobile').style.pointerEvents = 'auto';
       document.getElementById('dealer-tag').removeAttribute("title", $hoverText);
       document.getElementById('uptime-tag').removeAttribute("title", $hoverText);
+    } else {
+      $(this).css('background', '#484a4e');
+      tmpPinList3 = filteredDealerArray;
+      $.fn.tmpPins(tmpPinList3);
+      newList.forEach(function (pin) {
+        for (i = 0; i < $markers.length; i++) {
+
+          if ($markers[i].id == pin.IDENTIFIER_VALUE) {
+
+            marker = $markers[i];
+            marker.setMap(null);
+          }
+        }
+      });
+      document.getElementById('filterDealer').style.pointerEvents = 'none';
+      document.getElementById('filterUptime').style.pointerEvents = 'none';
+      document.getElementById('filterDealerMobile').style.pointerEvents = 'none';
+      document.getElementById('filterUptimeMobile').style.pointerEvents = 'none';
+      document.getElementById('dealer-tag').setAttribute("title", $hoverText);
+      document.getElementById('uptime-tag').setAttribute("title", $hoverText);
     }
     return false;
   });
@@ -2034,29 +2032,7 @@ $.fn.filterNearbyPins = function () {
         if (jQuery.inArray(el, filteredDealerArray) == -1) newList.push(el);
       });
     }
-    if (!toggled) {
-      $(this).css('background', '#484a4e');
-      tmpPinList4 = filteredDealerArray;
-      $.fn.tmpPins(tmpPinList4);
-
-      newList.forEach(function (pin) {
-        for (i = 0; i < $markers.length; i++) {
-
-          if ($markers[i].id == pin.IDENTIFIER_VALUE) {
-
-            marker = $markers[i];
-            marker.setMap(null);
-          }
-        }
-      });
-      document.getElementById('filterElectricDealer').style.pointerEvents = 'none';
-      document.getElementById('filterUptime').style.pointerEvents = 'none';
-      document.getElementById('filterElectricDealerMobile').style.pointerEvents = 'none';
-      document.getElementById('filterUptimeMobile').style.pointerEvents = 'none';
-      document.getElementById('electric-tag').setAttribute("title", $hoverText);
-      document.getElementById('uptime-tag').setAttribute("title", $hoverText);
-    }
-    else {
+    if (toggled) {
       $(this).css('background', '#000');
       $('.no-dealer-text').hide();
       $.fn.tmpPins(tmpPinList);
@@ -2080,6 +2056,27 @@ $.fn.filterNearbyPins = function () {
       document.getElementById('filterUptimeMobile').style.pointerEvents = 'auto';
       document.getElementById('electric-tag').removeAttribute("title", $hoverText);
       document.getElementById('uptime-tag').removeAttribute("title", $hoverText);
+    } else {
+      $(this).css('background', '#484a4e');
+      tmpPinList4 = filteredDealerArray;
+      $.fn.tmpPins(tmpPinList4);
+
+      newList.forEach(function (pin) {
+        for (i = 0; i < $markers.length; i++) {
+
+          if ($markers[i].id == pin.IDENTIFIER_VALUE) {
+
+            marker = $markers[i];
+            marker.setMap(null);
+          }
+        }
+      });
+      document.getElementById('filterElectricDealer').style.pointerEvents = 'none';
+      document.getElementById('filterUptime').style.pointerEvents = 'none';
+      document.getElementById('filterElectricDealerMobile').style.pointerEvents = 'none';
+      document.getElementById('filterUptimeMobile').style.pointerEvents = 'none';
+      document.getElementById('electric-tag').setAttribute("title", $hoverText);
+      document.getElementById('uptime-tag').setAttribute("title", $hoverText);
     }
     return false;
   });
@@ -2392,8 +2389,10 @@ $.fn.setAddress2 = function () {
       $me.setPosition({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
 
 
-      if (!$radius) {
-
+      if ($radius) {
+        $radius.setCenter({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
+        $.fn.filterRadius();
+      } else {
         if (!$isAsist) {
           $radius = new google.maps.Circle({
             strokeColor: '#2c6ba4',
@@ -2417,12 +2416,6 @@ $.fn.setAddress2 = function () {
 
         // Set default sidebar pane
         $.fn.switchSidebarPane('sidebar-pins');
-
-
-
-      } else {
-        $radius.setCenter({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
-        $.fn.filterRadius();
       }
 
       // Set default sidebar pane
@@ -2469,7 +2462,6 @@ $.fn.setAddress = function () {
         position.lng()
       ];
 
-
       if (!$me) {
         $pin = {
           url: $meIcon,
@@ -2494,15 +2486,14 @@ $.fn.setAddress = function () {
         });
 
         $me.setZIndex(0);
-
       }
-
 
       $me.setPosition({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
 
-
-      if (!$radius) {
-
+      if ($radius) {
+        $radius.setCenter({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
+        $.fn.filterRadius();
+      } else {
         if (!$isAsist) {
           $radius = new google.maps.Circle({
             strokeColor: '#2c6ba4',
@@ -2526,19 +2517,12 @@ $.fn.setAddress = function () {
 
         // Set default sidebar pane
         $.fn.switchSidebarPane('sidebar-pins');
-
-
-
-      } else {
-        $radius.setCenter({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
-        $.fn.filterRadius();
       }
 
       // Set default sidebar pane
       $.fn.switchSidebarPane('sidebar-pins');
 
       $('.waiting-overlay').css('display', 'none');
-
     }
   });
 };
@@ -2564,7 +2548,13 @@ $.fn.setLocation = function () {
       $map.setZoom(8);
 
 
-      if (!$radius) {
+      if ($radius) {
+        $me.setPosition({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
+
+        $radius.setCenter({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
+
+        $.fn.filterRadius();
+      } else {
 
         if (!$isAsist) {
           $radius = new google.maps.Circle({
@@ -2587,17 +2577,6 @@ $.fn.setLocation = function () {
 
         // Set default sidebar pane
         $.fn.switchSidebarPane('sidebar-pins');
-
-
-
-      } else {
-
-        $me.setPosition({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
-
-        $radius.setCenter({ lat: parseFloat(pos.lat), lng: parseFloat(pos.lng) });
-
-        $.fn.filterRadius();
-
       }
 
       var address;
@@ -2806,11 +2785,11 @@ $.fn.drawPin = function (text, width, height, color) {
 
 $.fn.handleLocationError = function (browserHasGeolocation, infoWindow, pos) {
 
-  if (!browserHasGeolocation) {
-    alert('Error: Your browser doesn\'t support geolocation.');
-  } else {
+  if (browserHasGeolocation) {
     $('.loading-overlay').css('display', 'none');
     $('.waiting-overlay').css('display', 'block');
+  } else {
+    alert('Error: Your browser doesn\'t support geolocation.');
   }
 
 };
@@ -2891,10 +2870,10 @@ $.fn.wayPointArray = function () {
 
 $.fn.directionsMessage = function (message) {
 
-  if (!message) {
-    $directionsMessage.html('');
-  } else {
+  if (message) {
     $directionsMessage.html(message);
+  } else {
+    $directionsMessage.html('');
   }
 };
 
