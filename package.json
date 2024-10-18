@@ -1,5 +1,11 @@
 {
   "name": "roadchoice",
+  "version": "6.0.0",
+  "description": "",
+  "engines": {
+    "node": ">=v20.15.1 <23",
+    "npm": ">=10.7.0"
+  },
   "scripts": {
     "dev": "aem up",
     "dev:ca": "AEM_PAGES_URL=https://main--roadchoice-ca--volvogroup.aem.page aem up",
@@ -13,6 +19,20 @@
     "format": "prettier --write \"**/*.{js,jsx}\"",
     "prepare": "husky"
   },
+  "lint-staged": {
+    "*.js": "npm run lint:js",
+    "*.css": "npm run lint:css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aemsites/vg-roadchoice-com/"
+  },
+  "author": "Adobe",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/aemsites/vg-roadchoice-com/issues"
+  },
+  "homepage": "https://github.com/aemsites/vg-roadchoice-com/#readme",
   "devDependencies": {
     "@babel/core": "7.25.8",
     "@babel/eslint-parser": "7.25.8",
