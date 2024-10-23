@@ -4,6 +4,7 @@ import {
   getJsonFromUrl,
   getLongJSONData,
   defaultLimit,
+  getLocaleContextedUrl,
 } from '../../scripts/common.js';
 import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 
@@ -31,7 +32,7 @@ async function getPDPData(pathSegments) {
   const { category, sku } = pathSegments;
 
   try {
-    const json = await getJsonFromUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`);
+    const json = await getJsonFromUrl(getLocaleContextedUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`));
     if (!json) return null;
     return findPartBySKU(json?.data, sku);
   } catch (error) {
@@ -44,10 +45,10 @@ function findPartImagesBySKU(parts, sku) {
 }
 
 async function fetchPartImages(sku) {
-  const placeholderImage = '/product-images/rc-placeholder-image.png';
+  const placeholderImage = getLocaleContextedUrl('/product-images/rc-placeholder-image.png');
   try {
     const data = await getLongJSONData({
-      url: '/product-images/road-choice-website-images.json',
+      url: getLocaleContextedUrl('/product-images/road-choice-website-images.json'),
       limit: defaultLimit,
     });
     const images = findPartImagesBySKU(data, sku);
@@ -166,7 +167,7 @@ function groupByLanguage(data) {
 async function fetchCategoryKeys(category) {
   try {
     const json = await getLongJSONData({
-      url: '/product-data/rc-attribute-master-file.json',
+      url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
       limit: defaultLimit,
     });
     if (!json || json.length === 0) return [];
@@ -183,7 +184,7 @@ function filterByDocType(data, type, category) {
 
 async function fetchDocs(category) {
   try {
-    const json = await getJsonFromUrl('/catalogs-categories.json');
+    const json = await getJsonFromUrl(getLocaleContextedUrl('/catalogs-categories.json'));
     if (!json) return null;
     const data = json?.data;
     return {
@@ -231,7 +232,7 @@ function renderDocs(docs) {
 // Check if product has catalog, product sheet or e-catalogs section
 async function fetchSDS(category) {
   try {
-    const json = await getJsonFromUrl('/sds-categories.json');
+    const json = await getJsonFromUrl(getLocaleContextedUrl('/sds-categories.json'));
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
@@ -263,7 +264,7 @@ function renderSDS(sdsList) {
 
 async function fetchBlogs(category) {
   try {
-    const json = await getJsonFromUrl('/blog/query-index.json');
+    const json = await getJsonFromUrl(getLocaleContextedUrl('/blog/query-index.json'));
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
@@ -306,7 +307,7 @@ function renderBlogs(blogList) {
 
 async function getPartFitConfig(category) {
   try {
-    const json = await getJsonFromUrl('/product-fit-vehicles/product-fit-vehicles-config.json');
+    const json = await getJsonFromUrl(getLocaleContextedUrl('/product-fit-vehicles/product-fit-vehicles-config.json'));
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
@@ -320,8 +321,8 @@ async function fetchPartFit(pathSegments) {
   const hasPartFit = await getPartFitConfig(category);
   if (hasPartFit?.length === 0) return null;
   try {
-    const json = await getJsonFromUrl(`/product-fit-vehicles/${
-      category.replace(/[^\w]/g, '-')}-application-data.json`);
+    const json = await getJsonFromUrl(getLocaleContextedUrl(`/product-fit-vehicles/${
+      category.replace(/[^\w]/g, '-')}-application-data.json`));
     if (!json) return null;
     return filterModelsBySKU(json?.data, sku);
   } catch (error) {
