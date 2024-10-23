@@ -30,9 +30,7 @@ export default async function decorate(block) {
   buttons.forEach((el) => {
     el.classList.add(`${blockName}__button-container`);
     [...el.querySelectorAll('a')].forEach((link) => {
-      if (link.classList.contains('button--primary')
-          || link.classList.contains('button--secondary')
-          || link.classList.contains('button--red')) {
+      if (link.classList.contains('button--primary') || link.classList.contains('button--secondary') || link.classList.contains('button--red')) {
         link.classList.add('button--small');
       } else {
         link.classList.add('standalone-link', `${blockName}__button`);

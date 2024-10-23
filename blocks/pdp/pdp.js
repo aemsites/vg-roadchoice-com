@@ -1,10 +1,4 @@
-import {
-  createElement,
-  getTextLabel,
-  getJsonFromUrl,
-  getLongJSONData,
-  defaultLimit,
-} from '../../scripts/common.js';
+import { createElement, getTextLabel, getJsonFromUrl, getLongJSONData, defaultLimit } from '../../scripts/common.js';
 import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 
 const blockName = 'pdp';
@@ -83,13 +77,7 @@ function renderImages(block, images) {
 
   // main image
   const mainPictureUrl = images[0]['Image URL'];
-  const mainPicture = createOptimizedPicture(
-    mainPictureUrl,
-    'Part image',
-    true,
-    undefined,
-    !mainPictureUrl.startsWith('/'),
-  );
+  const mainPicture = createOptimizedPicture(mainPictureUrl, 'Part image', true, undefined, !mainPictureUrl.startsWith('/'));
   mainPicture.querySelector('img').classList.add(`${blockName}-image`);
   selectedImage.append(mainPicture);
 
@@ -100,13 +88,7 @@ function renderImages(block, images) {
   images.forEach((image, id) => {
     const liFragment = docRange.createContextualFragment(`
       <li class="${blockName}-image-item ${id === 0 ? 'active' : ''}"> </li>`);
-    const picture = createOptimizedPicture(
-      image['Image URL'],
-      'Additional part image',
-      false,
-      undefined,
-      !image['Image URL'].startsWith('/'),
-    );
+    const picture = createOptimizedPicture(image['Image URL'], 'Additional part image', false, undefined, !image['Image URL'].startsWith('/'));
     picture.querySelector('img').classList.add(`${blockName}-gallery-image`);
     liFragment.querySelector('li').append(picture);
     imageList.append(liFragment);
@@ -151,8 +133,7 @@ function setPartData(part, block) {
 }
 
 function filterByCategory(data, category, categoryKey = 'category') {
-  return data.filter((item) => item[categoryKey].replace(/[^\w]/g, '')
-    .toLowerCase() === category.replace(/[^\w]/g, '').toLowerCase());
+  return data.filter((item) => item[categoryKey].replace(/[^\w]/g, '').toLowerCase() === category.replace(/[^\w]/g, '').toLowerCase());
 }
 
 function groupByLanguage(data) {
@@ -177,8 +158,12 @@ async function fetchCategoryKeys(category) {
 }
 
 function filterByDocType(data, type, category) {
-  return groupByLanguage(filterByCategory(data
-    .filter((doc) => doc.type.toLowerCase() === type), category));
+  return groupByLanguage(
+    filterByCategory(
+      data.filter((doc) => doc.type.toLowerCase() === type),
+      category,
+    ),
+  );
 }
 
 async function fetchDocs(category) {
@@ -320,8 +305,7 @@ async function fetchPartFit(pathSegments) {
   const hasPartFit = await getPartFitConfig(category);
   if (hasPartFit?.length === 0) return null;
   try {
-    const json = await getJsonFromUrl(`/product-fit-vehicles/${
-      category.replace(/[^\w]/g, '-')}-application-data.json`);
+    const json = await getJsonFromUrl(`/product-fit-vehicles/${category.replace(/[^\w]/g, '-')}-application-data.json`);
     if (!json) return null;
     return filterModelsBySKU(json?.data, sku);
   } catch (error) {
@@ -371,9 +355,8 @@ function renderPartFit(partFitData) {
     sectionWrapper.querySelector(`.${blockName}-part-fit-make-list`).append(makeFragment);
   });
 
-  partFitData
-    .forEach((vehicle) => {
-      const partFitFragment = docRange.createContextualFragment(`
+  partFitData.forEach((vehicle) => {
+    const partFitFragment = docRange.createContextualFragment(`
         <div class="${blockName}-part-fit-list-item" data-make="${vehicle.Make}">
           <h4 class="${blockName}-part-fit-make">${vehicle.Make}</h4>
           <h6 class="${blockName}-part-fit-model">Model: <span class="value">${vehicle.Model}</span></h6>
@@ -386,13 +369,13 @@ function renderPartFit(partFitData) {
         </div>
       `);
 
-      sectionWrapper.querySelector(`.${blockName}-part-fit-list`).append(partFitFragment);
-    });
+    sectionWrapper.querySelector(`.${blockName}-part-fit-list`).append(partFitFragment);
+  });
 
   const countVisibleItems = () => {
-    const count = sectionWrapper
-      .querySelectorAll(`.${blockName}-part-fit-list-item:not(.${blockName}-hide-by-filter):not(.${blockName}-hide-by-search)`)
-      .length;
+    const count = sectionWrapper.querySelectorAll(
+      `.${blockName}-part-fit-list-item:not(.${blockName}-hide-by-filter):not(.${blockName}-hide-by-search)`,
+    ).length;
     sectionWrapper.querySelector(`.${blockName}-part-fit-count`).textContent = `${count} Entries`;
   };
 

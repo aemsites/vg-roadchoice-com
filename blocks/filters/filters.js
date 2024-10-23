@@ -11,25 +11,20 @@ if (isSearchResult) products = JSON.parse(sessionStorage.getItem('results')) || 
 
 const reduceArrays = (array) => {
   const initialValue = {};
-  const reduced = array.reduce(
-    (acc, value) => ({ ...acc, [value]: (acc[value] || 0) + 1 }),
-    initialValue,
-  );
+  const reduced = array.reduce((acc, value) => ({ ...acc, [value]: (acc[value] || 0) + 1 }), initialValue);
   return reduced;
 };
 
 const reduceCategories = (cats) => {
   const categoryList = cats.map((x) => x['Part Category'].toLowerCase());
-  const catToReduce = urlCategory
-    ? categoryList.filter((item) => item.toLowerCase() === urlCategory) : categoryList;
+  const catToReduce = urlCategory ? categoryList.filter((item) => item.toLowerCase() === urlCategory) : categoryList;
   const reducedCategories = reduceArrays(catToReduce);
-  const orderedCategories = Object.keys(reducedCategories).sort().reduce(
-    (obj, key) => {
+  const orderedCategories = Object.keys(reducedCategories)
+    .sort()
+    .reduce((obj, key) => {
       obj[key] = reducedCategories[key];
       return obj;
-    },
-    {},
-  );
+    }, {});
   const reducedArray = Object.entries(orderedCategories);
 
   return reducedArray;

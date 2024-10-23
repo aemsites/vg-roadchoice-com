@@ -9,7 +9,6 @@ async function getConstantValues() {
       constants = response;
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Error with constants file', error);
   }
   return constants;
@@ -21,15 +20,12 @@ const formatValues = (values) => {
     /* eslint-disable-next-line */
     values.forEach(({ name, value }) => obj[name] = value);
   } else {
-    // eslint-disable-next-line no-console
     console.error('Error with constants file', values);
   }
   return obj;
 };
 
-const {
-  tools,
-} = await getConstantValues();
+const { tools } = await getConstantValues();
 
 const TOOLS_VALUES = formatValues(tools?.data);
 export default TOOLS_VALUES;

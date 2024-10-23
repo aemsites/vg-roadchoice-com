@@ -1,13 +1,5 @@
-import {
-  getImageURLs,
-  createResponsivePicture,
-  variantsClassesToBEM,
-  decorateIcons,
-} from '../../scripts/common.js';
-import {
-  isVideoLink,
-  createVideo,
-} from '../../scripts/video-helper.js';
+import { getImageURLs, createResponsivePicture, variantsClassesToBEM, decorateIcons } from '../../scripts/common.js';
+import { isVideoLink, createVideo } from '../../scripts/video-helper.js';
 
 const variantClasses = ['text-left', 'text-right', 'text-black'];
 const blockName = 'hero';
@@ -42,10 +34,7 @@ export default async function decorate(block) {
   }
 
   if (imageData.length > 1) {
-    imageData[0].breakpoints = [
-      { media: '(min-width: 600px)', width: 600 },
-      { width: 750 },
-    ];
+    imageData[0].breakpoints = [{ media: '(min-width: 600px)', width: 600 }, { width: 750 }];
 
     imageData[1].breakpoints = [
       { media: '(min-width: 1200px)', width: 1200 },
@@ -78,7 +67,7 @@ export default async function decorate(block) {
   const button = content.querySelector('a');
   const allTexts = content.querySelectorAll('p');
 
-  if (!button && (allTexts.length > 0)) {
+  if (!button && allTexts.length > 0) {
     content.classList.add('with-text');
     allTexts.forEach((p) => p.classList.add(`${blockName}__text`));
   }

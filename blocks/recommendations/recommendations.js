@@ -1,8 +1,4 @@
-import {
-  createElement,
-  getTextLabel,
-  getJsonFromUrl,
-} from '../../scripts/common.js';
+import { createElement, getTextLabel, getJsonFromUrl } from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/lib-franklin.js';
 
 const blockName = 'recommendations';
@@ -23,12 +19,13 @@ export const getLimit = (block) => {
   return limit;
 };
 
-export const clearRepeatedArticles = (articles) => articles.filter((e) => {
-  const currentArticlePath = window.location.href.split('/').pop();
-  const path = e.path.split('/').pop();
-  if (path !== currentArticlePath) return e;
-  return null;
-});
+export const clearRepeatedArticles = (articles) =>
+  articles.filter((e) => {
+    const currentArticlePath = window.location.href.split('/').pop();
+    const path = e.path.split('/').pop();
+    if (path !== currentArticlePath) return e;
+    return null;
+  });
 
 const formatDate = (date) => {
   const convertedDate = new Date(parseInt(date, 10) * 1000);
@@ -48,14 +45,12 @@ export default async function decorate(block) {
   const { data: allArticles } = await getJsonFromUrl(route);
 
   const sortedArticles = allArticles.sort((a, b) => {
-    a.date = +(a.date);
-    b.date = +(b.date);
+    a.date = +a.date;
+    b.date = +b.date;
     return b.date - a.date;
   });
   const filteredArticles = clearRepeatedArticles(sortedArticles);
-  const artByCategory = category ? filteredArticles
-    .filter((e) => e.category.toLowerCase() === category.toLowerCase())
-    : filteredArticles;
+  const artByCategory = category ? filteredArticles.filter((e) => e.category.toLowerCase() === category.toLowerCase()) : filteredArticles;
   const selectedArticles = artByCategory.slice(0, limit);
 
   const noArticles = selectedArticles.length === 0;
@@ -96,7 +91,7 @@ export default async function decorate(block) {
     articleLink.innerText = linkText;
     strongLink.appendChild(articleLink);
 
-    article.append(articleTitle, (isBlogArticle ? articleDate : ''), articleText, strongLink);
+    article.append(articleTitle, isBlogArticle ? articleDate : '', articleText, strongLink);
 
     recommendationsList.appendChild(article);
   });

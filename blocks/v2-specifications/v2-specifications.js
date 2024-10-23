@@ -1,11 +1,5 @@
-import {
-  loadBlock,
-} from '../../scripts/lib-franklin.js';
-import {
-  createElement,
-  slugify,
-  removeEmptyTags,
-} from '../../scripts/common.js';
+import { loadBlock } from '../../scripts/lib-franklin.js';
+import { createElement, slugify, removeEmptyTags } from '../../scripts/common.js';
 
 const blockName = 'v2-specifications';
 

@@ -10,8 +10,7 @@ const getProperties = (prod, st) => {
   const { Description } = prod;
   const cardName = {
     // TODO check for name, we don't have it now in the excel file
-    cross: Description && Description.length > maxChars
-      ? `${Description.substring(0, maxChars)} ...` : Description,
+    cross: Description && Description.length > maxChars ? `${Description.substring(0, maxChars)} ...` : Description,
     parts: prod['Part Name'],
   };
 
@@ -23,30 +22,16 @@ const getProperties = (prod, st) => {
   return cardContent;
 };
 
-const optimizePicture = (imgUrl) => createOptimizedPicture(
-  imgUrl,
-  'product image',
-  false,
-  [{ width: '200' }],
-  true,
-);
+const optimizePicture = (imgUrl) => createOptimizedPicture(imgUrl, 'product image', false, [{ width: '200' }], true);
 
 const productCard = (product, searchType) => {
   const object = getProperties(product, searchType);
 
-  const {
-    category,
-    name,
-    partNumber,
-    hasImage,
-    imgUrl,
-  } = object;
+  const { category, name, partNumber, hasImage, imgUrl } = object;
 
   const item = createElement('li', { classes: blockName });
 
-  const linkUrl = `/parts?category=${
-    category.replace(/[^\w]/g, '-').toLowerCase()
-  }&sku=${partNumber}`;
+  const linkUrl = `/parts?category=${category.replace(/[^\w]/g, '-').toLowerCase()}&sku=${partNumber}`;
   const imageLink = createElement('a', { classes: 'image-link', props: { href: linkUrl } });
 
   const productImageUrl = imgUrl;
@@ -56,10 +41,13 @@ const productCard = (product, searchType) => {
   const picture = optimizePicture(imageUrl);
   picture.classList.add('image');
   placeholderPicture.classList.add('image', 'hidden');
-  picture.querySelector('img').setAttribute('onerror', `
+  picture.querySelector('img').setAttribute(
+    'onerror',
+    `
     this.parentElement.classList.add("hidden");
     this.parentElement.previousElementSibling.classList.remove("hidden");
-    `);
+    `,
+  );
   imageLink.append(placeholderPicture, picture);
 
   const titleLink = createElement('a', { classes: 'title-link', props: { href: linkUrl } });

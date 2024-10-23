@@ -18,15 +18,7 @@ import {
   createOptimizedPicture,
 } from './lib-franklin.js';
 
-import {
-  addFavIcon,
-  createElement,
-  decorateIcons,
-  getPlaceholders,
-  loadDelayed,
-  slugify,
-  variantsClassesToBEM,
-} from './common.js';
+import { addFavIcon, createElement, decorateIcons, getPlaceholders, loadDelayed, slugify, variantsClassesToBEM } from './common.js';
 
 const disableHeader = getMetadata('disable-header').toLowerCase() === 'true';
 const disableFooter = getMetadata('disable-footer').toLowerCase() === 'true';
@@ -71,7 +63,8 @@ export function decorateSections(main) {
         if (key === 'style') {
           const styles = meta.style.split(',').map((style) => toClassName(style.trim()));
           styles.forEach((style) => section.classList.add(style));
-        } if (key === 'background') {
+        }
+        if (key === 'background') {
           const picture = sectionMeta.querySelector('picture');
           if (picture) addBackgroundImage(section, meta[key]);
         } else {
@@ -169,8 +162,7 @@ const handleLinkDecoration = (link) => {
       twoUp.parentElement.className = 'button-container';
       link.appendChild(arrow);
     }
-    if (up.tagName === 'LI' && twoUp.children.length === 1
-      && link.children.length > 0 && link.firstElementChild.tagName === 'STRONG') {
+    if (up.tagName === 'LI' && twoUp.children.length === 1 && link.children.length > 0 && link.firstElementChild.tagName === 'STRONG') {
       const arrow = createElement('span', { classes: ['fa', 'fa-arrow-right'] });
       link.className = 'button arrowed';
       twoUp.className = 'button-container';
@@ -245,10 +237,8 @@ function buildHeroBlock(main) {
   }
 
   if (heroBlock) return;
-  // eslint-disable-next-line no-bitwise
-  if (header && picture
-    // eslint-disable-next-line no-bitwise
-    && (header.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
+
+  if (header && picture && header.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING) {
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, header] }));
     section.querySelector('.hero').classList.add('auto-block');
@@ -285,7 +275,6 @@ function buildAutoBlocks(main, head) {
       buildSubNavigation(main, head);
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
   }
 }
@@ -311,10 +300,11 @@ export function decorateLinks(block) {
       }
 
       const url = new URL(link.href);
-      const external = !url.host.match('roadchoice.com')
-      && !url.host.match('.hlx.(page|live)')
-      && !url.host.match('.aem.(page|live)')
-      && !url.host.match('localhost');
+      const external =
+        !url.host.match('roadchoice.com') &&
+        !url.host.match('.hlx.(page|live)') &&
+        !url.host.match('.aem.(page|live)') &&
+        !url.host.match('localhost');
       if (url.host.match('build.roadchoice.com') || url.pathname.endsWith('.pdf') || external) {
         link.target = '_blank';
       }
@@ -322,14 +312,7 @@ export function decorateLinks(block) {
 }
 
 function decorateSectionBackgrounds(main) {
-  const variantClasses = [
-    'black-bg',
-    'white-bg',
-    'primary-red-bg',
-    'primary-medium-gray-bg',
-    'secondary-red-bg',
-    'no-vertical-padding',
-  ];
+  const variantClasses = ['black-bg', 'white-bg', 'primary-red-bg', 'primary-medium-gray-bg', 'secondary-red-bg', 'no-vertical-padding'];
 
   main.querySelectorAll(':scope > .section').forEach((section) => {
     // transform background color variants into BEM classnames
@@ -356,7 +339,7 @@ const createInpageNavigation = (main) => {
     if (title) {
       const countDuplcated = tabItemsObj.filter((item) => item.title === title)?.length || 0;
       const order = parseFloat(section.dataset.inpageOrder);
-      const anchorID = (countDuplcated > 0) ? slugify(`${section.dataset.inpage}-${countDuplcated}`) : slugify(section.dataset.inpage);
+      const anchorID = countDuplcated > 0 ? slugify(`${section.dataset.inpage}-${countDuplcated}`) : slugify(section.dataset.inpage);
       const obj = {
         title,
         id: anchorID,
@@ -427,7 +410,8 @@ export function decorateMain(main, head) {
   if (head) {
     const pageStyle = head.querySelector('[name="style"]')?.content;
     if (pageStyle) {
-      pageStyle.split(',')
+      pageStyle
+        .split(',')
         .map((style) => toClassName(style.trim()))
         .forEach((style) => main.classList.add(style));
     }
@@ -456,7 +440,6 @@ async function loadTemplate(doc, templateName) {
             await mod.default(doc);
           }
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.log(`failed to load module for ${lowercaseTemplateName}`, error);
         }
         resolve();
@@ -464,7 +447,6 @@ async function loadTemplate(doc, templateName) {
     });
     await Promise.all([cssLoaded, decorationComplete]);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.log(`failed to load block ${lowercaseTemplateName}`, error);
   }
 }
@@ -599,7 +581,7 @@ export function domEl(tag, ...items) {
 
   if (!(items[0] instanceof Element || items[0] instanceof HTMLElement) && typeof items[0] === 'object') {
     const [attributes, ...rest] = items;
-    // eslint-disable-next-line no-param-reassign
+
     items = rest;
 
     Object.entries(attributes).forEach(([key, value]) => {
@@ -612,10 +594,7 @@ export function domEl(tag, ...items) {
   }
 
   items.forEach((item) => {
-    // eslint-disable-next-line no-param-reassign
-    item = item instanceof Element || item instanceof HTMLElement
-      ? item
-      : document.createTextNode(item);
+    item = item instanceof Element || item instanceof HTMLElement ? item : document.createTextNode(item);
     element.appendChild(item);
   });
 
@@ -626,23 +605,57 @@ export function domEl(tag, ...items) {
     More shorthand functions can be added for very common DOM elements below.
     domEl function from above can be used for one-off DOM element occurrences.
   */
-export function div(...items) { return domEl('div', ...items); }
-export function p(...items) { return domEl('p', ...items); }
-export function a(...items) { return domEl('a', ...items); }
-export function h1(...items) { return domEl('h1', ...items); }
-export function h2(...items) { return domEl('h2', ...items); }
-export function h3(...items) { return domEl('h3', ...items); }
-export function h4(...items) { return domEl('h4', ...items); }
-export function h5(...items) { return domEl('h5', ...items); }
-export function h6(...items) { return domEl('h6', ...items); }
-export function ul(...items) { return domEl('ul', ...items); }
-export function li(...items) { return domEl('li', ...items); }
-export function i(...items) { return domEl('i', ...items); }
-export function img(...items) { return domEl('img', ...items); }
-export function span(...items) { return domEl('span', ...items); }
-export function input(...items) { return domEl('input', ...items); }
-export function form(...items) { return domEl('form', ...items); }
-export function button(...items) { return domEl('button', ...items); }
+export function div(...items) {
+  return domEl('div', ...items);
+}
+export function p(...items) {
+  return domEl('p', ...items);
+}
+export function a(...items) {
+  return domEl('a', ...items);
+}
+export function h1(...items) {
+  return domEl('h1', ...items);
+}
+export function h2(...items) {
+  return domEl('h2', ...items);
+}
+export function h3(...items) {
+  return domEl('h3', ...items);
+}
+export function h4(...items) {
+  return domEl('h4', ...items);
+}
+export function h5(...items) {
+  return domEl('h5', ...items);
+}
+export function h6(...items) {
+  return domEl('h6', ...items);
+}
+export function ul(...items) {
+  return domEl('ul', ...items);
+}
+export function li(...items) {
+  return domEl('li', ...items);
+}
+export function i(...items) {
+  return domEl('i', ...items);
+}
+export function img(...items) {
+  return domEl('img', ...items);
+}
+export function span(...items) {
+  return domEl('span', ...items);
+}
+export function input(...items) {
+  return domEl('input', ...items);
+}
+export function form(...items) {
+  return domEl('form', ...items);
+}
+export function button(...items) {
+  return domEl('button', ...items);
+}
 
 /**
  * A helper function that delays the execution of a function
@@ -655,7 +668,9 @@ export function debounce(func, timeout = 200) {
   return (...args) => {
     clearTimeout(timer);
 
-    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
   };
 }
 

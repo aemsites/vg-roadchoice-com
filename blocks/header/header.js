@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import { getMetadata } from '../../scripts/lib-franklin.js';
 import { createElement } from '../../scripts/common.js';
 
@@ -110,7 +109,7 @@ function setupNextLevelList(navSections, selector, level) {
 function toggleMenu(nav, navSections, forceExpanded = null) {
   const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
   const button = nav.querySelector('.nav-hamburger button');
-  document.body.style.overflowY = (expanded || isDesktop) ? '' : 'hidden';
+  document.body.style.overflowY = expanded || isDesktop ? '' : 'hidden';
   nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
   button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
   // enable nav dropdown keyboard accessibility
@@ -188,7 +187,9 @@ export default async function decorate(block) {
       const sectionNavs = navSections.querySelectorAll(':scope > ul');
       if (sectionNavs.length === sectionClasses.length) {
         const sectionPDFs = navSections.querySelectorAll('a[href$=".pdf"]');
-        [...sectionPDFs].forEach((pdf) => { pdf.target = '_blank'; });
+        [...sectionPDFs].forEach((pdf) => {
+          pdf.target = '_blank';
+        });
         sectionNavs[0].className = 'level-1';
         sectionClasses.forEach((c, i) => sectionNavs[i].classList.add(`nav-sections-${c}`));
       }

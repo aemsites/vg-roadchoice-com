@@ -80,9 +80,7 @@ const renderBlock = async (block) => {
   filterList.onclick = (e) => {
     const elements = [`${blockName}-title-wrapper`, `${blockName}-title`, 'plus-btn'];
     if (elements.some((el) => e.target.classList.contains(el))) {
-      const element = e.target.classList.contains(`${blockName}-title-wrapper`)
-        ? e.target
-        : e.target.parentElement;
+      const element = e.target.classList.contains(`${blockName}-title-wrapper`) ? e.target : e.target.parentElement;
       element.classList.toggle('active');
       element.nextElementSibling.classList.toggle('hidden');
     }
@@ -100,7 +98,9 @@ const renderBlock = async (block) => {
 
   filterForm.onsubmit = (e) => {
     e.preventDefault();
-    const { submitter: { id } } = e;
+    const {
+      submitter: { id },
+    } = e;
     const isApply = id === 'apply-filter-btn';
     if (isApply) {
       const checkedInputs = [...filterList.querySelectorAll(`.${blockName}-input:checked`)];
@@ -119,8 +119,7 @@ const renderBlock = async (block) => {
       });
       const filteredProducts = new Set();
       products.forEach((product) => {
-        const isFiltered = filteredAttrib.every((attrib) => attrib
-          .values.includes(product[attrib.title]));
+        const isFiltered = filteredAttrib.every((attrib) => attrib.values.includes(product[attrib.title]));
         if (isFiltered) filteredProducts.add(product);
       });
       const event = new CustomEvent('FilteredProducts', { detail: { filteredProducts } });

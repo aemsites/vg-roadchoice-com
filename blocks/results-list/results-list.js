@@ -26,20 +26,20 @@ if (isSearchResult) {
 
 const searchType = (query.searchType === 'cross' && 'cross') || 'parts';
 
-// eslint-disable-next-line object-curly-newline
 const renderResults = ({ loadingElement, productList, isTruckLibrary, detail }) => {
   loadingElement.remove();
   products = category ? products : detail?.results;
-  products = total > 0 && category
-    ? detail?.results.filter((item) => item['Part Category'].toLowerCase() === category)
-    : products;
+  products = total > 0 && category ? detail?.results.filter((item) => item['Part Category'].toLowerCase() === category) : products;
 
   if (products.length === 0) return;
   products.forEach((prod, idx) => {
     prod.hasImage = false;
-    const filterLoop = detail.data.imgData.filter((e) => e['Part Number'] === prod['Base Part Number']
-    && ((isTruckLibrary(e['Image URL']) && e['Image URL'].includes('.0?$'))
-    || (!isTruckLibrary(e['Image URL']) && e['Image URL'].includes('-0.jpg'))));
+    const filterLoop = detail.data.imgData.filter(
+      (e) =>
+        e['Part Number'] === prod['Base Part Number'] &&
+        ((isTruckLibrary(e['Image URL']) && e['Image URL'].includes('.0?$')) ||
+          (!isTruckLibrary(e['Image URL']) && e['Image URL'].includes('-0.jpg'))),
+    );
     if (filterLoop.length >= 1) {
       prod.hasImage = true;
       prod.imgUrl = filterLoop[0]['Image URL'];

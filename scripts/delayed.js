@@ -1,21 +1,10 @@
 // eslint-disable-next-line import/no-cycle
 import { sampleRUM, loadScript } from './lib-franklin.js';
 // eslint-disable-next-line import/no-cycle
-import {
-  isPerformanceAllowed,
-  isTargetingAllowed,
-  COOKIE_CONFIGS,
-  loadWorker,
-} from './common.js';
+import { isPerformanceAllowed, isTargetingAllowed, COOKIE_CONFIGS, loadWorker } from './common.js';
 
 // COOKIE ACCEPTANCE AND IDs default to false in case no ID is present
-const {
-  DATA_DOMAIN_SCRIPT = false,
-  GTM_ID = false,
-  HOTJAR_ID = false,
-  ARTIBOT_ID = false,
-  COOKIE_CHECK = true,
-} = COOKIE_CONFIGS;
+const { DATA_DOMAIN_SCRIPT = false, GTM_ID = false, HOTJAR_ID = false, ARTIBOT_ID = false, COOKIE_CHECK = true } = COOKIE_CONFIGS;
 
 // Core Web Vitals RUM collection
 sampleRUM('cwv');
@@ -35,8 +24,10 @@ if (avoidCookieCheck || isTargetingAllowed()) {
 // add more delayed functionality here
 
 // Prevent the cookie banner from loading when running in library
-if (!window.location.pathname.includes('srcdoc')
-  && !['localhost', 'hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((url) => window.location.host.includes(url))) {
+if (
+  !window.location.pathname.includes('srcdoc') &&
+  !['localhost', 'hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((url) => window.location.host.includes(url))
+) {
   loadScript('https://cdn.cookielaw.org/scripttemplates/otSDKStub.js', {
     type: 'text/javascript',
     charset: 'UTF-8',
@@ -67,9 +58,15 @@ async function loadGoogleTagManager() {
   // google tag manager
   // eslint-disable-next-line func-names
   (function (w, d, s, l, i) {
-    w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); const f = d.getElementsByTagName(s)[0]; const j = d.createElement(s); const
-      dl = l !== 'dataLayer' ? `&l=${l}` : ''; j.async = true; j.src = `https://www.googletagmanager.com/gtm.js?id=${i}${dl}`; f.parentNode.insertBefore(j, f);
-  }(window, document, 'script', 'dataLayer', GTM_ID));
+    w[l] = w[l] || [];
+    w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+    const f = d.getElementsByTagName(s)[0];
+    const j = d.createElement(s);
+    const dl = l !== 'dataLayer' ? `&l=${l}` : '';
+    j.async = true;
+    j.src = `https://www.googletagmanager.com/gtm.js?id=${i}${dl}`;
+    f.parentNode.insertBefore(j, f);
+  })(window, document, 'script', 'dataLayer', GTM_ID);
 }
 
 // Hotjar
