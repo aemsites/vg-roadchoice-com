@@ -2,13 +2,25 @@ import { createElement, getTextLabel } from '../../scripts/common.js';
 
 const blockName = 'category-filters';
 let products = window.categoryData;
-let filters = JSON.parse(sessionStorage.getItem('filter-attribs'));
 let isDecorated = false;
 const titleText = getTextLabel('category_filters_title');
 const clearText = getTextLabel('category_filters_clear_button');
 const applyText = getTextLabel('category_filters_apply_button');
 
+function getFilters() {
+  let filters = {};
+
+  try {
+    filters = JSON.parse(sessionStorage.getItem('filter-attribs'));
+  } catch (error) {
+    throw new Error('Error getting filters from sessionStorage');
+  }
+
+  return filters;
+}
+
 const renderBlock = async (block) => {
+  const filters = getFilters();
   const filterTitle = createElement('h3', { classes: `${blockName}-title` });
   filterTitle.textContent = titleText;
   const filterForm = createElement('form', { classes: `${blockName}-form`, props: { id: `${blockName}-form` } });
@@ -145,7 +157,7 @@ const renderBlock = async (block) => {
 };
 
 const isRenderedCheck = (block) => {
-  if (filters && products && !isDecorated) {
+  if (getFilters() && products && !isDecorated) {
     isDecorated = true;
     renderBlock(block);
   }
@@ -156,7 +168,6 @@ export default async function decorate(block) {
   if (isDecorated) return;
   ['FilterAttribsLoaded', 'CategoryDataLoaded'].forEach((eventName) => {
     document.addEventListener(eventName, () => {
-      filters = JSON.parse(sessionStorage.getItem(`${blockName}-attribs`));
       products = window.categoryData;
       isRenderedCheck(block);
     });

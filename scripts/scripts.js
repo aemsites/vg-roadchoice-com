@@ -585,10 +585,10 @@ export function domEl(tag, ...items) {
     items = rest;
 
     Object.entries(attributes).forEach(([key, value]) => {
-      if (!key.startsWith('on')) {
-        element.setAttribute(key, Array.isArray(value) ? value.join(' ') : value);
-      } else {
+      if (key.startsWith('on')) {
         element.addEventListener(key.substring(2).toLowerCase(), value);
+      } else {
+        element.setAttribute(key, Array.isArray(value) ? value.join(' ') : value);
       }
     });
   }

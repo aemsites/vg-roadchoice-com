@@ -1,9 +1,13 @@
-import { createElement, getLongJSONData, defaultLimit } from '../../scripts/common.js';
+import {
+  createElement,
+  getLongJSONData,
+  defaultLimit,
+  getLocaleContextedUrl,
+} from '../../scripts/common.js';
 
-const categoryMaster = '/product-data/rc-attribute-master-file.json';
-const amount = 12;
 const url = new URL(window.location.href);
-const urlParams = new URLSearchParams(url.search);
+const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
+const amount = 12;
 let category;
 let mainCategory;
 const json = {
@@ -12,6 +16,10 @@ const json = {
   offset: 0,
   total: 0,
 };
+
+function get404PageUrl() {
+  return getLocaleContextedUrl('/404.html');
+}
 
 /* Cases that throw an error if the category is wrong or missing that goes to 404 page:
  * 1. "/part-category/" => 404 if is index path
@@ -25,7 +33,11 @@ const json = {
  * Returns the category name from the URL query string, or _null_ if it is not present.
  * @returns {string|null} The category name or _null_.
  */
-const getCategory = async () => urlParams.get('category') || null;
+const getCategory = () => {
+  const urlParams = new URLSearchParams(url.search);
+
+  return urlParams.get('category') || null;
+};
 
 /**
  * Updates the sessionStorage with the category data and the amount of products to show.
@@ -36,8 +48,9 @@ const getCategory = async () => urlParams.get('category') || null;
  */
 const getCategoryData = async (cat) => {
   try {
+    const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
     const products = await getLongJSONData({
-      url: `/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`,
+      url: productDataUrl,
       limit: defaultLimit,
     });
     json.data = products;
@@ -51,7 +64,7 @@ const getCategoryData = async (cat) => {
     document.dispatchEvent(event);
   } catch (err) {
     console.log('%cError fetching category data', 'color:red;background-color:aliceblue', err);
-    window.location.href = '/404.html';
+    window.location.href = get404PageUrl();
   }
 };
 
@@ -80,7 +93,7 @@ const getFilterAttrib = async (cat) => {
     document.dispatchEvent(event);
   } catch (err) {
     console.log('%cError fetching filter attributes', 'color:red;background-color:aliceblue', err);
-    window.location.href = '/404.html';
+    window.location.href = get404PageUrl();
   }
 };
 
@@ -91,9 +104,9 @@ const resetCategoryData = () => {
 };
 
 export default async function decorate(doc) {
-  category = await getCategory();
+  category = getCategory();
   if (!category) {
-    window.location.href = '/404.html';
+    window.location.href = get404PageUrl();
     return;
   }
   const main = doc.querySelector('main');
@@ -126,12 +139,12 @@ export default async function decorate(doc) {
         classes: ['breadcrumb-item', `breadcrumb-item-${length}`],
       });
 
-      if (!mainCategory) {
-        lastElLink.href = url.origin;
-      } else {
+      if (mainCategory) {
         mainCategory = mainCategory.toLowerCase();
         lastElLink.href += `${mainCategory.replace(/\s/g, '-')}`;
         lastElLink.textContent = mainCategory;
+      } else {
+        lastElLink.href = url.origin;
       }
       breadcrumbItem.appendChild(link);
       breadcrumbList.appendChild(breadcrumbItem);

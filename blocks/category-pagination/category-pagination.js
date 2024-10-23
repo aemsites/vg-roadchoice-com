@@ -64,8 +64,11 @@ const renderBlock = async (block) => {
     addShowMoreHandler(bottomMoreBtn, resultsListBlock, text);
     textWrapper.append(moreBtn);
 
-    if (!hasImagesData) addImagesHandler({ resultsListBlock, moreBtn, bottomMoreBtn });
-    else addShowMoreBtns({ resultsListBlock, moreBtn, bottomMoreBtn });
+    if (hasImagesData) {
+      addShowMoreBtns({ resultsListBlock, moreBtn, bottomMoreBtn });
+    } else {
+      addImagesHandler({ resultsListBlock, moreBtn, bottomMoreBtn });
+    }
   }
 
   textWrapper.prepend(text);

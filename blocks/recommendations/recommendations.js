@@ -1,4 +1,9 @@
-import { createElement, getTextLabel, getJsonFromUrl } from '../../scripts/common.js';
+import {
+  createElement,
+  getTextLabel,
+  getJsonFromUrl,
+  getLocaleContextedUrl,
+} from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/lib-franklin.js';
 
 const blockName = 'recommendations';
@@ -38,10 +43,8 @@ const formatDate = (date) => {
 };
 
 export default async function decorate(block) {
-  const langLocale = getMetadata('i18n');
-  const i18nPath = langLocale ? `/${langLocale}` : '';
   const limit = Number(getLimit(block));
-  const route = `${i18nPath}/blog/query-index.json`;
+  const route = getLocaleContextedUrl('/blog/query-index.json');
   const { data: allArticles } = await getJsonFromUrl(route);
 
   const sortedArticles = allArticles.sort((a, b) => {
@@ -61,12 +64,12 @@ export default async function decorate(block) {
   const titleElement = createElement('h3', { classes: ['title'] });
   titleElement.innerText = isBlogArticle ? recommendationsTitle : homeTitle;
 
-  if (!isBlogArticle) {
+  if (isBlogArticle) {
+    titleSection.appendChild(titleElement);
+  } else {
     const link = createElement('a', { classes: ['link'] });
     link.append(titleElement);
     titleSection.appendChild(link);
-  } else {
-    titleSection.appendChild(titleElement);
   }
 
   const recommendationsList = createElement('ul', { classes: `${blockName}-list` });

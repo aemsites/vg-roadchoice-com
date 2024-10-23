@@ -1,14 +1,15 @@
-import { createElement, getJsonFromUrl, getTextLabel } from '../../scripts/common.js';
-import { getMetadata } from '../../scripts/lib-franklin.js';
-
-const langLocale = getMetadata('i18n');
-const i18nPath = langLocale ? `/${langLocale}` : '';
+import {
+  createElement,
+  getJsonFromUrl,
+  getTextLabel,
+  getLocaleContextedUrl,
+} from '../../scripts/common.js';
 
 const blockName = 'search';
 let isCrossRefActive = true;
 let noOthersItems;
 const modelsItems = [];
-const FILTERS_DATA = `${i18nPath}/search/search-filters.json`;
+const FILTERS_DATA = getLocaleContextedUrl('/search/search-filters.json');
 let crData;
 let pnData;
 export const amountOfProducts = 12;
@@ -122,7 +123,7 @@ async function getAndApplyFiltersData(form) {
   const modelsSelect = form.querySelector(`.${blockName}__model-filter__select`);
   const makeItems = [];
   const filters = await getJsonFromUrl(FILTERS_DATA);
-  const { data } = filters;
+  const { data } = filters || {};
   if (!data) return;
   data.forEach((item) => {
     const itemModels = item.Models !== 'null' ? item.Models.split(',') : [];
@@ -272,7 +273,7 @@ function formListener(form) {
     });
     if (!fitInStorage) sessionStorage.setItem('total-results-amount', results.length);
 
-    url.pathname = `${i18nPath}/search/`;
+    url.pathname = getLocaleContextedUrl('/search/');
     url.search = `?q=${value}&st=${searchType}`;
     window.location.href = url;
   };
