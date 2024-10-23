@@ -54,7 +54,6 @@ window.OptanonWrapper = () => {
 // Google Analytics
 async function loadGoogleTagManager() {
   // google tag manager
-  // eslint-disable-next-line func-names
   (function (w, d, s, l, i) {
     w[l] = w[l] || [];
     w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
@@ -69,33 +68,48 @@ async function loadGoogleTagManager() {
 
 // Hotjar
 async function loadHotjar() {
-  /* eslint-disable */
-  (function(h,o,t,j,a,r){
-    h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-    h._hjSettings={hjid:HOTJAR_ID,hjsv:6}; a=o.getElementsByTagName('head')[0];
-    r=o.createElement('script');r.async=1; r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+  (function (h, o, t, j, a, r) {
+    h.hj =
+      h.hj ||
+      function () {
+        (h.hj.q = h.hj.q || []).push(arguments);
+      };
+    h._hjSettings = { hjid: HOTJAR_ID, hjsv: 6 };
+    a = o.getElementsByTagName('head')[0];
+    r = o.createElement('script');
+    r.async = 1;
+    r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
     a.appendChild(r);
-  })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-  /* eslint-enable */
+  })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
 }
 
 async function loadArtibot() {
   // Artibot
-  /* eslint-disable */
-  (async function(t,e){
-    t.artibotApi={l:[],t:[],on:function(){this.l.push(arguments)},trigger:function(){this.t.push(arguments)}};
-    var a=!1,i=e.createElement("script");
-    i.async=!0,i.type="text/javascript",
-    i.src="https://app.artibot.ai/loader.js",
-    e.getElementsByTagName("head").item(0).appendChild(i),
-    i.onreadystatechange=i.onload = function() {
-      if (!(a||this.readyState&&"loaded"!=this.readyState&&"complete"!=this.readyState)) {
-        new window.ArtiBot({i:ARTIBOT_ID});
-        a=!0
-      }
-    }
-  })(window,document);
-  /* eslint-enable */
+  (async function (t, e) {
+    t.artibotApi = {
+      l: [],
+      t: [],
+      on: function () {
+        this.l.push(arguments);
+      },
+      trigger: function () {
+        this.t.push(arguments);
+      },
+    };
+    let a = !1;
+    const i = e.createElement('script');
+    (i.async = !0),
+      (i.type = 'text/javascript'),
+      (i.src = 'https://app.artibot.ai/loader.js'),
+      e.getElementsByTagName('head').item(0).appendChild(i),
+      (i.onreadystatechange = i.onload =
+        function () {
+          if (!(a || (this.readyState && 'loaded' != this.readyState && 'complete' != this.readyState))) {
+            new window.ArtiBot({ i: ARTIBOT_ID });
+            a = !0;
+          }
+        });
+  })(window, document);
 }
 
 // Roadchoice specific code ↓

@@ -322,8 +322,7 @@ export const extractObjectFromArray = (data) => {
 
 export const formatValues = (values) => {
   const obj = {};
-  /* eslint-disable-next-line */
-  if (values) values.forEach(({ name, value }) => obj[name] = value);
+  if (values) values.forEach(({ name, value }) => (obj[name] = value));
   return obj;
 };
 

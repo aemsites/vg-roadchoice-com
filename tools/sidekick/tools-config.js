@@ -17,8 +17,7 @@ async function getConstantValues() {
 const formatValues = (values) => {
   const obj = {};
   if (values) {
-    /* eslint-disable-next-line */
-    values.forEach(({ name, value }) => obj[name] = value);
+    values.forEach(({ name, value }) => (obj[name] = value));
   } else {
     console.error('Error with constants file', values);
   }

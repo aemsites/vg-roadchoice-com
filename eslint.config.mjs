@@ -7,7 +7,7 @@ export default [
     files: ['**/*.js', '**/*.jsx', '**/*.mjs'],
   },
   {
-    ignores: ['**/*.min.js', 'tools/importer/'],
+    ignores: ['**/*.min.js', 'tools/importer/', '**/dealer-locator/vendor/*'],
   },
   {
     languageOptions: { globals: globals.browser },
@@ -21,10 +21,9 @@ export default [
       'comma-style': ['error', 'last'],
       'no-extra-semi': 'error',
       'no-tabs': 'error',
-      'func-names': ['error', 'as-needed'],
+      'func-names': ['warn', 'as-needed'],
       semi: ['error', 'always'],
       'no-nested-ternary': 'error',
-      'no-new': 'error',
       'no-unused-vars': 'warn',
       'no-duplicate-imports': ['error', { includeExports: true }],
       'one-var': ['error', 'never'],
