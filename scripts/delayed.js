@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-cycle
 import { sampleRUM, loadScript } from './lib-franklin.js';
-// eslint-disable-next-line import/no-cycle
 import { isPerformanceAllowed, isTargetingAllowed, COOKIE_CONFIGS, loadWorker } from './common.js';
 
 // COOKIE ACCEPTANCE AND IDs default to false in case no ID is present
@@ -103,7 +101,7 @@ async function loadArtibot() {
 // Roadchoice specific code ↓
 // This Worker loads all the product information into de global object window
 const productsWorker = loadWorker();
-// eslint-disable-next-line import/prefer-default-export
+
 export const getProductsWorker = () => productsWorker;
 
 // This searches for id="cookie-preference" button and displays the cookie preference center.

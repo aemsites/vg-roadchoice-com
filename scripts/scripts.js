@@ -405,7 +405,6 @@ export function buildInpageNavigationBlock(main, classname) {
  * Decorates the main element.
  * @param {Element} main The main element
  */
-// eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main, head) {
   if (head) {
     const pageStyle = head.querySelector('[name="style"]')?.content;

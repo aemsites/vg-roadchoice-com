@@ -16,7 +16,6 @@ export default [
   prettierRecommended,
   {
     rules: {
-      indent: ['error', 2],
       'comma-dangle': ['error', 'always-multiline'],
       'comma-spacing': ['error', { before: false, after: true }],
       'comma-style': ['error', 'last'],
