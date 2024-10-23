@@ -1,13 +1,16 @@
 {
   "name": "roadchoice",
   "private": true,
-  "version": "6.0.0",
+  "version": "7.0.0",
   "description": "",
   "engines": {
     "node": ">=v20.15.1 <23",
     "npm": ">=10.7.0"
   },
   "scripts": {
+    "dev": "aem up",
+    "dev:ca": "AEM_PAGES_URL=https://main--roadchoice-ca--volvogroup.aem.page aem up",
+    "dev:mx": "AEM_PAGES_URL=https://main--roadchoice-mx--volvogroup.aem.page aem up",
     "lint:js": "eslint .",
     "lint:css": "stylelint blocks/**/*.css styles/*.css",
     "lint:js:fix": "eslint . --fix",
@@ -33,13 +36,13 @@
   "devDependencies": {
     "@babel/core": "7.24.9",
     "@babel/eslint-parser": "7.24.8",
+    "@esm-bundle/chai": "4.3.4-fix.0",
+    "@web/test-runner": "0.15.1",
+    "@web/test-runner-commands": "0.6.5",
     "chai": "4.3.7",
     "eslint": "8.57.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.29.1",
-    "@esm-bundle/chai": "4.3.4-fix.0",
-    "@web/test-runner": "0.15.1",
-    "@web/test-runner-commands": "0.6.5",
     "husky": "^9.1.1",
     "lint-staged": "^15.2.7",
     "sinon": "15.0.1",

@@ -1,4 +1,8 @@
-import { getTextLabel, createElement } from '../../scripts/common.js';
+import {
+  getTextLabel,
+  createElement,
+  getLocaleContextedUrl,
+} from '../../scripts/common.js';
 import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
 
 const blockName = 'product-card';
@@ -44,13 +48,13 @@ const productCard = (product, searchType) => {
 
   const item = createElement('li', { classes: blockName });
 
-  const linkUrl = `/parts?category=${
+  const linkUrl = getLocaleContextedUrl(`/parts?category=${
     category.replace(/[^\w]/g, '-').toLowerCase()
-  }&sku=${partNumber}`;
+  }&sku=${partNumber}`);
   const imageLink = createElement('a', { classes: 'image-link', props: { href: linkUrl } });
 
   const productImageUrl = imgUrl;
-  const placeholderImageUrl = '/media/images/000-rc-placeholder-image.png';
+  const placeholderImageUrl = getLocaleContextedUrl('/media/images/000-rc-placeholder-image.png');
   const imageUrl = hasImage ? productImageUrl : placeholderImageUrl;
   const placeholderPicture = optimizePicture(placeholderImageUrl);
   const picture = optimizePicture(imageUrl);
