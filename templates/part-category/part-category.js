@@ -1,9 +1,4 @@
-import {
-  createElement,
-  getLongJSONData,
-  defaultLimit,
-  getLocaleContextedUrl,
-} from '../../scripts/common.js';
+import { createElement, getLongJSONData, defaultLimit, getLocaleContextedUrl } from '../../scripts/common.js';
 
 const url = new URL(window.location.href);
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');

@@ -1,9 +1,4 @@
-import {
-  createElement,
-  getTextLabel,
-  getJsonFromUrl,
-  getLocaleContextedUrl,
-} from '../../scripts/common.js';
+import { createElement, getTextLabel, getJsonFromUrl, getLocaleContextedUrl } from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/lib-franklin.js';
 
 const blockName = 'recommendations';

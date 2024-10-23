@@ -1,9 +1,4 @@
-import {
-  createElement,
-  getJsonFromUrl,
-  getTextLabel,
-  getLocaleContextedUrl,
-} from '../../scripts/common.js';
+import { createElement, getJsonFromUrl, getTextLabel, getLocaleContextedUrl } from '../../scripts/common.js';
 
 const blockName = 'search';
 let isCrossRefActive = true;
