@@ -2,18 +2,10 @@ import { loadScript } from '../../scripts/lib-franklin.js';
 import { DEALER_LOCATOR } from '../../scripts/common.js';
 
 // DEALER LOCATOR config coming from constants file.
-const {
-  ENDPOINT_URL,
-  API_KEY,
-  BACKUP_URL,
-} = DEALER_LOCATOR;
+const { ENDPOINT_URL, API_KEY, BACKUP_URL } = DEALER_LOCATOR;
 
 function escapeHTML(input) {
-  return input.replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 export default async function decorate(block) {
@@ -28,7 +20,9 @@ export default async function decorate(block) {
     list.forEach((change) => {
       if (change.target.dataset.blockStatus !== 'loaded') return;
       block.classList.add('overflow');
-      setTimeout(() => { block.classList.remove('overflow'); }, 500);
+      setTimeout(() => {
+        block.classList.remove('overflow');
+      }, 500);
       observer.disconnect();
     });
   });
@@ -41,20 +35,30 @@ export default async function decorate(block) {
     dataSource: datasource,
     backupUrl: BACKUP_URL,
     apiKey: API_KEY,
-    amenities: ['Appointments Accepted', 'Bilingual Service', 'Driver Lounge', 'Free Pickup and Delivery', 'Hotel Shuttle', 'Internet Service', 'Laundry', 'Showers', 'Telephones', 'Trailer Parking', 'Video Games'],
+    amenities: [
+      'Appointments Accepted',
+      'Bilingual Service',
+      'Driver Lounge',
+      'Free Pickup and Delivery',
+      'Hotel Shuttle',
+      'Internet Service',
+      'Laundry',
+      'Showers',
+      'Telephones',
+      'Trailer Parking',
+      'Video Games',
+    ],
   };
 
-  loadScript('/blocks/dealer-locator/vendor/jquery.min.js', { type: 'text/javascript', charset: 'UTF-8' })
-    .then(() => {
-      // these scripts depend on jquery:
-      loadScript('/blocks/dealer-locator/sidebar-maps.js', { type: 'text/javascript', charset: 'UTF-8' });
-      loadScript('/blocks/dealer-locator/my-dealer.js', { type: 'text/javascript', charset: 'UTF-8' });
-    });
+  loadScript('/blocks/dealer-locator/vendor/jquery.min.js', { type: 'text/javascript', charset: 'UTF-8' }).then(() => {
+    // these scripts depend on jquery:
+    loadScript('/blocks/dealer-locator/sidebar-maps.js', { type: 'text/javascript', charset: 'UTF-8' });
+    loadScript('/blocks/dealer-locator/my-dealer.js', { type: 'text/javascript', charset: 'UTF-8' });
+  });
 
-  loadScript('/blocks/dealer-locator/vendor/moment.js', { type: 'text/javascript', charset: 'UTF-8' })
-    .then(() => {
-      loadScript('/blocks/dealer-locator/vendor/moment-timezone.min.js', { type: 'text/javascript', charset: 'UTF-8' });
-    });
+  loadScript('/blocks/dealer-locator/vendor/moment.js', { type: 'text/javascript', charset: 'UTF-8' }).then(() => {
+    loadScript('/blocks/dealer-locator/vendor/moment-timezone.min.js', { type: 'text/javascript', charset: 'UTF-8' });
+  });
 
   block.innerHTML = `<input id="hoverText" value="Please unselect the selected option to click this option" hidden/>
 <!-- PartsASIST Datasource Selection -->

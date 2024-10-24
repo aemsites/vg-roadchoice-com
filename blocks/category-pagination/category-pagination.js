@@ -28,10 +28,11 @@ const loadMoreProducts = (props) => {
 };
 
 const addShowMoreHandler = (btn, resultsListBlock, amountText) => {
-  btn.onclick = () => loadMoreProducts({
-    hidden: resultsListBlock.querySelectorAll('.product-card.hidden'),
-    amountText,
-  });
+  btn.onclick = () =>
+    loadMoreProducts({
+      hidden: resultsListBlock.querySelectorAll('.product-card.hidden'),
+      amountText,
+    });
 };
 
 const addShowMoreBtns = (props) => {

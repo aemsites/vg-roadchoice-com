@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unresolved
 import { PLUGIN_EVENTS } from 'https://www.hlx.live/tools/sidekick/library/events/events.js';
 
 async function getAuthorData() {
@@ -15,8 +14,9 @@ function getFilteredAuthors(data, query) {
     return data;
   }
 
-  return data.filter((item) => item.name.toLowerCase().includes(query.trim().toLowerCase())
-      || item['author-id'].toLowerCase().includes(query.trim().toLowerCase()));
+  return data.filter(
+    (item) => item.name.toLowerCase().includes(query.trim().toLowerCase()) || item['author-id'].toLowerCase().includes(query.trim().toLowerCase()),
+  );
 }
 
 export async function decorate(container, ignored, query) {
@@ -24,11 +24,15 @@ export async function decorate(container, ignored, query) {
 
   const createMenuItems = () => {
     const filteredAuthors = getFilteredAuthors(data, query);
-    return filteredAuthors.map((item) => `
+    return filteredAuthors
+      .map(
+        (item) => `
         <sp-menu-item value="${item.name} (${item['author-id']})">
           ${item.name} <span class="author-id">(${item['author-id']})</span>
         </sp-menu-item>
-      `).join('');
+      `,
+      )
+      .join('');
   };
 
   const handleCopyButtonClick = (e) => {
@@ -45,14 +49,13 @@ export async function decorate(container, ignored, query) {
   spContainer.classList.add('container');
   spContainer.innerHTML = `
     <sp-menu >
-      ${(createMenuItems())}
+      ${createMenuItems()}
     </sp-menu> `;
   container.append(spContainer);
 
-  spContainer.querySelectorAll('sp-menu-item')
-    .forEach((item) => {
-      item.addEventListener('click', handleCopyButtonClick);
-    });
+  spContainer.querySelectorAll('sp-menu-item').forEach((item) => {
+    item.addEventListener('click', handleCopyButtonClick);
+  });
 }
 
 export default {

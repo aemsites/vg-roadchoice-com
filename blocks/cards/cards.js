@@ -21,7 +21,7 @@ const buildCards = (block) => {
     const textElmts = [];
     row.querySelectorAll('p').forEach((p) => {
       const hasButton = [...p.classList].includes('button-container');
-      const isEmpty = (p.textContent.trim().length === 0);
+      const isEmpty = p.textContent.trim().length === 0;
 
       if (!isEmpty && !hasButton) textElmts.push(p);
     });
@@ -49,7 +49,7 @@ const buildResourcesCards = (block) => {
   [...block.children].forEach((row) => {
     const image = row.querySelector('picture');
     const aElmt = row.querySelector('a');
-    aElmt.classList = (`${blockName}-card`);
+    aElmt.classList = `${blockName}-card`;
 
     const item = createElement('li', { classes: `${blockName}-item` });
 

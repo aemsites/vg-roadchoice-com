@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import { createElement } from '../../scripts/common.js';
 
 export default async function decorate(block) {

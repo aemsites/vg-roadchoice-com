@@ -10,12 +10,10 @@ export default function decorate(block) {
   const videoContainer = block.querySelector(':scope > div');
   const isYTLink = isVideoLink(link);
   // if has Width class, use that to set the ratio
-  const configWidth = block.className.includes('width-')
-    ? block.className.split('width-')[1].split(' ')[0] : null;
+  const configWidth = block.className.includes('width-') ? block.className.split('width-')[1].split(' ')[0] : null;
   videoContainer.className = `${blockName}-video-container`;
   videoContainer.textContent = '';
   if (!isYTLink) {
-    // eslint-disable-next-line no-console
     console.warn('%cEmbed block: Not an embedded YouTube link', 'color: cornflowerblue', { link });
     return;
   }

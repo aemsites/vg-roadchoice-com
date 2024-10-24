@@ -1,9 +1,4 @@
-import {
-  amountOfProducts,
-  fitAmount,
-  searchCRPartNumValue,
-  searchPartNumValue,
-} from '../../blocks/search/search.js';
+import { amountOfProducts, fitAmount, searchCRPartNumValue, searchPartNumValue } from '../../blocks/search/search.js';
 import { getProductsWorker } from '../../scripts/delayed.js';
 import { getTextLabel, createElement } from '../../scripts/common.js';
 
@@ -88,8 +83,9 @@ export default async function decorate(doc) {
   const searchResultsSection = createElement('div', { classes: 'search-results-section' });
   const titleSection = createElement('div', { classes: 'title-section' });
   const title = createElement('h1', { classes: 'title' });
-  const titleText = ((searchType === 'cross') && `${titleContent} ${type}: "${value}"`)
-    || `${titleContent} ${isTextNull(query.make)} ${isTextNull(query.model)} ${value} ${type}`;
+  const titleText =
+    (searchType === 'cross' && `${titleContent} ${type}: "${value}"`) ||
+    `${titleContent} ${isTextNull(query.make)} ${isTextNull(query.model)} ${value} ${type}`;
   const productsWorker = getProductsWorker();
 
   productsWorker.onmessage = ({ data }) => {
@@ -106,7 +102,9 @@ export default async function decorate(doc) {
       // when all messages are send, save the data in the window object again if needed
       if (!Object.prototype.hasOwnProperty.call(window, 'allProducts')) {
         const keys = ['crData', 'pnData', 'imgData'];
-        keys.forEach((key) => { allProducts[key] = data[key]; });
+        keys.forEach((key) => {
+          allProducts[key] = data[key];
+        });
         window.allProducts = data;
       }
       const event = new CustomEvent('DataLoaded', { detail: { results, data } });

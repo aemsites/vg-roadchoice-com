@@ -1,7 +1,4 @@
-import {
-  createElement,
-  decorateIcons,
-} from '../../scripts/common.js';
+import { createElement, decorateIcons } from '../../scripts/common.js';
 import fragmentBlock from '../fragment/fragment.js';
 
 const blockName = 'v2-accordion';
@@ -27,9 +24,7 @@ export default async function decorate(block) {
       ':scope > div > h1, :scope > div > h2, :scope > div > h3, :scope > div > h4, :scope > div > h5, :scope > div > h6',
     );
     accordionHeader?.classList.add(`${blockName}__title`);
-    const accordionContent = row.querySelector(
-      ':scope > div:nth-child(2)',
-    );
+    const accordionContent = row.querySelector(':scope > div:nth-child(2)');
 
     const headerButton = createElement('button', { classes: `${blockName}__button` });
     const dropdownArrowIcon = createElement('span', { classes: [`${blockName}__icon`, 'icon', 'icon-dropdown-caret'] });

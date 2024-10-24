@@ -1,9 +1,4 @@
-import {
-  createElement,
-  getJsonFromUrl,
-  getTextLabel,
-  getLocaleContextedUrl,
-} from '../../scripts/common.js';
+import { createElement, getJsonFromUrl, getTextLabel, getLocaleContextedUrl } from '../../scripts/common.js';
 
 const blockName = 'search';
 let isCrossRefActive = true;
@@ -140,9 +135,7 @@ async function getAndApplyFiltersData(form) {
       return;
     }
     // if is not null then enable the select and then is filled by the maker value
-    const models = modelsItems.filter(
-      (item) => item.Make.toLowerCase() === e.target.value,
-    )[0].Models;
+    const models = modelsItems.filter((item) => item.Make.toLowerCase() === e.target.value)[0].Models;
     resetModelsFilter(modelsSelect, false);
     populateFilter(modelsSelect, models);
   };
@@ -153,9 +146,7 @@ export function searchCRPartNumValue(value, data = crData) {
   const results = new Set();
   if (value.trim() === '') return [];
   partNumberBrands.forEach((brand) => {
-    const tempResults = data.filter(
-      (item) => new RegExp(`.*${value.trim()}.*`, 'i').test(item[brand]),
-    );
+    const tempResults = data.filter((item) => new RegExp(`.*${value.trim()}.*`, 'i').test(item[brand]));
     if (tempResults.length > 0) {
       tempResults.forEach((item) => results.add(item));
     }
@@ -193,14 +184,7 @@ function filterByBasePartNumber(results) {
   return filteredResults;
 }
 
-function filterPNByColumn({
-  column,
-  data,
-  value,
-  make,
-  model,
-  results,
-}) {
+function filterPNByColumn({ column, data, value, make, model, results }) {
   let tempResults = data.filter((item) => new RegExp(`.*${value.trim()}.*`, 'i').test(item[column]));
   if (make === 'others' && tempResults.length > 0) {
     tempResults = filterByOthersMake(tempResults, make);
@@ -221,13 +205,23 @@ export function searchPartNumValue(value, make, model, data = pnData) {
   if (value.trim() === '' && make === 'null' && model === 'null') return [];
   partNumberBrands.forEach((brand) => {
     filterPNByColumn({
-      column: brand, data, value, make, model, results,
+      column: brand,
+      data,
+      value,
+      make,
+      model,
+      results,
     });
   });
   // search by Description aka Part Name
   if (results.size === 0) {
     filterPNByColumn({
-      column: 'Part Name', data, value, make, model, results,
+      column: 'Part Name',
+      data,
+      value,
+      make,
+      model,
+      results,
     });
   }
   return [...results];
@@ -252,9 +246,7 @@ function formListener(form) {
     if (!crData || !pnData) return;
     ssData.forEach((item) => sessionStorage.removeItem(item));
     if (sessionStorage.getItem('total-results-amount')) sessionStorage.removeItem('total-results-amount');
-    const results = isCrossRefActive
-      ? searchCRPartNumValue(value)
-      : searchPartNumValue(value, makeFilterValue, modelFilterValue);
+    const results = isCrossRefActive ? searchCRPartNumValue(value) : searchPartNumValue(value, makeFilterValue, modelFilterValue);
 
     const url = new URL(window.location.href);
     const searchType = isCrossRefActive ? 'cross' : `parts&make=${makeFilterValue}&model=${modelFilterValue}`;

@@ -6,33 +6,22 @@ const blockName = 'catalogs-table';
 const tableInfo = [
   {
     sectionTitle: 'catalogs',
-    criteria: [
-      { type: 'catalog' },
-      { language: 'en' },
-    ],
+    criteria: [{ type: 'catalog' }, { language: 'en' }],
     position: 1,
   },
   {
     sectionTitle: 'product-data-sheets',
-    criteria: [
-      { type: 'product-data-sheet' },
-    ],
+    criteria: [{ type: 'product-data-sheet' }],
     position: 2,
   },
   {
     sectionTitle: 'spanish-catalogs',
-    criteria: [
-      { type: 'catalog' },
-      { language: 'es' },
-    ],
+    criteria: [{ type: 'catalog' }, { language: 'es' }],
     position: 3,
   },
   {
     sectionTitle: 'french-catalogs',
-    criteria: [
-      { type: 'catalog' },
-      { language: 'fr' },
-    ],
+    criteria: [{ type: 'catalog' }, { language: 'fr' }],
     position: 4,
   },
 ];
@@ -41,7 +30,8 @@ const sortOn = (arr, prop) => {
   arr.sort((a, b) => {
     if (a[prop] < b[prop]) {
       return -1;
-    } if (a[prop] > b[prop]) {
+    }
+    if (a[prop] > b[prop]) {
       return 1;
     }
     return 0;
@@ -54,10 +44,7 @@ const buildTables = (catalogs) => {
     const { sectionTitle, criteria, position } = el;
 
     const catalogsSubsection = createElement('div', {
-      classes: [
-        `${blockName}-subsection`,
-        `${blockName}-subsection-${position}`,
-      ],
+      classes: [`${blockName}-subsection`, `${blockName}-subsection-${position}`],
     });
     const heading = createElement('h2', {
       classes: `${blockName}-heading`,

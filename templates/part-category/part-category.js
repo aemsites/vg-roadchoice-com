@@ -1,9 +1,4 @@
-import {
-  createElement,
-  getLongJSONData,
-  defaultLimit,
-  getLocaleContextedUrl,
-} from '../../scripts/common.js';
+import { createElement, getLongJSONData, defaultLimit, getLocaleContextedUrl } from '../../scripts/common.js';
 
 const url = new URL(window.location.href);
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
@@ -27,7 +22,7 @@ function get404PageUrl() {
  * 3. "/part-category/?category" => 404 if is an empty category without "=" sign
  * 4. "/part-category/?category=" => 404 if is an empty category with "=" sign
  * 5. "/part-category/?category=asdf" => 404 if is a wrong category
-*/
+ */
 
 /**
  * Returns the category name from the URL query string, or _null_ if it is not present.
@@ -45,7 +40,7 @@ const getCategory = () => {
  * @returns {void}
  * @throws {Error} If the category data is not found.
  * @emits {Event} _CategoryDataLoaded_ When the category data is loaded.
-*/
+ */
 const getCategoryData = async (cat) => {
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
@@ -63,7 +58,6 @@ const getCategoryData = async (cat) => {
     sessionStorage.setItem('amount', amount);
     document.dispatchEvent(event);
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.log('%cError fetching category data', 'color:red;background-color:aliceblue', err);
     window.location.href = get404PageUrl();
   }
@@ -75,7 +69,7 @@ const getCategoryData = async (cat) => {
  * @returns {void}
  * @throws {Error} If the filter attributes are not found.
  * @emits {Event} _FilterAttribsLoaded_ When the filter attributes are loaded.
-*/
+ */
 const getFilterAttrib = async (cat) => {
   try {
     const filtersJson = await getLongJSONData({
@@ -85,13 +79,14 @@ const getFilterAttrib = async (cat) => {
 
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
-    const filterAttribs = filtersJson.filter((el) => el.Subcategory.toLowerCase() === cat.toLowerCase().replaceAll('-', ' ') && el.Filter === '').map((el) => el.Attributes);
+    const filterAttribs = filtersJson
+      .filter((el) => el.Subcategory.toLowerCase() === cat.toLowerCase().replaceAll('-', ' ') && el.Filter === '')
+      .map((el) => el.Attributes);
 
     const event = new Event('FilterAttribsLoaded');
     sessionStorage.setItem('filter-attribs', JSON.stringify(filterAttribs));
     document.dispatchEvent(event);
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.log('%cError fetching filter attributes', 'color:red;background-color:aliceblue', err);
     window.location.href = get404PageUrl();
   }
@@ -114,9 +109,7 @@ export default async function decorate(doc) {
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
   const title = createElement('h1', { classes: 'part-category-title' });
   title.textContent = category.replaceAll('-', ' ');
-  const section = [...main.children]
-    .filter((child) => !['breadcrumb-container', 'search-container']
-      .some((el) => child.classList.contains(el)))[0];
+  const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
   section.classList.add('part-category');
   titleWrapper.appendChild(title);
   section.prepend(titleWrapper);

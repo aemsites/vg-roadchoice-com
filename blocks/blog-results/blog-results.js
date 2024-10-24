@@ -1,8 +1,4 @@
-import {
-  getTextLabel,
-  getJsonFromUrl,
-  createElement,
-} from '../../scripts/common.js';
+import { getTextLabel, getJsonFromUrl, createElement } from '../../scripts/common.js';
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
 
 const blockName = 'blog-results';
@@ -16,7 +12,54 @@ const readMoreText = getTextLabel('read_more');
 
 let totalArticleCount;
 let allArticles;
-let buildResults;
+
+const buildResults = (articles, page) => {
+  articles.sort((a, b) => {
+    a.date = +a.date;
+    b.date = +b.date;
+    return b.date - a.date;
+  });
+
+  const results = createElement('div', { classes: `${blockName}-articles` });
+
+  const topPaginationSection = createElement('div', { classes: 'pagination-top-section' });
+  const topPagination = createElement('p', { classes: 'pagination-top' });
+
+  if (firstBuild) totalArticleCount = rawText.replace('[$]', articles.length);
+  topPagination.textContent = totalArticleCount;
+  topPaginationSection.appendChild(topPagination);
+
+  const articleSection = createElement('ul', { classes: 'articles-section' });
+
+  const groupedArticles = page === 0 && firstBuild ? divideArray(articles, articlesPerPage) : articles;
+
+  const amountOfPages = groupedArticles.length;
+  const activePage = groupedArticles[page];
+
+  activePage.forEach((art, idx) => {
+    const article = createElement('li', { classes: ['article', `page-${idx}`] });
+    const title = createElement('h2', { classes: 'title' });
+    const titleLink = createElement('a', { classes: 'title-link', props: { href: art.path } });
+    titleLink.textContent = art.title;
+    title.appendChild(titleLink);
+
+    const date = createElement('p', { classes: 'date' });
+    date.textContent = formatDate(art.date);
+
+    const description = createElement('p', { classes: 'description' });
+    description.textContent = art.description;
+
+    const link = createElement('a', { classes: 'link', props: { href: art.path } });
+    link.textContent = readMoreText;
+
+    article.append(title, date, description, link);
+    articleSection.appendChild(article);
+  });
+  const bottomPagination = buildPagination(groupedArticles, amountOfPages, page);
+  results.append(topPaginationSection, articleSection, bottomPagination);
+
+  return results;
+};
 
 const divideArray = (mainArray, perChunk) => {
   const dividedArrays = mainArray.reduce((resultArray, item, index) => {
@@ -32,10 +75,7 @@ const divideArray = (mainArray, perChunk) => {
 
 const reduceArrays = (array) => {
   const initialValue = {};
-  const reduced = array.reduce(
-    (acc, value) => ({ ...acc, [value]: (acc[value] || 0) + 1 }),
-    initialValue,
-  );
+  const reduced = array.reduce((acc, value) => ({ ...acc, [value]: (acc[value] || 0) + 1 }), initialValue);
   return reduced;
 };
 
@@ -90,13 +130,12 @@ const selectCats = (e) => {
 const reduceCategories = (arts) => {
   const categoryList = arts.map((x) => x.category);
   const reducedCategories = reduceArrays(categoryList);
-  const orderedCategories = Object.keys(reducedCategories).sort().reduce(
-    (obj, key) => {
+  const orderedCategories = Object.keys(reducedCategories)
+    .sort()
+    .reduce((obj, key) => {
       obj[key] = reducedCategories[key];
       return obj;
-    },
-    {},
-  );
+    }, {});
   const reducedArray = Object.entries(orderedCategories);
 
   return reducedArray;
@@ -228,68 +267,12 @@ const buildPagination = (articles, totalPages, curentPage) => {
     pageItem.appendChild(pageLink);
     paginationList.appendChild(pageItem);
   }
-  bottomPaginationSection.append(
-    firstPageBtn,
-    prevPageBtn,
-    paginationList,
-    nextPageBtn,
-    lastPageBtn,
-  );
+  bottomPaginationSection.append(firstPageBtn, prevPageBtn, paginationList, nextPageBtn, lastPageBtn);
 
   const allBtns = bottomPaginationSection.querySelectorAll('.pagination-button');
   allBtns.forEach((btn) => btn.addEventListener('click', (e) => handlePagination(e, articles, curentPage, totalPages)));
 
   return bottomPaginationSection;
-};
-
-buildResults = (articles, page) => {
-  articles.sort((a, b) => {
-    a.date = +(a.date);
-    b.date = +(b.date);
-    return b.date - a.date;
-  });
-
-  const results = createElement('div', { classes: `${blockName}-articles` });
-
-  const topPaginationSection = createElement('div', { classes: 'pagination-top-section' });
-  const topPagination = createElement('p', { classes: 'pagination-top' });
-
-  if (firstBuild) totalArticleCount = rawText.replace('[$]', articles.length);
-  topPagination.textContent = totalArticleCount;
-  topPaginationSection.appendChild(topPagination);
-
-  const articleSection = createElement('ul', { classes: 'articles-section' });
-
-  const groupedArticles = (page === 0 && firstBuild)
-    ? divideArray(articles, articlesPerPage)
-    : articles;
-
-  const amountOfPages = groupedArticles.length;
-  const activePage = groupedArticles[page];
-
-  activePage.forEach((art, idx) => {
-    const article = createElement('li', { classes: ['article', `page-${idx}`] });
-    const title = createElement('h2', { classes: 'title' });
-    const titleLink = createElement('a', { classes: 'title-link', props: { href: art.path } });
-    titleLink.textContent = art.title;
-    title.appendChild(titleLink);
-
-    const date = createElement('p', { classes: 'date' });
-    date.textContent = formatDate(art.date);
-
-    const description = createElement('p', { classes: 'description' });
-    description.textContent = art.description;
-
-    const link = createElement('a', { classes: 'link', props: { href: art.path } });
-    link.textContent = readMoreText;
-
-    article.append(title, date, description, link);
-    articleSection.appendChild(article);
-  });
-  const bottomPagination = buildPagination(groupedArticles, amountOfPages, page);
-  results.append(topPaginationSection, articleSection, bottomPagination);
-
-  return results;
 };
 
 const buildSidebar = (articles, titleContent) => {
@@ -343,8 +326,8 @@ export default async function decorate(block) {
   const json = await getJsonFromUrl(url);
   allArticles = json.data;
   allArticles.sort((a, b) => {
-    a.date = +(a.date);
-    b.date = +(b.date);
+    a.date = +a.date;
+    b.date = +b.date;
     return b.date - a.date;
   });
 
