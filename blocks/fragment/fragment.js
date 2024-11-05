@@ -4,19 +4,15 @@
  * https://www.hlx.live/developer/block-collection/fragment
  */
 
-import {
-  decorateMain,
-} from '../../scripts/scripts.js';
+import { decorateMain } from '../../scripts/scripts.js';
 
-import {
-  loadBlocks,
-} from '../../scripts/lib-franklin.js';
+import { loadBlocks } from '../../scripts/lib-franklin.js';
 
 /**
-   * Loads a fragment.
-   * @param {string} path The path to the fragment
-   * @returns {Promise<HTMLElement>} The root element of the fragment
-   */
+ * Loads a fragment.
+ * @param {string} path The path to the fragment
+ * @returns {Promise<HTMLElement>} The root element of the fragment
+ */
 async function loadFragment(path) {
   const link = path && path.startsWith('/') ? path : new URL(path).pathname;
 

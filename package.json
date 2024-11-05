@@ -1,7 +1,7 @@
 {
   "name": "roadchoice",
   "private": true,
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "",
   "engines": {
     "node": ">=v20.15.1 <23",
@@ -17,6 +17,7 @@
     "lint:css:fix": "stylelint blocks/**/*.css styles/*.css --fix",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:fix": "npm run lint:js:fix && npm run lint:css:fix",
+    "format": "prettier --write \"**/*.{js,jsx}\"",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -34,19 +35,22 @@
   },
   "homepage": "https://github.com/aemsites/vg-roadchoice-com/#readme",
   "devDependencies": {
-    "@babel/core": "7.24.9",
-    "@babel/eslint-parser": "7.24.8",
+    "@babel/core": "7.25.8",
+    "@babel/eslint-parser": "7.25.8",
+    "@eslint/js": "^9.12.0",
     "@esm-bundle/chai": "4.3.4-fix.0",
     "@web/test-runner": "0.15.1",
     "@web/test-runner-commands": "0.6.5",
     "chai": "4.3.7",
-    "eslint": "8.57.0",
-    "eslint-config-airbnb-base": "15.0.0",
-    "eslint-plugin-import": "2.29.1",
+    "eslint": "9.12.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.11.0",
     "husky": "^9.1.1",
-    "lint-staged": "^15.2.7",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
     "sinon": "15.0.1",
-    "stylelint": "16.7.0",
+    "stylelint": "16.10.0",
     "stylelint-config-standard": "36.0.1"
   }
 }

@@ -1,12 +1,4 @@
-import {
-  sampleRUM,
-  loadCSS,
-  loadBlock,
-  loadBlocks,
-  loadHeader,
-  loadFooter,
-  getMetadata,
-} from './lib-franklin.js';
+import { sampleRUM, loadCSS, loadBlock, loadBlocks, loadHeader, loadFooter, getMetadata } from './lib-franklin.js';
 
 let placeholders = null;
 
@@ -93,39 +85,43 @@ export async function decorateIcons(element) {
 
   // Download all new icons
   const icons = [...element.querySelectorAll('span.icon')];
-  await Promise.all(icons.map(async (span) => {
-    const iconName = Array.from(span.classList).find((c) => c.startsWith('icon-')).substring(5);
-    if (!ICONS_CACHE[iconName]) {
-      ICONS_CACHE[iconName] = true;
-      try {
-        const response = await fetch(`${window.hlx.codeBasePath}/icons/${iconName}.svg`);
-        if (!response.ok) {
+  await Promise.all(
+    icons.map(async (span) => {
+      const iconName = Array.from(span.classList)
+        .find((c) => c.startsWith('icon-'))
+        .substring(5);
+      if (!ICONS_CACHE[iconName]) {
+        ICONS_CACHE[iconName] = true;
+        try {
+          const response = await fetch(`${window.hlx.codeBasePath}/icons/${iconName}.svg`);
+          if (!response.ok) {
+            ICONS_CACHE[iconName] = false;
+            return;
+          }
+          // Styled icons don't play nice with the sprite approach because of shadow dom isolation
+          const svg = await response.text();
+          if (svg.match(/(<style | class=)/)) {
+            ICONS_CACHE[iconName] = { styled: true, html: svg };
+          } else {
+            ICONS_CACHE[iconName] = {
+              html: svg
+                .replace('<svg', `<symbol id="icons-sprite-${iconName}"`)
+                .replace(/ width=".*?"/, '')
+                .replace(/ height=".*?"/, '')
+                .replace('</svg>', '</symbol>'),
+            };
+          }
+        } catch (error) {
           ICONS_CACHE[iconName] = false;
-          return;
-        }
-        // Styled icons don't play nice with the sprite approach because of shadow dom isolation
-        const svg = await response.text();
-        if (svg.match(/(<style | class=)/)) {
-          ICONS_CACHE[iconName] = { styled: true, html: svg };
-        } else {
-          ICONS_CACHE[iconName] = {
-            html: svg
-              .replace('<svg', `<symbol id="icons-sprite-${iconName}"`)
-              .replace(/ width=".*?"/, '')
-              .replace(/ height=".*?"/, '')
-              .replace('</svg>', '</symbol>'),
-          };
-        }
-      } catch (error) {
-        ICONS_CACHE[iconName] = false;
-        // eslint-disable-next-line no-console
-        console.error(error);
-      }
-    }
-  }));
 
-  const symbols = Object
-    .keys(ICONS_CACHE).filter((k) => !svgSprite.querySelector(`#icons-sprite-${k}`))
+          console.error(error);
+        }
+      }
+    }),
+  );
+
+  const symbols = Object.keys(ICONS_CACHE)
+    .filter((k) => !svgSprite.querySelector(`#icons-sprite-${k}`))
     .map((k) => ICONS_CACHE[k])
     .filter((v) => !v.styled)
     .map((v) => v.html)
@@ -133,7 +129,9 @@ export async function decorateIcons(element) {
   svgSprite.innerHTML += symbols;
 
   icons.forEach((span) => {
-    const iconName = Array.from(span.classList).find((c) => c.startsWith('icon-')).substring(5);
+    const iconName = Array.from(span.classList)
+      .find((c) => c.startsWith('icon-'))
+      .substring(5);
     const parent = span.firstElementChild?.tagName === 'A' ? span.firstElementChild : span;
     // Styled icons need to be inlined as-is, while unstyled ones can leverage the sprite
     if (ICONS_CACHE[iconName].styled) {
@@ -157,7 +155,6 @@ export async function loadTemplate(doc, templateName) {
             await mod.default(doc);
           }
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.log(`failed to load module for ${templateName}`, error);
         }
         resolve();
@@ -165,7 +162,6 @@ export async function loadTemplate(doc, templateName) {
     });
     await Promise.all([cssLoaded, decorationComplete]);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.log(`failed to load block ${templateName}`, error);
   }
 }
@@ -202,9 +198,7 @@ export async function loadLazy(doc) {
  * the user experience.
  */
 export function loadDelayed() {
-  // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => {
-    // eslint-disable-next-line import/no-cycle
     import('./delayed.js');
   }, 3000);
   // load anything that can be postponed to the latest here
@@ -217,9 +211,10 @@ export const removeEmptyTags = (block) => {
     // checking that the tag is not autoclosed to make sure we don't remove <meta />
     // checking the innerHTML and trim it to make sure the content inside the tag is 0
     if (
-      x.outerHTML.slice(tagName.length * -1).toUpperCase() === tagName
+      x.outerHTML.slice(tagName.length * -1).toUpperCase() === tagName &&
       // && x.childElementCount === 0
-      && x.innerHTML.trim().length === 0) {
+      x.innerHTML.trim().length === 0
+    ) {
       x.remove();
     }
   });
@@ -274,8 +269,11 @@ export const variantsClassesToBEM = (blockClasses, expectedVariantsNames, blockN
   });
 };
 
-export const slugify = (text) => (
-  text.toString().toLowerCase().trim()
+export const slugify = (text) =>
+  text
+    .toString()
+    .toLowerCase()
+    .trim()
     // separate accent from letter
     .normalize('NFD')
     // remove all separated accents
@@ -287,8 +285,7 @@ export const slugify = (text) => (
     // remove all non-word chars
     .replace(/[^\w-]+/g, '')
     // replace multiple '-' with single '-'
-    .replace(/--+/g, '-')
-);
+    .replace(/--+/g, '-');
 
 /**
  * loads the constants file where configuration values are stored
@@ -302,7 +299,6 @@ async function getConstantValues() {
       constants = response;
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Error with constants file', error);
   }
   return constants;
@@ -318,7 +314,6 @@ export const extractObjectFromArray = (data) => {
       const [key, value] = item.split(':', 2);
       obj[key.trim()] = value.trim();
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.warn(`Error with item: "${item}"`, error);
     }
   }
@@ -327,16 +322,11 @@ export const extractObjectFromArray = (data) => {
 
 export const formatValues = (values) => {
   const obj = {};
-  /* eslint-disable-next-line */
-  if (values) values.forEach(({ name, value }) => obj[name] = value);
+  if (values) values.forEach(({ name, value }) => (obj[name] = value));
   return obj;
 };
 
-const {
-  cookieValues,
-  projectConfig,
-  dealerLocator,
-} = await getConstantValues();
+const { cookieValues, projectConfig, dealerLocator } = await getConstantValues();
 
 // This data comes from the sharepoint 'constants.xlsx' file
 export const COOKIE_CONFIGS = formatValues(cookieValues?.data);
@@ -352,12 +342,7 @@ export function checkOneTrustGroup(groupName, cookieCheck = false) {
   return cookieCheck || oneTrustCookie.includes(`${groupName}:1`);
 }
 
-const {
-  PERFORMANCE_COOKIE = false,
-  FUNCTIONAL_COOKIE = false,
-  TARGETING_COOKIE = false,
-  SOCIAL_COOKIE = false,
-} = COOKIE_CONFIGS;
+const { PERFORMANCE_COOKIE = false, FUNCTIONAL_COOKIE = false, TARGETING_COOKIE = false, SOCIAL_COOKIE = false } = COOKIE_CONFIGS;
 
 export function isPerformanceAllowed() {
   return checkOneTrustGroup(PERFORMANCE_COOKIE);
@@ -379,13 +364,15 @@ export function isSocialAllowed() {
  * Helper for delaying a function
  * @param {function} func callback function
  * @param {number} timeout time to debouce in ms, default 200
-*/
+ */
 export function debounce(func, timeout = 200) {
   let timer;
   return (...args) => {
     clearTimeout(timer);
 
-    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
   };
 }
 
@@ -393,7 +380,7 @@ export function debounce(func, timeout = 200) {
  * Returns a list of properties listed in the block
  * @param {string} route get the Json data from the route
  * @returns {Object} the json data object
-*/
+ */
 export const getJsonFromUrl = async (route) => {
   try {
     const response = await fetch(route);
@@ -401,7 +388,6 @@ export const getJsonFromUrl = async (route) => {
     const json = await response.json();
     return json;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('getJsonFromUrl:', { error });
   }
   return null;
@@ -423,7 +409,8 @@ export const getJsonFromUrl = async (route) => {
 export const formatStringToArray = (inputString) => {
   // eslint-disable-next-line no-useless-escape
   const cleanedString = inputString.replace(/[\[\]\\'"]+/g, '');
-  return cleanedString.split(',')
+  return cleanedString
+    .split(',')
     .map((item) => item.trim())
     .filter((item) => item);
 };
@@ -567,7 +554,7 @@ export const deepMerge = (originalTarget, source) => {
 // fetch data helpers
 /**
  * Save the fetched data in a temporary array
-*/
+ */
 const tempData = [];
 /**
  * The default limit of the fetched data
@@ -581,7 +568,7 @@ export const defaultLimit = 100_000;
  * @param {number} props.offset the offset of the data
  * @param {number} props.limit the limit of the data
  * @returns {Object} the json data object
-*/
+ */
 const getInitialJSONData = async (props) => {
   try {
     const { url, offset = 0, limit = null } = props;
@@ -596,7 +583,6 @@ const getInitialJSONData = async (props) => {
     const json = await results.json();
     return json;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('getInitialJSONData:', { error });
     return null;
   }
@@ -610,7 +596,7 @@ const getInitialJSONData = async (props) => {
  * @param {number} limit the limit of the data
  * @returns {Object} the json data object
  * @example getMoreJSONData('https://roadchoice.com/api/news', 1000, 0, 100_000)
-*/
+ */
 async function getMoreJSONData(url, total, offset = 0, limit = defaultLimit) {
   try {
     const newOffset = offset + limit;
@@ -624,7 +610,6 @@ async function getMoreJSONData(url, total, offset = 0, limit = defaultLimit) {
     tempData.push(...json.data);
     return getMoreJSONData(total, newOffset);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('getMoreJSONData:', { error });
     return null;
   }
@@ -676,7 +661,7 @@ export function loadWorker() {
  * checks for p elements for different configurations
  * space -> [*space*]
  * button -> [*button*] (id) text content
-*/
+ */
 //  EXAMPLES:
 //  - white spacing required in document -> [*space*]
 //  - button with id -> [*button*] (cookie preference) Cookie preference center
@@ -689,7 +674,10 @@ export function loadWorker() {
       el.replaceWith(spaceSpan);
     }
     if (el.textContent.includes('[*button*]')) {
-      const id = el.textContent.match(/\((.*?)\)/)[1].toLowerCase().replace(/\s/g, '-');
+      const id = el.textContent
+        .match(/\((.*?)\)/)[1]
+        .toLowerCase()
+        .replace(/\s/g, '-');
       const textContent = el.textContent.split(')')[1].trim();
       const newBtn = createElement('a', {
         classes: ['button', 'primary'],
