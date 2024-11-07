@@ -54,6 +54,7 @@ window.OptanonWrapper = () => {
 // Google Analytics
 async function loadGoogleTagManager() {
   // google tag manager
+  // eslint-disable-next-line func-names
   (function (w, d, s, l, i) {
     w[l] = w[l] || [];
     w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
@@ -68,6 +69,7 @@ async function loadGoogleTagManager() {
 
 // Hotjar
 async function loadHotjar() {
+  /* eslint-disable */
   (function (h, o, t, j, a, r) {
     h.hj =
       h.hj ||
@@ -81,10 +83,12 @@ async function loadHotjar() {
     r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
     a.appendChild(r);
   })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
+  /* eslint-enable */
 }
 
 async function loadArtibot() {
   // Artibot
+  /* eslint-disable */
   (async function (t, e) {
     t.artibotApi = {
       l: [],
@@ -110,6 +114,7 @@ async function loadArtibot() {
           }
         });
   })(window, document);
+  /* eslint-enable */
 }
 
 // Roadchoice specific code ↓

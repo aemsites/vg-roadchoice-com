@@ -29,6 +29,7 @@ async function getPDPData(pathSegments) {
     if (!json) return null;
     return findPartBySKU(json?.data, sku);
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
@@ -50,6 +51,7 @@ async function fetchPartImages(sku) {
       return images;
     }
   } catch (error) {
+    console.error(error);
     return [{ 'Image URL': placeholderImage }];
   }
   return [{ 'Image URL': placeholderImage }];
@@ -153,6 +155,7 @@ async function fetchCategoryKeys(category) {
     if (!json || json.length === 0) return [];
     return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
+    console.error(error);
     return [];
   }
 }
@@ -176,6 +179,7 @@ async function fetchDocs(category) {
       manuals: filterByDocType(data, docTypes.manual, category),
     };
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
@@ -220,6 +224,7 @@ async function fetchSDS(category) {
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
@@ -252,6 +257,7 @@ async function fetchBlogs(category) {
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
@@ -295,6 +301,7 @@ async function getPartFitConfig(category) {
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
@@ -309,6 +316,7 @@ async function fetchPartFit(pathSegments) {
     if (!json) return null;
     return filterModelsBySKU(json?.data, sku);
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
