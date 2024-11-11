@@ -12,7 +12,7 @@
       "id": "library",
       "title": "Library",
       "environments": [ "edit" ],
-      "url": "https://main--vg-roadchoice-com--volvogroup.aem.live/tools/sidekick/library.html",
+      "url": "https://main--vg-roadchoice-com--volvogroup.aem.page/tools/sidekick/library.html",
       "includePaths": [ "**.docx**" ]
     },
     {
