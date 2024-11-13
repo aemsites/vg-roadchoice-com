@@ -75,7 +75,7 @@ export function sampleRUM(checkpoint, data = {}) {
       }
     }
   } catch (error) {
-    // something went wrong
+    console.error(error);
   }
 }
 
