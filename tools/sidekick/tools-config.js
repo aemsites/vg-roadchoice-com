@@ -1,5 +1,3 @@
-// for future use of variables const gitowner, gitrepo and globalSitemapURL
-
 async function getConstantValues() {
   const url = '/constants.json';
   let constants;
