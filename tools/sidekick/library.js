@@ -1,11 +1,6 @@
-import TOOLS_VALUES from './tools-config.js';
-
-const { SIDEKICK_LIBRARY_EXTENDS } = TOOLS_VALUES;
-
 const library = document.createElement('sidekick-library');
 library.config = {
   base: '/block-library/library.json',
-  extends: SIDEKICK_LIBRARY_EXTENDS,
   plugins: {
     blocks: {
       viewPorts: [

@@ -1,7 +1,7 @@
 {
   "name": "roadchoice",
   "private": true,
-  "version": "8.0.0",
+  "version": "7.0.0",
   "description": "",
   "engines": {
     "node": ">=v20.15.1 <23",
