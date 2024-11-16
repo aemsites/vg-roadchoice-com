@@ -30,7 +30,7 @@ const reduceCategories = (cats) => {
   return reducedArray;
 };
 
-const buildFilter = (cats) => {
+export const buildFilter = (cats) => {
   const section = createElement('div', { classes: `${blockName}-section` });
   const title = createElement('h3', { classes: 'title' });
   title.textContent = categoriesText;

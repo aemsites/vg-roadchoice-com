@@ -2,6 +2,7 @@ import { createElement, getTextLabel } from '../../scripts/common.js';
 import productCard from './product-card.js';
 import { amountOfProducts } from '../search/search.js';
 import { results, allProducts } from '../../templates/search-results/search-results.js';
+import { loadGraphQLResults } from '../../blocks/search/graphql-search.js';
 
 const blockName = 'results-list';
 const loadingLabel = getTextLabel('loading_label');
@@ -56,6 +57,15 @@ export default async function decorate(block) {
   const loadingElement = createElement('div', { classes: 'loading' });
   loadingElement.textContent = loadingLabel;
   resultsSection.append(loadingElement);
+  const urlCategory = new URLSearchParams(window.location.search).get('cat');
+  resultsSection.append(productList);
+
+  block.textContent = '';
+  block.append(resultsSection);
+  if (!urlCategory) {
+    loadGraphQLResults({ isFirstSet: true });
+    return;
+  }
 
   const isTruckLibrary = (text) => text.includes('trucklibrary.com');
 
@@ -90,9 +100,4 @@ export default async function decorate(block) {
     render(detail);
     isRendered = true;
   });
-
-  resultsSection.append(productList);
-
-  block.textContent = '';
-  block.append(resultsSection);
 }

@@ -234,6 +234,24 @@ function getFieldValue(selector, items) {
 function formListener(form) {
   form.onsubmit = (e) => {
     e.preventDefault();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.get('cat')) {
+      const items = [...form];
+      const value = getFieldValue(`${blockName}__input-${isCrossRefActive ? 'cr' : 'pn'}__input`, items);
+      const makeFilterValue = getFieldValue(`${blockName}__make-filter__select`, items);
+      const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
+      const searchType = isCrossRefActive
+        ? 'cross'
+        : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
+      const offset = 0;
+      const url = new URL(window.location.href);
+      url.pathname = getLocaleContextedUrl('/search/');
+      url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
+      window.location.href = url;
+      return;
+    }
+
     if (!window.allProducts) return;
     ({ crData, pnData } = window.allProducts);
     const ssData = ['query', 'results', 'amount'];

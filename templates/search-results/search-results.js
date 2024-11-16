@@ -52,7 +52,7 @@ const type = (searchType === 'cross' && 'cross-reference') || 'parts';
 
 const isTextNull = (text) => (text === 'null' ? '' : text);
 
-const noResultsTemplate = `
+export const noResultsTemplate = `
   <div class="no-results-section">
     <h5 class="no-results-subtitle">${subTitleText}</h5>
     <div class="no-results-options">
@@ -86,6 +86,13 @@ export default async function decorate(doc) {
   const titleText =
     (searchType === 'cross' && `${titleContent} ${type}: "${value}"`) ||
     `${titleContent} ${isTextNull(query.make)} ${isTextNull(query.model)} ${value} ${type}`;
+  if (!urlParams.get('cat')) {
+    searchResultsSection.append(titleSection, filters, pagination, resultsList);
+    searchResultsWrapper.appendChild(searchResultsSection);
+    section.appendChild(searchResultsWrapper);
+    main.append(section);
+    return;
+  }
   const productsWorker = getProductsWorker();
 
   productsWorker.onmessage = ({ data }) => {
