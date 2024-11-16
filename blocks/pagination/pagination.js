@@ -1,5 +1,6 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
 import { amountOfProducts } from '../search/search.js';
+import { loadGraphQLResults } from '../search/graphql-search.js';
 
 const blockName = 'pagination';
 const amount = JSON.parse(sessionStorage.getItem('amount')) || amountOfProducts;
@@ -14,7 +15,7 @@ const partNumberText = getTextLabel('part_number');
 const displayedTextContent = getTextLabel('pagination_text');
 const buttonTextContent = getTextLabel('pagination_button');
 const firstWord = partNumberText.split(' ')[0];
-const category = new URLSearchParams(window.location.search).get('cat');
+const urlCategory = new URLSearchParams(window.location.search).get('cat');
 
 const loadMoreProducts = (props) => {
   const { hidden, amountText } = props;
@@ -51,32 +52,37 @@ const decoratePagination = (block) => {
   const paginationTitle = createElement('h2', { classes: 'title' });
   paginationTitle.textContent = `${firstWord}s`;
   const showingSection = createElement('div', { classes: 'showing-section' });
-  const displayedText = createElement('p', { classes: 'displayed-text' });
-  if (category) {
-    products = products.filter((item) => item['Part Category'].toLowerCase() === category);
+  const displayedTextElement = createElement('p', { classes: 'displayed-text' });
+  if (urlCategory) {
+    products = products.filter((item) => item['Part Category'].toLowerCase() === urlCategory);
   }
   hasMoreItems = products && products.length > amount;
   currentAmount = hasMoreItems ? amount : [...products].length;
   newText = displayedTextContent.replace('[$]', currentAmount);
-  displayedText.textContent = newText;
-  showingSection.append(displayedText);
+  displayedTextElement.textContent = newText;
+  showingSection.append(displayedTextElement);
 
-  if (hasMoreItems) {
-    const moreBtn = createElement('button', { classes: ['more-button', 'hidden'] });
+  if (hasMoreItems || !urlCategory) {
+    const moreBtnClasses = ['more-button'];
+    const moreBtn = createElement('button', { classes: moreBtnClasses });
     moreBtn.textContent = buttonTextContent;
     const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
     bottomMoreBtn.textContent = buttonTextContent;
     const resultsListBlock = document.querySelector('.results-list.block');
-    addShowMoreHandler(moreBtn, resultsListBlock, displayedText);
-    addShowMoreHandler(bottomMoreBtn, resultsListBlock, displayedText);
     showingSection.append(moreBtn);
-
-    if (imageData.length > 0) {
-      addButtons({ resultsListBlock, moreBtn, bottomMoreBtn });
-    } else {
-      document.addEventListener('DataLoaded', () => {
+    if (urlCategory) {
+      moreBtnClasses.push('hidden');
+      addShowMoreHandler(moreBtn, resultsListBlock, displayedTextElement);
+      addShowMoreHandler(bottomMoreBtn, resultsListBlock, displayedTextElement);
+      if (imageData.length > 0) {
         addButtons({ resultsListBlock, moreBtn, bottomMoreBtn });
-      });
+      } else {
+        document.addEventListener('DataLoaded', () => {
+          addButtons({ resultsListBlock, moreBtn, bottomMoreBtn });
+        });
+      }
+    } else {
+      moreBtn.onclick = () => loadGraphQLResults({ isFirstSet: false });
     }
   }
 
@@ -86,6 +92,10 @@ const decoratePagination = (block) => {
 };
 
 export default async function decorate(block) {
+  if (!urlCategory) {
+    decoratePagination(block);
+    return;
+  }
   document.addEventListener('DataLoaded', ({ detail }) => {
     products = detail.results;
     imageData = detail.data.imgData;

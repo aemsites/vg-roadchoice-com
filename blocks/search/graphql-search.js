@@ -63,10 +63,7 @@ export async function fetchGraphQL({ query, limit, offset, make, model, searchTy
     }
 
     const results = data.data[queryName].items.map((item) => item.metadata);
-    const categories = data.data[queryName].facets.map((facet) => ({
-      category: facet.key,
-      count: facet.doc_count,
-    }));
+    const categories = data.data[queryName].facets.map((facet) => [facet.key, facet.doc_count]);
 
     return { results, categories };
   } catch (error) {
