@@ -104,9 +104,11 @@ function addSearchByListeners(wrapper, form) {
 function populateFilter(select, items) {
   const docRange = document.createRange();
   let htmlFragment = '';
+  const urlParams = new URLSearchParams(window.location.search);
   items.forEach((item) => {
+    const itemValue = urlParams.get('cat') ? item.toLowerCase() : item;
     htmlFragment += `
-      <option value="${item.toLowerCase()}">${item}</option>
+      <option value="${itemValue}">${item}</option>
     `;
   });
   const fragment = docRange.createContextualFragment(htmlFragment);
@@ -135,7 +137,7 @@ async function getAndApplyFiltersData(form) {
       return;
     }
     // if is not null then enable the select and then is filled by the maker value
-    const models = modelsItems.filter((item) => item.Make.toLowerCase() === e.target.value)[0].Models;
+    const models = modelsItems.filter((item) => item.Make.toLowerCase() === e.target.value.toLowerCase())[0].Models;
     resetModelsFilter(modelsSelect, false);
     populateFilter(modelsSelect, models);
   };

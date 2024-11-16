@@ -57,19 +57,23 @@ export const buildFilter = (cats) => {
 };
 
 const decorateFilter = (block) => {
-  const filtersSection = createElement('div', { classes: `${blockName}-wrapper` });
+  const filtersWrapper = createElement('div', { classes: `${blockName}-wrapper` });
 
-  const categories = reduceCategories(products);
-
-  const categoryFilterSection = buildFilter(categories);
-
-  filtersSection.append(categoryFilterSection);
+  if (urlCategory) {
+    const categories = reduceCategories(products);
+    const categoryFilterSection = buildFilter(categories);
+    filtersWrapper.append(categoryFilterSection);
+  }
 
   block.textContent = '';
-  block.append(filtersSection);
+  block.append(filtersWrapper);
 };
 
 export default async function decorate(block) {
+  if (!urlCategory) {
+    decorateFilter(block);
+    return;
+  }
   document.addEventListener('DataLoaded', ({ detail }) => {
     products = detail.results;
     if (products.length > 0) decorateFilter(block);

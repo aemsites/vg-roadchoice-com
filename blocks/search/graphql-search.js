@@ -82,29 +82,28 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
   const make = urlParams.get('make');
   const model = urlParams.get('model');
   const searchType = urlParams.get('st');
-  // const searchCategory = urlParams.get('cat') || '';
   const offset = isFirstSet ? 0 : parseInt(offsetParam) + 1;
   if (!isFirstSet) {
     const newUrl = new URL(window.location);
     newUrl.searchParams.set('offset', offset);
     window.history.pushState({ path: newUrl.href }, '', newUrl.href);
   }
+  const filtersWrapper = document.querySelector('.filters-wrapper');
   const loadingLabel = getTextLabel('loading_label');
-  const loadingElement = createElement('div', { classes: 'loading' });
+  let loadingElement = document.querySelector('.loading');
+  if (!loadingElement) {
+    loadingElement = createElement('div', { classes: 'loading' });
+    resultsSection.append(loadingElement);
+  }
   loadingElement.textContent = loadingLabel;
-  // resultsSection.append(loadingElement);
   const searchParams = { query, limit, offset: offset * limit, make, model, searchType };
   const { results, categories } = await fetchGraphQL(searchParams);
   loadingElement.remove();
   console.warn(results);
   if (results?.length > 0) {
     results.forEach((result) => {
-      // const resultCategory = (result['part_category']?.[0] || '').toLowerCase();
-      // const searchCategoryNormalized = searchCategory.toLowerCase().replace(/[+]+/g, ' ');
-      // if (!searchCategory || searchCategoryNormalized === resultCategory) {
       const liElement = productCard(result, searchType);
       resultsList.appendChild(liElement);
-      // }
     });
     const buttonTextContent = getTextLabel('pagination_button');
     const resultsCountElement = document.querySelector('.displayed-text');
@@ -126,10 +125,10 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
     const titleElement = searchResultsSection.querySelector('.title');
     const titleText = getTextLabel('no_results_title').replace('[$]', `${query}`);
     titleElement.innerText = titleText;
-    const filters = document.querySelector('.filters-wrapper');
     const fragment = document.createRange().createContextualFragment(noResultsTemplate);
     searchResultsSection.classList.add('no-results');
-    searchResultsSection.insertBefore(fragment, filters);
+    searchResultsSection.insertBefore(fragment, filtersWrapper);
   }
-  buildFilter(categories);
+  const filters = buildFilter(categories);
+  filtersWrapper.append(filters);
 };
