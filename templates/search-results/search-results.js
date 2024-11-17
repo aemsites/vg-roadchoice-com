@@ -113,7 +113,7 @@ export default async function decorate(doc) {
   };
 
   document.addEventListener('DataLoaded', ({ detail }) => {
-    if (detail.results.length === 0) {
+    if (urlParams.get('cat') && detail.results.length === 0) {
       isResultsEmpty = true;
       title.textContent = noResultsContent.replace('[$]', value);
       if (!searchResultsSection.classList.contains('no-results')) {
@@ -136,7 +136,7 @@ export default async function decorate(doc) {
     }
   });
 
-  const noResults = !isResultsEmpty && results.length === 0;
+  const noResults = urlParams.get('cat') && !isResultsEmpty && results.length === 0;
   const noResultsText = noResultsContent.replace('[$]', value);
 
   title.textContent = !noResults ? titleText : noResultsText;

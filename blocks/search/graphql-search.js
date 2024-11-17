@@ -78,8 +78,8 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
   const query = urlParams.get('q');
   const limit = amountOfProducts;
   const offsetParam = urlParams.get('offset');
-  const make = urlParams.get('make');
-  const model = urlParams.get('model');
+  const make = urlParams.get('make') === 'null' ? undefined : urlParams.get('make');
+  const model = urlParams.get('model') === 'null' ? undefined : urlParams.get('model');
   const searchType = urlParams.get('st');
   const offset = isFirstSet ? 0 : parseInt(offsetParam) + 1;
   if (!isFirstSet) {
