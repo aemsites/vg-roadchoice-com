@@ -1,7 +1,6 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 import { noResultsTemplate } from '../../templates/search-results/search-results.js';
-import { buildFilter } from '../filters/filters.js';
 import { amountOfProducts } from './search.js';
 
 const graphQLEndpoint = 'https://search-api-qa-eds.aws.43636.vnonprod.com/search';
@@ -97,7 +96,7 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
   }
   loadingElement.textContent = loadingLabel;
   const searchParams = { query, limit, offset: offset * limit, make, model, searchType };
-  const { results, categories } = await fetchGraphQL(searchParams);
+  const { results } = await fetchGraphQL(searchParams);
   loadingElement.remove();
   console.warn(results);
   if (results?.length > 0) {
@@ -129,6 +128,4 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
     searchResultsSection.classList.add('no-results');
     searchResultsSection.insertBefore(fragment, filtersWrapper);
   }
-  const filters = buildFilter(categories);
-  filtersWrapper.append(filters);
 };

@@ -59,21 +59,15 @@ export const buildFilter = (cats) => {
 const decorateFilter = (block) => {
   const filtersWrapper = createElement('div', { classes: `${blockName}-wrapper` });
 
-  if (urlCategory) {
-    const categories = reduceCategories(products);
-    const categoryFilterSection = buildFilter(categories);
-    filtersWrapper.append(categoryFilterSection);
-  }
+  const categories = reduceCategories(products);
+  const categoryFilterSection = buildFilter(categories);
+  filtersWrapper.append(categoryFilterSection);
 
   block.textContent = '';
   block.append(filtersWrapper);
 };
 
 export default async function decorate(block) {
-  if (!urlCategory) {
-    decorateFilter(block);
-    return;
-  }
   document.addEventListener('DataLoaded', ({ detail }) => {
     products = detail.results;
     if (products.length > 0) decorateFilter(block);
