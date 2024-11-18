@@ -14,7 +14,7 @@ jobs:
         echo "Org: ${{ github.event.client_payload.org }}"
         echo "Path: ${{ github.event.client_payload.path }}"
   notify-connector:
-    if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && endsWith(github.event.client_payload.path, '.json')
+    if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && contains(github.event.client_payload.path, 'road-choice-make-model-part-filter-options')
     runs-on: ubuntu-latest
     steps:
     - name: Notify create_os_documents endpoint
