@@ -115,8 +115,6 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
       bottomMoreBtn.textContent = buttonTextContent;
       resultsSection.appendChild(bottomMoreBtn);
       bottomMoreBtn.onclick = () => loadGraphQLResults({ isFirstSet: false });
-    } else {
-      resultsList.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   }
   if (!results || results.length === 0) {
