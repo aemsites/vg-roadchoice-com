@@ -97,6 +97,9 @@ export default async function decorate(block) {
   }
 
   document.addEventListener('DataLoaded', ({ detail }) => {
+    if (!urlCategory) {
+      return;
+    }
     render(detail);
     isRendered = true;
   });
