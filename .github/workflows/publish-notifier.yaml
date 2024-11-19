@@ -20,7 +20,7 @@ jobs:
     - name: Notify create_os_documents endpoint
       run: |
         sleep 120s
-        PAGE_PATH=$(echo "${{ github.event.client_payload.path }}"
+        PAGE_PATH=$(echo "${{ github.event.client_payload.path }}")
         WEBSITE_NAME="${{ github.event.client_payload.site }}"
         URI=$(echo "${{ vars.ROADCHOICE_CONNECTOR_DOMAIN }}/$WEBSITE_NAME")
         BODY='"'$PAGE_PATH'"'
