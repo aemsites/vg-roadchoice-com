@@ -115,6 +115,8 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
       bottomMoreBtn.textContent = buttonTextContent;
       resultsSection.appendChild(bottomMoreBtn);
       bottomMoreBtn.onclick = () => loadGraphQLResults({ isFirstSet: false });
+    } else if (results.length < amountOfProducts) {
+      document.querySelectorAll('.more-button').forEach((moreBtn) => moreBtn.remove());
     }
   }
   if (!results || results.length === 0) {
