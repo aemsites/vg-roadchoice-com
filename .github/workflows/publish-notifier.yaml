@@ -1,0 +1,30 @@
+name: RoadChoice Search Connector - Create_os_documents
+
+on:
+  repository_dispatch:
+    types:
+      - resource-published
+jobs:
+  check-event-status:
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo "Status: ${{ github.event.client_payload.status }}"
+        echo "Site: ${{ github.event.client_payload.site }}"
+        echo "Org: ${{ github.event.client_payload.org }}"
+        echo "Path: ${{ github.event.client_payload.path }}"
+  notify-connector:
+    if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && contains(github.event.client_payload.path, 'road-choice-make-model-part-filter-options')
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify create_os_documents endpoint
+      run: |
+        sleep 120s
+        PAGE_PATH=$(echo "${{ github.event.client_payload.path }}"
+        WEBSITE_NAME="${{ github.event.client_payload.site }}"
+        URI=$(echo "${{ vars.ROADCHOICE_CONNECTOR_DOMAIN }}/$WEBSITE_NAME")
+        BODY='"'$PAGE_PATH'"'
+        BODY="$(echo "$BODY" | jq -c)"
+        response=$(curl -s -H "x-api-key: ${{ secrets.ROADCHOICE_API_KEY }}" -X POST "$URI" -d "$BODY")
+        echo "response: $response"
+      shell: bash
