@@ -21,6 +21,7 @@
   color: var(--primary-red);
   font-family: var(--headings-ff-black);
   font-size: var(--body-font-size-m);
+  background-color: unset;
 }
 
 .manuals-table .manuals-table-column.empty {

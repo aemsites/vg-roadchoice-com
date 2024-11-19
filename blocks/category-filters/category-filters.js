@@ -13,7 +13,7 @@ function getFilters() {
   try {
     filters = JSON.parse(sessionStorage.getItem('filter-attribs'));
   } catch (error) {
-    throw new Error('Error getting filters from sessionStorage');
+    throw new Error('Error getting filters from sessionStorage: ', error);
   }
 
   return filters;
