@@ -86,6 +86,13 @@ export default async function decorate(doc) {
   const titleText =
     (searchType === 'cross' && `${titleContent} ${type}: "${value}"`) ||
     `${titleContent} ${isTextNull(query.make)} ${isTextNull(query.model)} ${value} ${type}`;
+  if (!urlParams.get('cat')) {
+    searchResultsSection.append(titleSection, filters, pagination, resultsList);
+    searchResultsWrapper.appendChild(searchResultsSection);
+    section.appendChild(searchResultsWrapper);
+    main.append(section);
+    return;
+  }
   const productsWorker = getProductsWorker();
 
   productsWorker.onmessage = ({ data }) => {

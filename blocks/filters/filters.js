@@ -40,7 +40,7 @@ export const buildFilter = (cats) => {
 
   cats.forEach((cat) => {
     const [category, amount] = cat;
-    urlParams.set('cat', category.toLowerCase());
+    urlParams.set('category', category.toLowerCase());
     const filterUrl = `${currentUrl.pathname}?${urlParams.toString()}`;
     const item = createElement('li', { classes: 'item' });
     const link = createElement('a', {
@@ -59,15 +59,21 @@ export const buildFilter = (cats) => {
 const decorateFilter = (block) => {
   const filtersWrapper = createElement('div', { classes: `${blockName}-wrapper` });
 
-  const categories = reduceCategories(products);
-  const categoryFilterSection = buildFilter(categories);
-  filtersWrapper.append(categoryFilterSection);
+  if (urlCategory) {
+    const categories = reduceCategories(products);
+    const categoryFilterSection = buildFilter(categories);
+    filtersWrapper.append(categoryFilterSection);
+  }
 
   block.textContent = '';
   block.append(filtersWrapper);
 };
 
 export default async function decorate(block) {
+  if (!urlCategory) {
+    decorateFilter(block);
+    return;
+  }
   document.addEventListener('DataLoaded', ({ detail }) => {
     products = detail.results;
     if (products.length > 0) decorateFilter(block);

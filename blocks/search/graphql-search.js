@@ -1,18 +1,19 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 import { noResultsTemplate } from '../../templates/search-results/search-results.js';
+import { buildFilter } from '../filters/filters.js';
 import { amountOfProducts } from './search.js';
 
 const graphQLEndpoint = 'https://search-api-qa-eds.aws.43636.vnonprod.com/search';
 const crossReferenceQueryName = 'rccrossreferencesearch';
 const partNumberQueryName = 'rcpartsearch';
 
-export async function fetchGraphQL({ query, limit, offset, make, model, searchType }) {
+export async function fetchGraphQL({ query, limit, offset, make, model, searchType, category }) {
   const queryName = searchType === 'cross' ? crossReferenceQueryName : partNumberQueryName;
   const graphqlQuery = {
     query: `
-      query ${queryName}($q: String!, $limit: Int, $offset: Int${searchType === 'parts' ? ', $makeFilter: String, $modelFilter: String' : ''}) {
-        ${queryName}(q: $q, limit: $limit, offset: $offset${searchType === 'parts' ? ', makeFilter: $makeFilter, modelFilter: $modelFilter' : ''}) {
+      query ${queryName}($q: String!, $limit: Int, $offset: Int${searchType === 'parts' ? ', $makeFilter: String, $modelFilter: String' : ''}${category ? ', $categoryFilter: String' : ''}) {
+        ${queryName}(q: $q, limit: $limit, offset: $offset${searchType === 'parts' ? ', makeFilter: $makeFilter, modelFilter: $modelFilter' : ''}${category ? ', categoryFilter: $categoryFilter' : ''}) {
           count
           items {
             score
@@ -26,6 +27,8 @@ export async function fetchGraphQL({ query, limit, offset, make, model, searchTy
               image_url
             }
           }
+          currentPage
+          numberOfPages
           facets {
             key
             doc_count
@@ -38,6 +41,7 @@ export async function fetchGraphQL({ query, limit, offset, make, model, searchTy
       limit,
       offset,
       ...(searchType === 'parts' && { makeFilter: make, modelFilter: model }),
+      ...(category && { categoryFilter: category }),
     },
   };
 
@@ -81,7 +85,8 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
   const make = urlParams.get('make') === 'null' ? undefined : urlParams.get('make');
   const model = urlParams.get('model') === 'null' ? undefined : urlParams.get('model');
   const searchType = urlParams.get('st');
-  const offset = isFirstSet ? 0 : parseInt(offsetParam) + 1;
+  const category = urlParams.get('category');
+  const offset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
   if (!isFirstSet) {
     const newUrl = new URL(window.location);
     newUrl.searchParams.set('offset', offset);
@@ -95,10 +100,9 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
     resultsSection.append(loadingElement);
   }
   loadingElement.textContent = loadingLabel;
-  const searchParams = { query, limit, offset: offset * limit, make, model, searchType };
-  const { results } = await fetchGraphQL(searchParams);
+  const searchParams = { query, limit, offset: offset * limit, make, model, searchType, category };
+  const { results, categories } = await fetchGraphQL(searchParams);
   loadingElement.remove();
-  console.warn(results);
   if (results?.length > 0) {
     results.forEach((result) => {
       const liElement = productCard(result, searchType);
@@ -128,5 +132,10 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
     const fragment = document.createRange().createContextualFragment(noResultsTemplate);
     searchResultsSection.classList.add('no-results');
     searchResultsSection.insertBefore(fragment, filtersWrapper);
+  }
+  const filters = buildFilter(categories);
+  if (filters) {
+    filtersWrapper.innerHTML = '';
+    filtersWrapper.append(filters);
   }
 };
