@@ -103,11 +103,17 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
   const searchParams = { query, limit, offset: offset * limit, make, model, searchType, category };
   const { results, categories } = await fetchGraphQL(searchParams);
   loadingElement.remove();
+  const searchResultsSection = document.querySelector('.search-results-section');
+  const titleElement = searchResultsSection.querySelector('.title');
   if (results?.length > 0) {
     results.forEach((result) => {
       const liElement = productCard(result, searchType);
       resultsList.appendChild(liElement);
     });
+    const titleContent = getTextLabel('search_results_title');
+    const type = searchType === 'cross' ? 'cross-reference' : 'parts';
+    const titleText = `${titleContent} ${searchType === 'cross' ? `${type}: "${query}"` : `${make} ${model} ${query} ${type}`}`;
+    titleElement.textContent = titleText;
     const buttonTextContent = getTextLabel('pagination_button');
     const resultsCountElement = document.querySelector('.displayed-text');
     const currentAmount = document.querySelectorAll('.product-card').length;
@@ -125,8 +131,6 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
     }
   }
   if (!results || results.length === 0) {
-    const searchResultsSection = document.querySelector('.search-results-section');
-    const titleElement = searchResultsSection.querySelector('.title');
     const titleText = getTextLabel('no_results_title').replace('[$]', `${query}`);
     titleElement.innerText = titleText;
     const fragment = document.createRange().createContextualFragment(noResultsTemplate);
