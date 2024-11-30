@@ -1,13 +1,11 @@
 import { createElement, getTextLabel, getLocaleContextedUrl } from '../../scripts/common.js';
-import { fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
+import { graphQLConfig, fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
 import productCard from '../results-list/product-card.js';
 import { noResultsTemplate } from '../../templates/search-results/search-results.js';
 import { buildFilter } from '../filters/filters.js';
 
 const blockName = 'search';
 let isCrossRefActive = true;
-export const amountOfProducts = 12;
-export const fitAmount = 5000;
 
 const PLACEHOLDERS = {
   crossReference: getTextLabel('cross-reference_number'),
@@ -118,16 +116,15 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
   const query = urlParams.get('q');
-  const limit = amountOfProducts;
   const offsetParam = urlParams.get('offset');
   const make = urlParams.get('make') === 'null' ? undefined : urlParams.get('make');
   const model = urlParams.get('model') === 'null' ? undefined : urlParams.get('model');
   const searchType = urlParams.get('st');
   const category = urlParams.get('category');
-  const offset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+  const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
   if (!isFirstSet) {
     const newUrl = new URL(window.location);
-    newUrl.searchParams.set('offset', offset);
+    newUrl.searchParams.set('offset', targetOffset);
     window.history.pushState({ path: newUrl.href }, '', newUrl.href);
   }
   const filtersWrapper = document.querySelector('.filters-wrapper');
@@ -138,7 +135,8 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     resultsSection.append(loadingElement);
   }
   loadingElement.textContent = loadingLabel;
-  const searchParams = { query, limit, offset: offset * limit, make, model, searchType, category };
+  const offset = targetOffset * graphQLConfig.maxProductsPerQuery;
+  const searchParams = { query, offset, make, model, searchType, category };
   const { results, categories } = await fetchSearchResults(searchParams);
   loadingElement.remove();
   const searchResultsSection = document.querySelector('.search-results-section');
@@ -158,13 +156,13 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     const displayedTextContent = getTextLabel('pagination_text');
     const newText = displayedTextContent.replace('[$]', currentAmount);
     resultsCountElement.innerText = newText;
-    if (offset === 0) {
+    if (targetOffset === 0) {
       const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
       bottomMoreBtn.textContent = buttonTextContent;
       resultsSection.appendChild(bottomMoreBtn);
       bottomMoreBtn.onclick = () => getAndApplySearchResults({ isFirstSet: false });
     }
-    if (results.length < amountOfProducts) {
+    if (results.length < graphQLConfig.maxProductsPerQuery) {
       document.querySelectorAll('.more-button').forEach((moreBtn) => moreBtn.remove());
     }
   }

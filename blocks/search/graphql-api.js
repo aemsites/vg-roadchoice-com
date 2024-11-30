@@ -1,9 +1,13 @@
-const graphQLEndpoint = 'https://search-api-qa-eds.aws.43636.vnonprod.com/search';
-const crossReferenceQueryName = 'rccrossreferencesearch';
-const partNumberQueryName = 'rcpartsearch';
-const filterFacetsQueryName = 'rcfilterfacets';
+export const graphQLConfig = {
+  graphQLEndpoint: 'https://search-api-qa-eds.aws.43636.vnonprod.com/search',
+  crossReferenceQueryName: 'rccrossreferencesearch',
+  partNumberQueryName: 'rcpartsearch',
+  filterFacetsQueryName: 'rcfilterfacets',
+  maxProductsPerQuery: 12,
+};
 
-export async function fetchSearchResults({ query, limit, offset, make, model, searchType, category }) {
+export async function fetchSearchResults({ query, offset, make, model, searchType, category }) {
+  const { graphQLEndpoint, crossReferenceQueryName, partNumberQueryName, maxProductsPerQuery } = graphQLConfig;
   const queryName = searchType === 'cross' ? crossReferenceQueryName : partNumberQueryName;
   const graphqlQuery = {
     query: `
@@ -33,7 +37,7 @@ export async function fetchSearchResults({ query, limit, offset, make, model, se
     `,
     variables: {
       q: query,
-      limit,
+      limit: maxProductsPerQuery,
       offset,
       ...(searchType === 'parts' && { makeFilter: make, modelFilter: model }),
       ...(category && { categoryFilter: category }),
@@ -71,6 +75,8 @@ export async function fetchSearchResults({ query, limit, offset, make, model, se
 }
 
 export async function fetchFilterFacets({ field, filter }) {
+  const { graphQLEndpoint, filterFacetsQueryName } = graphQLConfig;
+
   const graphqlQuery = {
     query: `
       query ${filterFacetsQueryName}($field: RcFieldEnum!, $filter: String) {
