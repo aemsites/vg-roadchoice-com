@@ -150,7 +150,7 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     });
     const titleContent = getTextLabel('search_results_title');
     const type = searchType === 'cross' ? 'cross-reference' : 'parts';
-    const titleText = `${titleContent} ${searchType === 'cross' ? `${type}: "${query}"` : `${make} ${model} ${query} ${type}`}`;
+    const titleText = `${titleContent} ${searchType === 'cross' ? `${type}: "${query}"` : `${make || ''} ${model || ''} ${query} ${type}`}`;
     titleElement.textContent = titleText;
     const buttonTextContent = getTextLabel('pagination_button');
     const resultsCountElement = document.querySelector('.displayed-text');
