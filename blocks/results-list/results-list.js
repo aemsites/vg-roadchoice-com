@@ -2,7 +2,7 @@ import { createElement, getTextLabel } from '../../scripts/common.js';
 import productCard from './product-card.js';
 import { amountOfProducts } from '../search/search.js';
 import { results, allProducts } from '../../templates/search-results/search-results.js';
-import { loadGraphQLResults } from '../../blocks/search/graphql-search.js';
+import { renderSearchResults } from '../../blocks/search/graphql-search.js';
 
 const blockName = 'results-list';
 const loadingLabel = getTextLabel('loading_label');
@@ -63,7 +63,7 @@ export default async function decorate(block) {
   block.textContent = '';
   block.append(resultsSection);
   if (!urlCategory) {
-    loadGraphQLResults({ isFirstSet: true });
+    renderSearchResults({ isFirstSet: true });
     return;
   }
 

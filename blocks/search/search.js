@@ -1,10 +1,9 @@
-import { createElement, getJsonFromUrl, getTextLabel, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getTextLabel, getLocaleContextedUrl } from '../../scripts/common.js';
+import { fetchFilterFacets } from '../search/graphql-search.js';
 
 const blockName = 'search';
 let isCrossRefActive = true;
 let noOthersItems;
-const modelsItems = [];
-const FILTERS_DATA = getLocaleContextedUrl('/search/search-filters.json');
 let crData;
 let pnData;
 export const amountOfProducts = 12;
@@ -118,18 +117,12 @@ function populateFilter(select, items) {
 async function getAndApplyFiltersData(form) {
   const makeSelect = form.querySelector(`.${blockName}__make-filter__select`);
   const modelsSelect = form.querySelector(`.${blockName}__model-filter__select`);
-  const makeItems = [];
-  const filters = await getJsonFromUrl(FILTERS_DATA);
-  const { data } = filters || {};
-  if (!data) return;
-  data.forEach((item) => {
-    const itemModels = item.Models !== 'null' ? item.Models.split(',') : [];
-    modelsItems.push({ Make: item.Make, Models: itemModels });
-    makeItems.push(item.Make);
-  });
+  const fetchedMakeFacets = await fetchFilterFacets({ field: 'MAKE' });
+  const makeFacets = fetchedMakeFacets.facets.facets;
+  const makeItems = makeFacets.map((facet) => facet.key);
   populateFilter(makeSelect, makeItems);
   noOthersItems = makeItems.filter((item) => item !== 'Others');
-  makeSelect.onchange = (e) => {
+  makeSelect.onchange = async (e) => {
     const isNotNull = e.target.value !== 'null';
     // if is null then disable the models filter
     if (!isNotNull) {
@@ -137,9 +130,11 @@ async function getAndApplyFiltersData(form) {
       return;
     }
     // if is not null then enable the select and then is filled by the maker value
-    const models = modelsItems.filter((item) => item.Make.toLowerCase() === e.target.value.toLowerCase())[0].Models;
+    const fetchedModelFacets = await fetchFilterFacets({ field: 'NAME', filter: makeSelect.value });
+    const modelFacets = fetchedModelFacets.facets.facets;
+    const modelItems = modelFacets.map((facet) => facet.key);
     resetModelsFilter(modelsSelect, false);
-    populateFilter(modelsSelect, models);
+    populateFilter(modelsSelect, modelItems);
   };
 }
 

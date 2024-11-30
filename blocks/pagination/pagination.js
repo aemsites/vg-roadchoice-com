@@ -1,6 +1,6 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
 import { amountOfProducts } from '../search/search.js';
-import { loadGraphQLResults } from '../search/graphql-search.js';
+import { renderSearchResults } from '../search/graphql-search.js';
 
 const blockName = 'pagination';
 const amount = JSON.parse(sessionStorage.getItem('amount')) || amountOfProducts;
@@ -82,7 +82,7 @@ const decoratePagination = (block) => {
         });
       }
     } else {
-      moreBtn.onclick = () => loadGraphQLResults({ isFirstSet: false });
+      moreBtn.onclick = () => renderSearchResults({ isFirstSet: false });
     }
   }
 

@@ -7,8 +7,9 @@ import { amountOfProducts } from './search.js';
 const graphQLEndpoint = 'https://search-api-qa-eds.aws.43636.vnonprod.com/search';
 const crossReferenceQueryName = 'rccrossreferencesearch';
 const partNumberQueryName = 'rcpartsearch';
+const filterFacetsQueryName = 'rcfilterfacets';
 
-export async function fetchGraphQL({ query, limit, offset, make, model, searchType, category }) {
+export async function fetchSearchResults({ query, limit, offset, make, model, searchType, category }) {
   const queryName = searchType === 'cross' ? crossReferenceQueryName : partNumberQueryName;
   const graphqlQuery = {
     query: `
@@ -75,7 +76,52 @@ export async function fetchGraphQL({ query, limit, offset, make, model, searchTy
   }
 }
 
-export const loadGraphQLResults = async ({ isFirstSet }) => {
+export async function fetchFilterFacets({ field, filter }) {
+  const graphqlQuery = {
+    query: `
+      query ${filterFacetsQueryName}($field: RcFieldEnum!, $filter: String) {
+        ${filterFacetsQueryName}(field: $field, filter: $filter) {
+          facets {
+            key
+            doc_count
+          }
+        }
+      }
+    `,
+    variables: {
+      field,
+      ...(filter && { filter }),
+    },
+  };
+
+  try {
+    const response = await fetch(graphQLEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(graphqlQuery),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
+      return { facets: [], error: 'An error occurred while fetching facets.' };
+    }
+
+    return { facets: data.data[filterFacetsQueryName] };
+  } catch (error) {
+    console.error('Error fetching filter facets:', error.message);
+    return { facets: [] };
+  }
+}
+
+export const renderSearchResults = async ({ isFirstSet }) => {
   const urlParams = new URLSearchParams(window.location.search);
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
@@ -101,7 +147,7 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
   }
   loadingElement.textContent = loadingLabel;
   const searchParams = { query, limit, offset: offset * limit, make, model, searchType, category };
-  const { results, categories } = await fetchGraphQL(searchParams);
+  const { results, categories } = await fetchSearchResults(searchParams);
   loadingElement.remove();
   const searchResultsSection = document.querySelector('.search-results-section');
   const titleElement = searchResultsSection.querySelector('.title');
@@ -124,7 +170,7 @@ export const loadGraphQLResults = async ({ isFirstSet }) => {
       const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
       bottomMoreBtn.textContent = buttonTextContent;
       resultsSection.appendChild(bottomMoreBtn);
-      bottomMoreBtn.onclick = () => loadGraphQLResults({ isFirstSet: false });
+      bottomMoreBtn.onclick = () => renderSearchResults({ isFirstSet: false });
     }
     if (results.length < amountOfProducts) {
       document.querySelectorAll('.more-button').forEach((moreBtn) => moreBtn.remove());
