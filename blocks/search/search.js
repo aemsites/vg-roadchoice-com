@@ -1,5 +1,8 @@
 import { createElement, getTextLabel, getLocaleContextedUrl } from '../../scripts/common.js';
-import { fetchFilterFacets } from '../search/graphql-search.js';
+import { fetchSearchResults, fetchFilterFacets } from '../search/graphql-search.js';
+import productCard from '../results-list/product-card.js';
+import { noResultsTemplate } from '../../templates/search-results/search-results.js';
+import { buildFilter } from '../filters/filters.js';
 
 const blockName = 'search';
 let isCrossRefActive = true;
@@ -109,6 +112,75 @@ function populateFilter(select, items) {
   const fragment = docRange.createContextualFragment(htmlFragment);
   select.appendChild(fragment);
 }
+
+export const getAndApplySearchResults = async ({ isFirstSet }) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const resultsSection = document.querySelector('.results-list__section');
+  const resultsList = document.querySelector('.results-list__list');
+  const query = urlParams.get('q');
+  const limit = amountOfProducts;
+  const offsetParam = urlParams.get('offset');
+  const make = urlParams.get('make') === 'null' ? undefined : urlParams.get('make');
+  const model = urlParams.get('model') === 'null' ? undefined : urlParams.get('model');
+  const searchType = urlParams.get('st');
+  const category = urlParams.get('category');
+  const offset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+  if (!isFirstSet) {
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.set('offset', offset);
+    window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+  }
+  const filtersWrapper = document.querySelector('.filters-wrapper');
+  const loadingLabel = getTextLabel('loading_label');
+  let loadingElement = document.querySelector('.loading');
+  if (!loadingElement) {
+    loadingElement = createElement('div', { classes: 'loading' });
+    resultsSection.append(loadingElement);
+  }
+  loadingElement.textContent = loadingLabel;
+  const searchParams = { query, limit, offset: offset * limit, make, model, searchType, category };
+  const { results, categories } = await fetchSearchResults(searchParams);
+  loadingElement.remove();
+  const searchResultsSection = document.querySelector('.search-results-section');
+  const titleElement = searchResultsSection.querySelector('.title');
+  if (results?.length > 0) {
+    results.forEach((result) => {
+      const liElement = productCard(result, searchType);
+      resultsList.appendChild(liElement);
+    });
+    const titleContent = getTextLabel('search_results_title');
+    const type = searchType === 'cross' ? 'cross-reference' : 'parts';
+    const titleText = `${titleContent} ${searchType === 'cross' ? `${type}: "${query}"` : `${make} ${model} ${query} ${type}`}`;
+    titleElement.textContent = titleText;
+    const buttonTextContent = getTextLabel('pagination_button');
+    const resultsCountElement = document.querySelector('.displayed-text');
+    const currentAmount = document.querySelectorAll('.product-card').length;
+    const displayedTextContent = getTextLabel('pagination_text');
+    const newText = displayedTextContent.replace('[$]', currentAmount);
+    resultsCountElement.innerText = newText;
+    if (offset === 0) {
+      const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
+      bottomMoreBtn.textContent = buttonTextContent;
+      resultsSection.appendChild(bottomMoreBtn);
+      bottomMoreBtn.onclick = () => getAndApplySearchResults({ isFirstSet: false });
+    }
+    if (results.length < amountOfProducts) {
+      document.querySelectorAll('.more-button').forEach((moreBtn) => moreBtn.remove());
+    }
+  }
+  if (!results || results.length === 0) {
+    const titleText = getTextLabel('no_results_title').replace('[$]', `${query}`);
+    titleElement.innerText = titleText;
+    const fragment = document.createRange().createContextualFragment(noResultsTemplate);
+    searchResultsSection.classList.add('no-results');
+    searchResultsSection.insertBefore(fragment, filtersWrapper);
+  }
+  const filters = buildFilter(categories);
+  if (filters) {
+    filtersWrapper.innerHTML = '';
+    filtersWrapper.append(filters);
+  }
+};
 
 async function getAndApplyFiltersData(form) {
   const makeSelect = form.querySelector(`.${blockName}__make-filter__select`);

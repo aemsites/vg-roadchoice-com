@@ -1,5 +1,5 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
-import { renderSearchResults } from '../search/graphql-search.js';
+import { getAndApplySearchResults } from '../search/search.js';
 
 const blockName = 'pagination';
 const partNumberText = getTextLabel('part_number');
@@ -20,7 +20,7 @@ export default async function decorate(block) {
   const moreBtn = createElement('button', { classes: moreBtnClasses });
   moreBtn.textContent = buttonTextContent;
   showingSection.append(moreBtn);
-  moreBtn.onclick = () => renderSearchResults({ isFirstSet: false });
+  moreBtn.onclick = () => getAndApplySearchResults({ isFirstSet: false });
 
   paginationSection.append(paginationTitle, showingSection);
 

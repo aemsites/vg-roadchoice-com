@@ -1,5 +1,5 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
-import { renderSearchResults } from '../../blocks/search/graphql-search.js';
+import { getAndApplySearchResults } from '../../blocks/search/search.js';
 
 const blockName = 'results-list';
 const loadingLabel = getTextLabel('loading_label');
@@ -13,5 +13,5 @@ export default async function decorate(block) {
   resultsSection.append(productList);
   block.textContent = '';
   block.append(resultsSection);
-  renderSearchResults({ isFirstSet: true });
+  getAndApplySearchResults({ isFirstSet: true });
 }
