@@ -1,34 +1,7 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
 
 const blockName = 'filters';
-let products;
-const isSearchResult = document.querySelector('.search-results') !== null;
-const urlCategory = new URLSearchParams(window.location.search).get('cat');
-const total = +sessionStorage.getItem('total-results-amount') || null;
 const categoriesText = getTextLabel('categories_label');
-
-if (isSearchResult) products = JSON.parse(sessionStorage.getItem('results')) || [];
-
-const reduceArrays = (array) => {
-  const initialValue = {};
-  const reduced = array.reduce((acc, value) => ({ ...acc, [value]: (acc[value] || 0) + 1 }), initialValue);
-  return reduced;
-};
-
-const reduceCategories = (cats) => {
-  const categoryList = cats.map((x) => x['Part Category'].toLowerCase());
-  const catToReduce = urlCategory ? categoryList.filter((item) => item.toLowerCase() === urlCategory) : categoryList;
-  const reducedCategories = reduceArrays(catToReduce);
-  const orderedCategories = Object.keys(reducedCategories)
-    .sort()
-    .reduce((obj, key) => {
-      obj[key] = reducedCategories[key];
-      return obj;
-    }, {});
-  const reducedArray = Object.entries(orderedCategories);
-
-  return reducedArray;
-};
 
 export const buildFilter = (cats) => {
   const section = createElement('div', { classes: `${blockName}-section` });
@@ -56,28 +29,8 @@ export const buildFilter = (cats) => {
   return section;
 };
 
-const decorateFilter = (block) => {
+export default async function decorate(block) {
   const filtersWrapper = createElement('div', { classes: `${blockName}-wrapper` });
-
-  if (urlCategory) {
-    const categories = reduceCategories(products);
-    const categoryFilterSection = buildFilter(categories);
-    filtersWrapper.append(categoryFilterSection);
-  }
-
   block.textContent = '';
   block.append(filtersWrapper);
-};
-
-export default async function decorate(block) {
-  if (!urlCategory) {
-    decorateFilter(block);
-    return;
-  }
-  document.addEventListener('DataLoaded', ({ detail }) => {
-    products = detail.results;
-    if (products.length > 0) decorateFilter(block);
-  });
-
-  if (products.length > 0 && !total) decorateFilter(block);
 }
