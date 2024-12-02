@@ -6,9 +6,38 @@ export const graphQLConfig = {
   maxProductsPerQuery: 12,
 };
 
+async function fetchGraphQLData(graphqlQuery, endpoint) {
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(graphqlQuery),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
+      return { error: 'An error occurred during the request.', data: null };
+    }
+
+    return { data };
+  } catch (error) {
+    console.error('Error fetching data:', error.message);
+    return { error: 'An unexpected error occurred.', data: null };
+  }
+}
+
 export async function fetchSearchResults({ query, offset, make, model, searchType, category }) {
   const { graphQLEndpoint, crossReferenceQueryName, partNumberQueryName, maxProductsPerQuery } = graphQLConfig;
   const queryName = searchType === 'cross' ? crossReferenceQueryName : partNumberQueryName;
+
   const graphqlQuery = {
     query: `
       query ${queryName}($q: String!, $limit: Int, $offset: Int${searchType === 'parts' ? ', $makeFilter: String, $modelFilter: String' : ''}${category ? ', $categoryFilter: String' : ''}) {
@@ -44,34 +73,14 @@ export async function fetchSearchResults({ query, offset, make, model, searchTyp
     },
   };
 
-  try {
-    const response = await fetch(graphQLEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(graphqlQuery),
-    });
+  const { data, error } = await fetchGraphQLData(graphqlQuery, graphQLEndpoint);
 
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.statusText}`);
-    }
+  if (error) return { results: [], categories: [], error };
 
-    const data = await response.json();
+  const results = data.data[queryName].items.map((item) => item.metadata);
+  const categories = data.data[queryName].facets.map((facet) => [facet.key, facet.doc_count]);
 
-    if (data.errors) {
-      console.error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
-      return { items: [], error: 'An error occurred while searching.' };
-    }
-
-    const results = data.data[queryName].items.map((item) => item.metadata);
-    const categories = data.data[queryName].facets.map((facet) => [facet.key, facet.doc_count]);
-
-    return { results, categories };
-  } catch (error) {
-    console.error('Error fetching data:', error.message);
-    return { results: [], categories: [] };
-  }
+  return { results, categories };
 }
 
 export async function fetchFilterFacets({ field, filter }) {
@@ -94,29 +103,9 @@ export async function fetchFilterFacets({ field, filter }) {
     },
   };
 
-  try {
-    const response = await fetch(graphQLEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(graphqlQuery),
-    });
+  const { data, error } = await fetchGraphQLData(graphqlQuery, graphQLEndpoint);
 
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.statusText}`);
-    }
+  if (error) return { facets: [], error };
 
-    const data = await response.json();
-
-    if (data.errors) {
-      console.error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
-      return { facets: [], error: 'An error occurred while fetching facets.' };
-    }
-
-    return { facets: data.data[filterFacetsQueryName] };
-  } catch (error) {
-    console.error('Error fetching filter facets:', error.message);
-    return { facets: [] };
-  }
+  return { facets: data.data[filterFacetsQueryName] };
 }
