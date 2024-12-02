@@ -1,10 +1,4 @@
-export const graphQLConfig = {
-  graphQLEndpoint: 'https://search-api-qa-eds.aws.43636.vnonprod.com/search',
-  crossReferenceQueryName: 'rccrossreferencesearch',
-  partNumberQueryName: 'rcpartsearch',
-  filterFacetsQueryName: 'rcfilterfacets',
-  maxProductsPerQuery: 12,
-};
+import { SEARCH_CONFIG } from '../../scripts/common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
   try {
@@ -35,8 +29,8 @@ async function fetchGraphQLData(graphqlQuery, endpoint) {
 }
 
 export async function fetchSearchResults({ query, offset, make, model, searchType, category }) {
-  const { graphQLEndpoint, crossReferenceQueryName, partNumberQueryName, maxProductsPerQuery } = graphQLConfig;
-  const queryName = searchType === 'cross' ? crossReferenceQueryName : partNumberQueryName;
+  const { SEARCH_URL_DEV, CROSS_REFERENCE_QUERY_NAME, PART_NUMBER_QUERY_NAME, MAX_PRODUCTS_PER_QUERY } = SEARCH_CONFIG;
+  const queryName = searchType === 'cross' ? CROSS_REFERENCE_QUERY_NAME : PART_NUMBER_QUERY_NAME;
 
   const graphqlQuery = {
     query: `
@@ -66,14 +60,14 @@ export async function fetchSearchResults({ query, offset, make, model, searchTyp
     `,
     variables: {
       q: query,
-      limit: maxProductsPerQuery,
+      limit: parseInt(MAX_PRODUCTS_PER_QUERY),
       offset,
       ...(searchType === 'parts' && { makeFilter: make, modelFilter: model }),
       ...(category && { categoryFilter: category }),
     },
   };
 
-  const { data, error } = await fetchGraphQLData(graphqlQuery, graphQLEndpoint);
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
   if (error) return { results: [], categories: [], error };
 
@@ -84,12 +78,12 @@ export async function fetchSearchResults({ query, offset, make, model, searchTyp
 }
 
 export async function fetchFilterFacets({ field, filter }) {
-  const { graphQLEndpoint, filterFacetsQueryName } = graphQLConfig;
+  const { SEARCH_URL_DEV, FILTER_FACETS_QUERY_NAME } = SEARCH_CONFIG;
 
   const graphqlQuery = {
     query: `
-      query ${filterFacetsQueryName}($field: RcFieldEnum!, $filter: String) {
-        ${filterFacetsQueryName}(field: $field, filter: $filter) {
+      query ${FILTER_FACETS_QUERY_NAME}($field: RcFieldEnum!, $filter: String) {
+        ${FILTER_FACETS_QUERY_NAME}(field: $field, filter: $filter) {
           facets {
             key
             doc_count
@@ -103,9 +97,9 @@ export async function fetchFilterFacets({ field, filter }) {
     },
   };
 
-  const { data, error } = await fetchGraphQLData(graphqlQuery, graphQLEndpoint);
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
   if (error) return { facets: [], error };
 
-  return { facets: data.data[filterFacetsQueryName] };
+  return { facets: data.data[FILTER_FACETS_QUERY_NAME] };
 }

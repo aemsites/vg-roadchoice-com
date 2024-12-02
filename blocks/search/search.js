@@ -1,5 +1,5 @@
-import { createElement, getTextLabel, getLocaleContextedUrl } from '../../scripts/common.js';
-import { graphQLConfig, fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
+import { createElement, getTextLabel, getLocaleContextedUrl, SEARCH_CONFIG } from '../../scripts/common.js';
+import { fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
 import productCard from '../results-list/product-card.js';
 import { noResultsTemplate } from '../../templates/search-results/search-results.js';
 import { buildFilter } from '../filters/filters.js';
@@ -112,6 +112,7 @@ function populateFilter(select, items) {
 }
 
 export const getAndApplySearchResults = async ({ isFirstSet }) => {
+  const { MAX_PRODUCTS_PER_QUERY } = SEARCH_CONFIG;
   const urlParams = new URLSearchParams(window.location.search);
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
@@ -135,7 +136,7 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     resultsSection.append(loadingElement);
   }
   loadingElement.textContent = loadingLabel;
-  const offset = targetOffset * graphQLConfig.maxProductsPerQuery;
+  const offset = targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY);
   const searchParams = { query, offset, make, model, searchType, category };
   const { results, categories } = await fetchSearchResults(searchParams);
   loadingElement.remove();
@@ -162,7 +163,7 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
       resultsSection.appendChild(bottomMoreBtn);
       bottomMoreBtn.onclick = () => getAndApplySearchResults({ isFirstSet: false });
     }
-    if (results.length < graphQLConfig.maxProductsPerQuery) {
+    if (results.length < parseInt(MAX_PRODUCTS_PER_QUERY)) {
       document.querySelectorAll('.more-button').forEach((moreBtn) => moreBtn.remove());
     }
   }

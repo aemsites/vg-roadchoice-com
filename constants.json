@@ -80,11 +80,39 @@
       }
     ]
   },
+  "searchConfig": {
+    "total": 5,
+    "offset": 0,
+    "limit": 5,
+    "data": [
+      {
+        "name": "SEARCH_URL_DEV",
+        "value": "https://search-api-qa-eds.aws.43636.vnonprod.com/search"
+      },
+      {
+        "name": "CROSS_REFERENCE_QUERY_NAME",
+        "value": "rccrossreferencesearch"
+      },
+      {
+        "name": "PART_NUMBER_QUERY_NAME",
+        "value": "rcpartsearch"
+      },
+      {
+        "name": "FILTER_FACETS_QUERY_NAME",
+        "value": "rcfilterfacets"
+      },
+      {
+        "name": "MAX_PRODUCTS_PER_QUERY",
+        "value": "12"
+      }
+    ]
+  },
   ":version": 3,
   ":names": [
     "cookieValues",
     "projectConfig",
-    "dealerLocator"
+    "dealerLocator",
+    "searchConfig"
   ],
   ":type": "multi-sheet"
 }
