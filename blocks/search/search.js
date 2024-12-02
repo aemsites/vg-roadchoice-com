@@ -184,7 +184,7 @@ async function getAndApplyFiltersData(form) {
   const makeSelect = form.querySelector(`.${blockName}__make-filter__select`);
   const modelsSelect = form.querySelector(`.${blockName}__model-filter__select`);
   const fetchedMakeFacets = await fetchFilterFacets({ field: 'MAKE' });
-  const makeFacets = fetchedMakeFacets.facets.facets;
+  const makeFacets = fetchedMakeFacets.facets.facets.slice(1);
   const makeItems = makeFacets.map((facet) => facet.key);
   populateFilter(makeSelect, makeItems);
   makeSelect.onchange = async (e) => {
@@ -196,7 +196,7 @@ async function getAndApplyFiltersData(form) {
     }
     // if is not null then enable the select and then is filled by the maker value
     const fetchedModelFacets = await fetchFilterFacets({ field: 'NAME', filter: makeSelect.value });
-    const modelFacets = fetchedModelFacets.facets.facets;
+    const modelFacets = fetchedModelFacets.facets.facets.slice(1);
     const modelItems = modelFacets.map((facet) => facet.key);
     resetModelsFilter(modelsSelect, false);
     populateFilter(modelsSelect, modelItems);
