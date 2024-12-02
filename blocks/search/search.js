@@ -1,15 +1,11 @@
-import { createElement, getJsonFromUrl, getTextLabel, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getTextLabel, getLocaleContextedUrl, SEARCH_CONFIG } from '../../scripts/common.js';
+import { fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
+import productCard from '../results-list/product-card.js';
+import { noResultsTemplate } from '../../templates/search-results/search-results.js';
+import { buildFilter } from '../filters/filters.js';
 
 const blockName = 'search';
 let isCrossRefActive = true;
-let noOthersItems;
-const modelsItems = [];
-const FILTERS_DATA = getLocaleContextedUrl('/search/search-filters.json');
-let crData;
-let pnData;
-export const amountOfProducts = 12;
-let fitInStorage = true;
-export const fitAmount = 5000;
 
 const PLACEHOLDERS = {
   crossReference: getTextLabel('cross-reference_number'),
@@ -104,30 +100,95 @@ function addSearchByListeners(wrapper, form) {
 function populateFilter(select, items) {
   const docRange = document.createRange();
   let htmlFragment = '';
+  const urlParams = new URLSearchParams(window.location.search);
   items.forEach((item) => {
+    const itemValue = urlParams.get('cat') ? item.toLowerCase() : item;
     htmlFragment += `
-      <option value="${item.toLowerCase()}">${item}</option>
+      <option value="${itemValue}">${item}</option>
     `;
   });
   const fragment = docRange.createContextualFragment(htmlFragment);
   select.appendChild(fragment);
 }
 
+export const getAndApplySearchResults = async ({ isFirstSet }) => {
+  const { MAX_PRODUCTS_PER_QUERY } = SEARCH_CONFIG;
+  const urlParams = new URLSearchParams(window.location.search);
+  const resultsSection = document.querySelector('.results-list__section');
+  const resultsList = document.querySelector('.results-list__list');
+  const query = urlParams.get('q');
+  const offsetParam = urlParams.get('offset');
+  const make = urlParams.get('make') === 'null' ? undefined : urlParams.get('make');
+  const model = urlParams.get('model') === 'null' ? undefined : urlParams.get('model');
+  const searchType = urlParams.get('st');
+  const category = urlParams.get('category');
+  const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+  if (!isFirstSet) {
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.set('offset', targetOffset);
+    window.history.pushState({ path: newUrl.href }, '', newUrl.href);
+  }
+  const filtersWrapper = document.querySelector('.filters-wrapper');
+  const loadingLabel = getTextLabel('loading_label');
+  let loadingElement = document.querySelector('.loading');
+  if (!loadingElement) {
+    loadingElement = createElement('div', { classes: 'loading' });
+    resultsSection.append(loadingElement);
+  }
+  loadingElement.textContent = loadingLabel;
+  const offset = targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY);
+  const searchParams = { query, offset, make, model, searchType, category };
+  const { results, categories } = await fetchSearchResults(searchParams);
+  loadingElement.remove();
+  const searchResultsSection = document.querySelector('.search-results-section');
+  const titleElement = searchResultsSection.querySelector('.title');
+  if (results?.length > 0) {
+    results.forEach((result) => {
+      const liElement = productCard(result, searchType);
+      resultsList.appendChild(liElement);
+    });
+    const titleContent = getTextLabel('search_results_title');
+    const type = searchType === 'cross' ? 'cross-reference' : 'parts';
+    const titleText = `${titleContent} ${searchType === 'cross' ? `${type}: "${query}"` : `${make || ''} ${model || ''} ${query} ${type}`}`;
+    titleElement.textContent = titleText;
+    const buttonTextContent = getTextLabel('pagination_button');
+    const resultsCountElement = document.querySelector('.displayed-text');
+    const currentAmount = document.querySelectorAll('.product-card').length;
+    const displayedTextContent = getTextLabel('pagination_text');
+    const newText = displayedTextContent.replace('[$]', currentAmount);
+    resultsCountElement.innerText = newText;
+    if (targetOffset === 0) {
+      const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
+      bottomMoreBtn.textContent = buttonTextContent;
+      resultsSection.appendChild(bottomMoreBtn);
+      bottomMoreBtn.onclick = () => getAndApplySearchResults({ isFirstSet: false });
+    }
+    if (results.length < parseInt(MAX_PRODUCTS_PER_QUERY)) {
+      document.querySelectorAll('.more-button').forEach((moreBtn) => moreBtn.remove());
+    }
+  }
+  if (!results || results.length === 0) {
+    const titleText = getTextLabel('no_results_title').replace('[$]', `${query}`);
+    titleElement.innerText = titleText;
+    const fragment = document.createRange().createContextualFragment(noResultsTemplate);
+    searchResultsSection.classList.add('no-results');
+    searchResultsSection.insertBefore(fragment, filtersWrapper);
+  }
+  const filters = buildFilter(categories);
+  if (filters) {
+    filtersWrapper.innerHTML = '';
+    filtersWrapper.append(filters);
+  }
+};
+
 async function getAndApplyFiltersData(form) {
   const makeSelect = form.querySelector(`.${blockName}__make-filter__select`);
   const modelsSelect = form.querySelector(`.${blockName}__model-filter__select`);
-  const makeItems = [];
-  const filters = await getJsonFromUrl(FILTERS_DATA);
-  const { data } = filters || {};
-  if (!data) return;
-  data.forEach((item) => {
-    const itemModels = item.Models !== 'null' ? item.Models.split(',') : [];
-    modelsItems.push({ Make: item.Make, Models: itemModels });
-    makeItems.push(item.Make);
-  });
+  const fetchedMakeFacets = await fetchFilterFacets({ field: 'MAKE' });
+  const makeFacets = fetchedMakeFacets.facets.facets;
+  const makeItems = makeFacets.map((facet) => facet.key);
   populateFilter(makeSelect, makeItems);
-  noOthersItems = makeItems.filter((item) => item !== 'Others');
-  makeSelect.onchange = (e) => {
+  makeSelect.onchange = async (e) => {
     const isNotNull = e.target.value !== 'null';
     // if is null then disable the models filter
     if (!isNotNull) {
@@ -135,141 +196,32 @@ async function getAndApplyFiltersData(form) {
       return;
     }
     // if is not null then enable the select and then is filled by the maker value
-    const models = modelsItems.filter((item) => item.Make.toLowerCase() === e.target.value)[0].Models;
+    const fetchedModelFacets = await fetchFilterFacets({ field: 'NAME', filter: makeSelect.value });
+    const modelFacets = fetchedModelFacets.facets.facets;
+    const modelItems = modelFacets.map((facet) => facet.key);
     resetModelsFilter(modelsSelect, false);
-    populateFilter(modelsSelect, models);
+    populateFilter(modelsSelect, modelItems);
   };
-}
-
-export function searchCRPartNumValue(value, data = crData) {
-  const partNumberBrands = ['OEM_num'];
-  const results = new Set();
-  if (value.trim() === '') return [];
-  partNumberBrands.forEach((brand) => {
-    const tempResults = data.filter((item) => new RegExp(`.*${value.trim()}.*`, 'i').test(item[brand]));
-    if (tempResults.length > 0) {
-      tempResults.forEach((item) => results.add(item));
-    }
-  });
-  return [...results];
-}
-
-function filterResults(results, filter, isMake = true) {
-  const itemFilter = isMake ? 'Make' : 'Model';
-  return results.filter((item) => {
-    const itemValue = item[itemFilter].toLowerCase();
-    const filterValue = filter.toLowerCase();
-    // if is Model, can have a list of models
-    if (!isMake && itemValue.includes(',')) {
-      const modelArray = itemValue.split(',').map((s) => s.trim());
-      return modelArray.includes(filterValue);
-    }
-    return itemValue === filterValue;
-  });
-}
-
-function filterByOthersMake(results) {
-  return results.filter((item) => !noOthersItems.includes(item.Make));
-}
-
-function filterByBasePartNumber(results) {
-  const basePartNumbers = new Set();
-  const filteredResults = [];
-  results.forEach((item) => {
-    if (!basePartNumbers.has(item['Base Part Number'])) {
-      basePartNumbers.add(item['Base Part Number']);
-      filteredResults.push(item);
-    }
-  });
-  return filteredResults;
-}
-
-function filterPNByColumn({ column, data, value, make, model, results }) {
-  let tempResults = data.filter((item) => new RegExp(`.*${value.trim()}.*`, 'i').test(item[column]));
-  if (make === 'others' && tempResults.length > 0) {
-    tempResults = filterByOthersMake(tempResults, make);
-  } else if (make !== 'null' && tempResults.length > 0) {
-    tempResults = filterResults(tempResults, make);
-  }
-  if (model !== 'null' && tempResults.length > 0) {
-    tempResults = filterResults(tempResults, model, false);
-  }
-  if (tempResults.length > 0) tempResults = filterByBasePartNumber(tempResults);
-  tempResults.forEach((item) => results.add(item));
-}
-
-export function searchPartNumValue(value, make, model, data = pnData) {
-  // search by part number
-  const partNumberBrands = ['Base Part Number', 'Volvo Part Number', 'Mack Part Number'];
-  const results = new Set();
-  if (value.trim() === '' && make === 'null' && model === 'null') return [];
-  partNumberBrands.forEach((brand) => {
-    filterPNByColumn({
-      column: brand,
-      data,
-      value,
-      make,
-      model,
-      results,
-    });
-  });
-  // search by Description aka Part Name
-  if (results.size === 0) {
-    filterPNByColumn({
-      column: 'Part Name',
-      data,
-      value,
-      make,
-      model,
-      results,
-    });
-  }
-  return [...results];
 }
 
 function getFieldValue(selector, items) {
   return items.filter((item) => item.classList.contains(selector))[0]?.value;
 }
 
-function formListener(form) {
+function addFormListener(form) {
   form.onsubmit = (e) => {
     e.preventDefault();
-    if (!window.allProducts) return;
-    ({ crData, pnData } = window.allProducts);
-    const ssData = ['query', 'results', 'amount'];
-    const ssDataItems = [];
     const items = [...form];
     const value = getFieldValue(`${blockName}__input-${isCrossRefActive ? 'cr' : 'pn'}__input`, items);
     const makeFilterValue = getFieldValue(`${blockName}__make-filter__select`, items);
     const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
-
-    if (!crData || !pnData) return;
-    ssData.forEach((item) => sessionStorage.removeItem(item));
-    if (sessionStorage.getItem('total-results-amount')) sessionStorage.removeItem('total-results-amount');
-    const results = isCrossRefActive ? searchCRPartNumValue(value) : searchPartNumValue(value, makeFilterValue, modelFilterValue);
-
+    const searchType = isCrossRefActive
+      ? 'cross'
+      : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
+    const offset = 0;
     const url = new URL(window.location.href);
-    const searchType = isCrossRefActive ? 'cross' : `parts&make=${makeFilterValue}&model=${modelFilterValue}`;
-    const query = {
-      searchType,
-      value,
-    };
-    if (!isCrossRefActive) {
-      query.make = makeFilterValue;
-      query.model = modelFilterValue;
-    }
-    ssDataItems.push(query, results, amountOfProducts);
-    ssData.forEach((item, i) => {
-      if (i === 1 && results.length > fitAmount) {
-        fitInStorage = false;
-        return;
-      }
-      sessionStorage.setItem(item, JSON.stringify(ssDataItems[i]));
-    });
-    if (!fitInStorage) sessionStorage.setItem('total-results-amount', results.length);
-
     url.pathname = getLocaleContextedUrl('/search/');
-    url.search = `?q=${value}&st=${searchType}`;
+    url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
     window.location.href = url;
   };
 }
@@ -285,7 +237,7 @@ export default function decorate(block) {
   // add listeners and fill filters with data
   addSearchByListeners(form.querySelector(`.${blockName}__buttons__wrapper`), form);
   getAndApplyFiltersData(form);
-  formListener(form);
+  addFormListener(form);
   // insert templates to form
   formWrapper.appendChild(form);
   block.appendChild(formWrapper);
