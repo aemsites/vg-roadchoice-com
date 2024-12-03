@@ -20,7 +20,7 @@
   align-items: baseline;
 }
 
-.pagination-section .showing-section p.displayed-text {
+.pagination-section .showing-section p.top-results-text {
   font-family: var(--headings-ff-bold);
   font-size: var(--body-font-size-xs);
   color: var(--c-medium-gray-1);
@@ -54,7 +54,7 @@
     align-items: baseline;
   }
 
-  .pagination-section .showing-section p.displayed-text {
+  .pagination-section .showing-section p.top-results-text {
     margin: 0 0 0 20px;
   }
 
