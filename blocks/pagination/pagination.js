@@ -3,7 +3,6 @@ import { getAndApplySearchResults } from '../search/search.js';
 
 const blockName = 'pagination';
 const partNumberText = getTextLabel('part_number');
-const displayedTextContent = getTextLabel('pagination_text');
 const buttonTextContent = getTextLabel('pagination_button');
 const firstWord = partNumberText.split(' ')[0];
 
@@ -12,9 +11,8 @@ export default async function decorate(block) {
   const paginationTitle = createElement('h2', { classes: 'title' });
   paginationTitle.textContent = `${firstWord}s`;
   const showingSection = createElement('div', { classes: 'showing-section' });
-  const displayedTextElement = createElement('p', { classes: 'displayed-text' });
-  displayedTextElement.textContent = displayedTextContent;
-  showingSection.append(displayedTextElement);
+  const topResultsElement = createElement('p', { classes: 'top-results-text' });
+  showingSection.append(topResultsElement);
 
   const moreBtnClasses = ['more-button'];
   const moreBtn = createElement('button', { classes: moreBtnClasses });
