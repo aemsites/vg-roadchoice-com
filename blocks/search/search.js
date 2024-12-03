@@ -112,89 +112,75 @@ function populateFilter(select, items) {
 }
 
 export const getAndApplySearchResults = async ({ isFirstSet }) => {
+  const { MAX_PRODUCTS_PER_QUERY } = SEARCH_CONFIG;
   const urlParams = new URLSearchParams(window.location.search);
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
-  const filtersWrapper = document.querySelector('.filters-wrapper');
-  const searchResultsSection = document.querySelector('.search-results-section');
-  const titleElement = searchResultsSection?.querySelector('.title');
-
-  const searchParams = getSearchParams(urlParams, isFirstSet);
-  updateUrl(isFirstSet, searchParams.targetOffset);
-  showLoader(resultsSection);
-
-  const { results, categories } = await fetchSearchResults(searchParams);
-  hideLoader();
-
-  if (results?.length > 0) {
-    displaySearchResults(results, resultsList, titleElement, searchParams);
-    handleShowMoreButtons(results.length, searchParams.targetOffset, resultsSection);
-  } else {
-    displayNoResults(titleElement, searchResultsSection, filtersWrapper, searchParams.query);
-  }
-
-  updateFilters(filtersWrapper, categories);
-};
-
-const getSearchParams = (urlParams, isFirstSet) => {
   const query = urlParams.get('q');
   const offsetParam = urlParams.get('offset');
   const make = urlParams.get('make') === 'null' ? undefined : urlParams.get('make');
   const model = urlParams.get('model') === 'null' ? undefined : urlParams.get('model');
   const searchType = urlParams.get('st');
   const category = urlParams.get('category');
-  const targetPage = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+  const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
-  const offset = targetPage * parseInt(SEARCH_CONFIG.MAX_PRODUCTS_PER_QUERY);
+  const loadingElement = showLoader(resultsSection);
+  const offset = targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY);
+  const searchParams = { query, offset, make, model, searchType, category };
+  const { results, categories } = await fetchSearchResults(searchParams);
+  loadingElement?.remove();
 
-  return { query, offset, make, model, searchType, category, targetPage };
+  if (!isFirstSet) {
+    updateUrl(targetOffset);
+  }
+  updateSearchResults(results, searchType, query, make, model, resultsSection, resultsList, targetOffset);
+  updateFilters(categories);
 };
 
-const updateUrl = (isFirstSet, targetOffset) => {
-  if (!isFirstSet) {
-    const newUrl = new URL(window.location);
-    newUrl.searchParams.set('offset', targetOffset);
-    window.history.pushState({ path: newUrl.href }, '', newUrl.href);
-  }
+const updateUrl = (targetOffset) => {
+  const newUrl = new URL(window.location);
+  newUrl.searchParams.set('offset', targetOffset);
+  window.history.pushState({ path: newUrl.href }, '', newUrl.href);
 };
 
 const showLoader = (resultsSection) => {
   const loadingLabel = getTextLabel('loading_label');
   let loadingElement = document.querySelector('.loading');
-  if (!loadingElement && resultsSection) {
+  if (!loadingElement) {
     loadingElement = createElement('div', { classes: 'loading' });
-    resultsSection.append(loadingElement);
+    resultsSection?.append(loadingElement);
   }
   loadingElement.textContent = loadingLabel;
+  return loadingElement;
 };
 
-const hideLoader = () => {
-  document.querySelector('.loading')?.remove();
-};
+const updateSearchResults = (results, searchType, query, make, model, resultsSection, resultsList, targetOffset) => {
+  const searchResultsSection = document.querySelector('.search-results-section');
+  const titleElement = searchResultsSection?.querySelector('.title');
 
-const displaySearchResults = (results, resultsList, titleElement, { query, searchType, make, model }) => {
-  results.forEach((result) => {
-    const liElement = productCard(result, searchType);
-    resultsList?.appendChild(liElement);
-  });
-
-  if (titleElement) {
+  if (results?.length > 0) {
+    results.forEach((result) => {
+      const liElement = productCard(result, searchType);
+      resultsList?.appendChild(liElement);
+    });
     const titleContent = getTextLabel('search_results_title');
     const type = searchType === 'cross' ? 'cross-reference' : 'parts';
     const titleText = `${titleContent} ${searchType === 'cross' ? `${type}: "${query}"` : `${make || ''} ${model || ''} ${query} ${type}`}`;
-    titleElement.textContent = titleText;
+    if (titleElement) titleElement.textContent = titleText;
+
+    updatePagination(resultsSection, targetOffset, results.length);
+  } else {
+    showNoResultsMessage(query, searchResultsSection);
   }
 };
 
-const handleShowMoreButtons = (resultCount, targetOffset, resultsSection) => {
+const updatePagination = (resultsSection, targetOffset, resultsLength) => {
   const buttonTextContent = getTextLabel('pagination_button');
+  const resultsCountElement = document.querySelector('.top-results-text');
   const currentAmount = document.querySelectorAll('.product-card').length;
-  const displayedTextContent = getTextLabel('pagination_text').replace('[$]', currentAmount);
-
-  const resultsCountElement = document.querySelector('.pagination .top-results-text');
-  if (resultsCountElement) {
-    resultsCountElement.innerText = displayedTextContent;
-  }
+  const displayedTextContent = getTextLabel('pagination_text');
+  const newText = displayedTextContent.replace('[$]', currentAmount);
+  if (resultsCountElement) resultsCountElement.innerText = newText;
 
   if (targetOffset === 0) {
     const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
@@ -203,27 +189,24 @@ const handleShowMoreButtons = (resultCount, targetOffset, resultsSection) => {
     bottomMoreBtn.onclick = () => getAndApplySearchResults({ isFirstSet: false });
   }
 
-  if (resultCount < parseInt(SEARCH_CONFIG.MAX_PRODUCTS_PER_QUERY)) {
+  if (resultsLength < parseInt(SEARCH_CONFIG.MAX_PRODUCTS_PER_QUERY)) {
     document.querySelectorAll('.more-button').forEach((moreBtn) => moreBtn.remove());
   }
 };
 
-const displayNoResults = (titleElement, searchResultsSection, filtersWrapper, query) => {
-  if (titleElement) {
-    const titleText = getTextLabel('no_results_title').replace('[$]', `${query}`);
-    titleElement.innerText = titleText;
-  }
-
+const showNoResultsMessage = (query, searchResultsSection) => {
+  const titleElement = searchResultsSection?.querySelector('.title');
+  const titleText = getTextLabel('no_results_title').replace('[$]', `${query}`);
+  if (titleElement) titleElement.innerText = titleText;
   const fragment = document.createRange().createContextualFragment(noResultsTemplate);
   searchResultsSection?.classList.add('no-results');
-  if (filtersWrapper && searchResultsSection) {
-    searchResultsSection.insertBefore(fragment, filtersWrapper);
-  }
+  searchResultsSection?.insertBefore(fragment, document.querySelector('.filters-wrapper'));
 };
 
-const updateFilters = (filtersWrapper, categories) => {
+const updateFilters = (categories) => {
+  const filtersWrapper = document.querySelector('.filters-wrapper');
   const filters = buildFilter(categories);
-  if (filters) {
+  if (filtersWrapper && filters) {
     filtersWrapper.innerHTML = '';
     filtersWrapper.append(filters);
   }
