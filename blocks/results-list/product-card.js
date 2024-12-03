@@ -7,18 +7,19 @@ const partNumberText = getTextLabel('part_number');
 const getProperties = (prod, st) => {
   const cardContent = {};
   const maxChars = 48;
-  const { Description } = prod;
+  const { path, part_name, image_url, imgUrl, Description } = prod;
+  const name = part_name ? part_name[0] : Description;
   const cardName = {
-    // TODO check for name, we don't have it now in the excel file
-    cross: Description && Description.length > maxChars ? `${Description.substring(0, maxChars)} ...` : Description,
-    parts: prod['Part Name'],
+    cross: name && name.length > maxChars ? `${name.substring(0, maxChars)}...` : name,
+    parts: name || prod['Part Name'],
   };
 
-  cardContent.imgUrl = prod.imgUrl;
+  cardContent.imgUrl = image_url ? image_url[0] : imgUrl || '';
   cardContent.name = cardName[st];
-  cardContent.category = prod['Part Category'] || prod.Subcategory;
-  cardContent.partNumber = prod['Base Part Number'];
-  cardContent.hasImage = prod.hasImage;
+  cardContent.category = prod['part_category'] ? prod['part_category'][0] : prod['Part Category'] || prod.Subcategory;
+  cardContent.partNumber = prod['base_part_number'] || prod['Base Part Number'];
+  cardContent.hasImage = cardContent.imgUrl?.length > 0 || prod.hasImage;
+  cardContent.path = path || '';
   return cardContent;
 };
 
@@ -27,11 +28,10 @@ const optimizePicture = (imgUrl) => createOptimizedPicture(imgUrl, 'product imag
 const productCard = (product, searchType) => {
   const object = getProperties(product, searchType);
 
-  const { category, name, partNumber, hasImage, imgUrl } = object;
+  const { category, path, name, partNumber, hasImage, imgUrl } = object;
 
   const item = createElement('li', { classes: blockName });
-
-  const linkUrl = getLocaleContextedUrl(`/parts?category=${category.replace(/[^\w]/g, '-').toLowerCase()}&sku=${partNumber}`);
+  const linkUrl = getLocaleContextedUrl(path || `/parts?category=${category.replace(/[^\w]/g, '-').toLowerCase()}&sku=${partNumber}`);
   const imageLink = createElement('a', { classes: 'image-link', props: { href: linkUrl } });
 
   const productImageUrl = imgUrl;
