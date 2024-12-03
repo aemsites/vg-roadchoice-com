@@ -220,9 +220,9 @@ async function getAndApplyFiltersData(form) {
   const makeItems = makeFacets.map((facet) => facet.key);
   populateFilter(makeSelect, makeItems);
   makeSelect.onchange = async (e) => {
-    const isNotNull = e.target.value !== 'null';
-    // if is null then disable the models filter
-    if (!isNotNull) {
+    const isNull = e.target.value === 'null';
+    if (isNull) {
+      // if is null then disable the models filter
       resetModelsFilter(modelsSelect);
       return;
     }
