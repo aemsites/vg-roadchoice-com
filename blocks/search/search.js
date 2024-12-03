@@ -143,9 +143,11 @@ const getSearchParams = (urlParams, isFirstSet) => {
   const model = urlParams.get('model') === 'null' ? undefined : urlParams.get('model');
   const searchType = urlParams.get('st');
   const category = urlParams.get('category');
-  const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+  const targetPage = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
-  return { query, offset: targetOffset * parseInt(SEARCH_CONFIG.MAX_PRODUCTS_PER_QUERY), make, model, searchType, category, targetOffset };
+  const offset = targetPage * parseInt(SEARCH_CONFIG.MAX_PRODUCTS_PER_QUERY);
+
+  return { query, offset, make, model, searchType, category, targetPage };
 };
 
 const updateUrl = (isFirstSet, targetOffset) => {
