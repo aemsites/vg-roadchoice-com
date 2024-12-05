@@ -14,6 +14,7 @@ export const buildFilter = (cats) => {
   cats.forEach((cat) => {
     const [category, amount] = cat;
     urlParams.set('category', category.toLowerCase());
+    urlParams.set('offset', 0);
     const filterUrl = `${currentUrl.pathname}?${urlParams.toString()}`;
     const item = createElement('li', { classes: 'item' });
     const link = createElement('a', {
