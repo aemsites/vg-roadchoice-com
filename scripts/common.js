@@ -1,4 +1,4 @@
-import { sampleRUM, loadCSS, loadBlock, loadBlocks, loadHeader, loadFooter, getMetadata } from './lib-franklin.js';
+import { loadCSS, loadBlock, loadBlocks, loadHeader, loadFooter, getMetadata } from './lib-franklin.js';
 
 let placeholders = null;
 
@@ -188,9 +188,6 @@ export async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/styles/favicon.svg`);
-  sampleRUM('lazy');
-  sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
-  sampleRUM.observe(main.querySelectorAll('picture > img'));
 }
 
 /**
