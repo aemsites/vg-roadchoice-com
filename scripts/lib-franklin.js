@@ -11,20 +11,16 @@
  */
 
 export function sampleRUM(checkpoint, data) {
-  // eslint-disable-next-line max-len
   const timeShift = () => (window.performance ? window.performance.now() : Date.now() - window.hlx.rum.firstReadTime);
   try {
     window.hlx = window.hlx || {};
     sampleRUM.enhance = () => {};
     if (!window.hlx.rum) {
       const param = new URLSearchParams(window.location.search).get('rum');
-      const weight = (window.SAMPLE_PAGEVIEWS_AT_RATE === 'high' && 10)
-        || (window.SAMPLE_PAGEVIEWS_AT_RATE === 'low' && 1000)
-        || (param === 'on' && 1)
-        || 100;
+      const weight =
+        (window.SAMPLE_PAGEVIEWS_AT_RATE === 'high' && 10) || (window.SAMPLE_PAGEVIEWS_AT_RATE === 'low' && 1000) || (param === 'on' && 1) || 100;
       const id = Math.random().toString(36).slice(-4);
       const isSelected = param !== 'off' && Math.random() * weight < 1;
-      // eslint-disable-next-line object-curly-newline, max-len
       window.hlx.rum = {
         weight,
         id,
@@ -71,7 +67,6 @@ export function sampleRUM(checkpoint, data) {
         sampleRUM.baseURL = sampleRUM.baseURL || new URL(window.RUM_BASE || '/', new URL('https://rum.hlx.page'));
         sampleRUM.collectBaseURL = sampleRUM.collectBaseURL || sampleRUM.baseURL;
         sampleRUM.sendPing = (ck, time, pingData = {}) => {
-          // eslint-disable-next-line max-len, object-curly-newline
           const rumData = JSON.stringify({
             weight,
             id,
@@ -80,18 +75,10 @@ export function sampleRUM(checkpoint, data) {
             t: time,
             ...pingData,
           });
-          const urlParams = window.RUM_PARAMS
-            ? `?${new URLSearchParams(window.RUM_PARAMS).toString()}`
-            : '';
-          const { href: url, origin } = new URL(
-            `.rum/${weight}${urlParams}`,
-            sampleRUM.collectBaseURL,
-          );
-          const body = origin === window.location.origin
-            ? new Blob([rumData], { type: 'application/json' })
-            : rumData;
+          const urlParams = window.RUM_PARAMS ? `?${new URLSearchParams(window.RUM_PARAMS).toString()}` : '';
+          const { href: url, origin } = new URL(`.rum/${weight}${urlParams}`, sampleRUM.collectBaseURL);
+          const body = origin === window.location.origin ? new Blob([rumData], { type: 'application/json' }) : rumData;
           navigator.sendBeacon(url, body);
-          // eslint-disable-next-line no-console
           console.debug(`ping:${ck}`, pingData);
         };
         sampleRUM.sendPing('top', timeShift());
@@ -105,10 +92,7 @@ export function sampleRUM(checkpoint, data) {
             script.integrity = enhancerHash;
             script.setAttribute('crossorigin', 'anonymous');
           }
-          script.src = new URL(
-            `.rum/@adobe/helix-rum-enhancer@${enhancerVersion || '^2'}/src/index.js`,
-            sampleRUM.baseURL,
-          ).href;
+          script.src = new URL(`.rum/@adobe/helix-rum-enhancer@${enhancerVersion || '^2'}/src/index.js`, sampleRUM.baseURL).href;
           document.head.appendChild(script);
         };
         if (!window.hlx.RUM_MANUAL_ENHANCE) {
