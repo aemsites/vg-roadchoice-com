@@ -12,6 +12,7 @@
   <script src="/scripts/scripts.js" type="module" crossorigin="use-credentials"></script>
   <script type="module">
     import { sampleRUM } from '/scripts/lib-franklin.js';
+    sampleRUM('404', { source: document.referrer });
 
     window.addEventListener('load', () => {
       const breadcrumb = document.querySelector('[data-not-found]');
@@ -25,7 +26,6 @@
       });
 
       observer.observe(breadcrumb, {attributes: true, attributeFilter: ['data-block-status']})
-      sampleRUM('404', { source: document.referrer, target: window.location.href });
     });
   </script>
   <link rel="stylesheet" href="/styles/styles.css">
