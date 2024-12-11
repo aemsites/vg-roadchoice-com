@@ -1,4 +1,4 @@
-import { sampleRUM, loadScript } from './lib-franklin.js';
+import { sampleRUM, loadScript } from './aem.js';
 import { isPerformanceAllowed, isTargetingAllowed, COOKIE_CONFIGS, loadWorker } from './common.js';
 
 // COOKIE ACCEPTANCE AND IDs default to false in case no ID is present

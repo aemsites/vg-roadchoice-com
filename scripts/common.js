@@ -1,4 +1,4 @@
-import { sampleRUM, loadCSS, loadBlock, loadBlocks, loadHeader, loadFooter, getMetadata } from './lib-franklin.js';
+import { sampleRUM, loadCSS, loadBlock, loadBlocks, loadHeader, loadFooter, getMetadata } from './aem.js';
 
 let placeholders = null;
 

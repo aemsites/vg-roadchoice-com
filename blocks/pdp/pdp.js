@@ -1,5 +1,5 @@
 import { createElement, getTextLabel, getJsonFromUrl, getLongJSONData, defaultLimit, getLocaleContextedUrl } from '../../scripts/common.js';
-import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
+import { createOptimizedPicture } from '../../scripts/aem.js';
 
 const blockName = 'pdp';
 const docTypes = {

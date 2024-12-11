@@ -16,7 +16,7 @@ import {
   toClassName,
   loadScript,
   createOptimizedPicture,
-} from './lib-franklin.js';
+} from './aem.js';
 
 import { addFavIcon, createElement, decorateIcons, getPlaceholders, loadDelayed, slugify, variantsClassesToBEM } from './common.js';
 
