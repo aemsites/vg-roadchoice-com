@@ -23,6 +23,7 @@ if (avoidCookieCheck || isTargetingAllowed()) {
 
 // Prevent the cookie banner from loading when running in library
 if (
+  DATA_DOMAIN_SCRIPT &&
   !window.location.pathname.includes('srcdoc') &&
   !['localhost', 'hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((url) => window.location.host.includes(url))
 ) {

@@ -112,7 +112,7 @@ function populateFilter(select, items) {
 }
 
 export const getAndApplySearchResults = async ({ isFirstSet }) => {
-  const { MAX_PRODUCTS_PER_QUERY } = SEARCH_CONFIG;
+  const { MAX_PRODUCTS_PER_QUERY = false } = SEARCH_CONFIG;
   const urlParams = new URLSearchParams(window.location.search);
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
@@ -125,7 +125,7 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
   const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
   const loadingElement = showLoader(resultsSection);
-  const offset = targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY);
+  const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
   const searchParams = { query, offset, make, model, searchType, category };
   const { results, categories } = await fetchSearchResults(searchParams);
   loadingElement?.remove();
@@ -175,6 +175,7 @@ const updateSearchResults = (results, searchType, query, make, model, resultsSec
 };
 
 const updatePagination = (resultsSection, targetOffset, resultsLength) => {
+  const { MAX_PRODUCTS_PER_QUERY = false } = SEARCH_CONFIG;
   const buttonTextContent = getTextLabel('pagination_button');
   const resultsCountElement = document.querySelector('.top-results-text');
   const currentAmount = document.querySelectorAll('.product-card').length;
@@ -189,7 +190,7 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
     bottomMoreBtn.onclick = () => getAndApplySearchResults({ isFirstSet: false });
   }
 
-  if (resultsLength < parseInt(SEARCH_CONFIG.MAX_PRODUCTS_PER_QUERY)) {
+  if (!MAX_PRODUCTS_PER_QUERY || resultsLength < parseInt(MAX_PRODUCTS_PER_QUERY)) {
     document.querySelectorAll('.more-button').forEach((moreBtn) => moreBtn.remove());
   }
 };

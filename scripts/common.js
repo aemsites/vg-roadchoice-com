@@ -305,6 +305,7 @@ async function getConstantValues() {
 }
 
 export const extractObjectFromArray = (data) => {
+  if (!Array.isArray(data)) return {};
   const obj = {};
   for (const item of data) {
     try {
@@ -340,7 +341,7 @@ export const SEARCH_CONFIG = formatValues(searchConfig?.data);
  */
 export function checkOneTrustGroup(groupName, cookieCheck = false) {
   const oneTrustCookie = decodeURIComponent(document.cookie.split(';').find((cookie) => cookie.trim().startsWith('OptanonConsent=')));
-  return cookieCheck || oneTrustCookie.includes(`${groupName}:1`);
+  return cookieCheck || (groupName && oneTrustCookie.includes(`${groupName}:1`));
 }
 
 const { PERFORMANCE_COOKIE = false, FUNCTIONAL_COOKIE = false, TARGETING_COOKIE = false, SOCIAL_COOKIE = false } = COOKIE_CONFIGS;
@@ -408,6 +409,7 @@ export const getJsonFromUrl = async (route) => {
  *                     original input.
  */
 export const formatStringToArray = (inputString) => {
+  if (typeof inputString !== 'string') return [];
   // eslint-disable-next-line no-useless-escape
   const cleanedString = inputString.replace(/[\[\]\\'"]+/g, '');
   return cleanedString
