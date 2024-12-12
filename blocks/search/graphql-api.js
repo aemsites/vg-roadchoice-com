@@ -29,7 +29,16 @@ async function fetchGraphQLData(graphqlQuery, endpoint) {
 }
 
 export async function fetchSearchResults({ query, offset, make, model, searchType, category }) {
-  const { SEARCH_URL_DEV, CROSS_REFERENCE_QUERY_NAME, PART_NUMBER_QUERY_NAME, MAX_PRODUCTS_PER_QUERY } = SEARCH_CONFIG;
+  const {
+    SEARCH_URL_DEV = false,
+    CROSS_REFERENCE_QUERY_NAME = false,
+    PART_NUMBER_QUERY_NAME = false,
+    MAX_PRODUCTS_PER_QUERY = false,
+  } = SEARCH_CONFIG;
+  if (!SEARCH_URL_DEV || !CROSS_REFERENCE_QUERY_NAME || !PART_NUMBER_QUERY_NAME || !MAX_PRODUCTS_PER_QUERY) {
+    console.error('Missing 1 or more of the attributes in SEARCH CONFIG', SEARCH_CONFIG);
+    return { results: [], categories: [], error: 'An unexpected error occurred in SEARCH CONFIG fetching results.' };
+  }
   const queryName = searchType === 'cross' ? CROSS_REFERENCE_QUERY_NAME : PART_NUMBER_QUERY_NAME;
 
   const graphqlQuery = {
@@ -78,7 +87,11 @@ export async function fetchSearchResults({ query, offset, make, model, searchTyp
 }
 
 export async function fetchFilterFacets({ field, filter }) {
-  const { SEARCH_URL_DEV, FILTER_FACETS_QUERY_NAME } = SEARCH_CONFIG;
+  const { SEARCH_URL_DEV = false, FILTER_FACETS_QUERY_NAME = false } = SEARCH_CONFIG;
+  if (!SEARCH_URL_DEV || !FILTER_FACETS_QUERY_NAME) {
+    console.error('Missing 1 or more attributes in SEARCH CONFIG', SEARCH_CONFIG);
+    return { facets: [], error: 'An unexpected error occurred in SEARCH CONFIG fetching filters.' };
+  }
 
   const graphqlQuery = {
     query: `
