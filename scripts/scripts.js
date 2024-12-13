@@ -23,25 +23,6 @@ import { addFavIcon, createElement, getPlaceholders, loadDelayed, slugify, varia
 const disableHeader = getMetadata('disable-header').toLowerCase() === 'true';
 const disableFooter = getMetadata('disable-footer').toLowerCase() === 'true';
 
-export function findAndCreateImageLink(node) {
-  const links = node.querySelectorAll('picture ~ a');
-
-  [...links].forEach((link) => {
-    let prevEl = link.previousElementSibling;
-
-    if (prevEl.tagName.toLowerCase() === 'br') {
-      prevEl = prevEl.previousElementSibling;
-    }
-
-    if (prevEl.tagName.toLowerCase() === 'picture') {
-      link.innerHTML = '';
-      link.appendChild(prevEl);
-      link.setAttribute('target', '_blank');
-      link.classList.add('image-link');
-    }
-  });
-}
-
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
@@ -149,78 +130,6 @@ function decorateSectionBackgrounds(main) {
   });
 }
 
-const createInpageNavigation = (main) => {
-  const navItems = [];
-  const tabItemsObj = [];
-
-  // Extract the inpage navigation info from sections
-  [...main.querySelectorAll(':scope > div')].forEach((section) => {
-    const title = section.dataset.inpage;
-    if (title) {
-      const countDuplcated = tabItemsObj.filter((item) => item.title === title)?.length || 0;
-      const order = parseFloat(section.dataset.inpageOrder);
-      const anchorID = countDuplcated > 0 ? slugify(`${section.dataset.inpage}-${countDuplcated}`) : slugify(section.dataset.inpage);
-      const obj = {
-        title,
-        id: anchorID,
-      };
-
-      if (order) {
-        obj.order = order;
-      }
-
-      tabItemsObj.push(obj);
-
-      // Set section with ID
-      section.dataset.inpageid = anchorID;
-    }
-  });
-
-  // Sort the object by order
-  const sortedObject = tabItemsObj.slice().sort((obj1, obj2) => {
-    const order1 = obj1.order ?? Infinity; // Fallback to a large number if 'order' is not present
-    const order2 = obj2.order ?? Infinity;
-
-    return order1 - order2;
-  });
-
-  // From the array of objects create the DOM
-  sortedObject.forEach((item) => {
-    const subnavItem = createElement('div');
-    const subnavLink = createElement('button', {
-      props: {
-        'data-id': item.id,
-        title: item.title,
-      },
-    });
-
-    subnavLink.textContent = item.title;
-
-    subnavItem.append(subnavLink);
-    navItems.push(subnavItem);
-  });
-
-  return navItems;
-};
-
-export function buildInpageNavigationBlock(main, classname) {
-  const items = createInpageNavigation(main);
-
-  if (items.length > 0) {
-    const section = createElement('div');
-    Object.assign(section.style, {
-      height: '48px',
-      overflow: 'hidden',
-    });
-
-    section.append(buildBlock(classname, { elems: items }));
-    // insert in second position, assumption is that Hero should be first
-    main.insertBefore(section, main.children[1]);
-
-    decorateBlock(section.querySelector(`.${classname}`));
-  }
-}
-
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -235,7 +144,6 @@ export function decorateMain(main, head) {
         .forEach((style) => main.classList.add(style));
     }
   }
-  // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main, head);
