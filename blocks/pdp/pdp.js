@@ -1,4 +1,4 @@
-import { createElement, getTextLabel, getJsonFromUrl, getLongJSONData, defaultLimit, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getTextLabel, getJsonFromUrl, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl } from '../../scripts/common.js';
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
 const blockName = 'pdp';
@@ -43,7 +43,7 @@ async function fetchPartImages(sku) {
   try {
     const data = await getLongJSONData({
       url: getLocaleContextedUrl('/product-images/road-choice-website-images.json'),
-      limit: defaultLimit,
+      limit: DEFAULT_LIMIT,
     });
     const images = findPartImagesBySKU(data, sku);
 
@@ -150,7 +150,7 @@ async function fetchCategoryKeys(category) {
   try {
     const json = await getLongJSONData({
       url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
-      limit: defaultLimit,
+      limit: DEFAULT_LIMIT,
     });
     if (!json || json.length === 0) return [];
     return filterByCategory(json, category, 'Subcategory');

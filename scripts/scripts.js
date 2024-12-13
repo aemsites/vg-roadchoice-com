@@ -1,14 +1,15 @@
 import {
-  sampleRUM,
   buildBlock,
   loadHeader,
   loadFooter,
   decorateBlocks,
   decorateBlock,
+  decorateIcons,
   decorateTemplateAndTheme,
+  waitForFirstImage,
   getMetadata,
-  waitForLCP,
-  loadBlocks,
+  loadSection,
+  loadSections,
   loadBlock,
   loadCSS,
   readBlockConfig,
@@ -18,7 +19,7 @@ import {
   createOptimizedPicture,
 } from './aem.js';
 
-import { addFavIcon, createElement, decorateIcons, getPlaceholders, loadDelayed, slugify, variantsClassesToBEM } from './common.js';
+import { addFavIcon, createElement, getPlaceholders, loadDelayed, slugify, variantsClassesToBEM, loadTemplate } from './common.js';
 
 const disableHeader = getMetadata('disable-header').toLowerCase() === 'true';
 const disableFooter = getMetadata('disable-footer').toLowerCase() === 'true';
@@ -425,31 +426,6 @@ export function decorateMain(main, head) {
   decorateLinks(main);
 }
 
-async function loadTemplate(doc, templateName) {
-  const lowercaseTemplateName = templateName.toLowerCase();
-  try {
-    const cssLoaded = new Promise((resolve) => {
-      loadCSS(`${window.hlx.codeBasePath}/templates/${lowercaseTemplateName}/${lowercaseTemplateName}.css`, resolve);
-    });
-    const decorationComplete = new Promise((resolve) => {
-      (async () => {
-        try {
-          const mod = await import(`../templates/${lowercaseTemplateName}/${lowercaseTemplateName}.js`);
-          if (mod.default) {
-            await mod.default(doc);
-          }
-        } catch (error) {
-          console.log(`failed to load module for ${lowercaseTemplateName}`, error);
-        }
-        resolve();
-      })();
-    });
-    await Promise.all([cssLoaded, decorationComplete]);
-  } catch (error) {
-    console.log(`failed to load block ${lowercaseTemplateName}`, error);
-  }
-}
-
 /**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
@@ -462,10 +438,13 @@ async function loadEager(doc) {
   if (main) {
     decorateMain(main, head);
     document.body.classList.add('appear');
-    await waitForLCP(LCP_BLOCKS);
-  }
 
-  await getPlaceholders();
+    await getPlaceholders();
+
+    await loadSection(main.querySelector('.section'), waitForFirstImage);
+  } else {
+    await getPlaceholders();
+  }
 }
 
 /**
@@ -477,7 +456,7 @@ async function loadLazy(doc) {
   if (templateName) await loadTemplate(doc, templateName);
 
   const main = doc.querySelector('main');
-  await loadBlocks(main);
+  await loadSections(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
@@ -499,9 +478,6 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   addFavIcon(`${window.hlx.codeBasePath}/styles/favicon.svg`);
-  sampleRUM('lazy');
-  sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
-  sampleRUM.observe(main.querySelectorAll('picture > img'));
 }
 
 async function loadPage() {
@@ -654,23 +630,6 @@ export function form(...items) {
 }
 export function button(...items) {
   return domEl('button', ...items);
-}
-
-/**
- * A helper function that delays the execution of a function
- * @param {function} func the function to execute
- * @param {number} timeout the timeout in milliseconds, 200 by default
- * @returns {function} the function that will be executed after the timeout
- */
-export function debounce(func, timeout = 200) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-
-    timer = setTimeout(() => {
-      func.apply(this, args);
-    }, timeout);
-  };
 }
 
 /**

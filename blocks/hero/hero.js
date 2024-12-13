@@ -1,4 +1,5 @@
-import { getImageURLs, createResponsivePicture, variantsClassesToBEM, decorateIcons } from '../../scripts/common.js';
+import { getImageURLs, createResponsivePicture, variantsClassesToBEM } from '../../scripts/common.js';
+import { decorateIcons } from '../../scripts/aem.js';
 import { isVideoLink, createVideo } from '../../scripts/video-helper.js';
 
 const variantClasses = ['text-left', 'text-right', 'text-black'];
