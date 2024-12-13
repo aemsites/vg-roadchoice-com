@@ -271,10 +271,19 @@ function getMetadata(name, doc = document) {
  * @param {Array} [breakpoints] Breakpoints and corresponding params (eg. width)
  * @returns {Element} The picture element
  */
-function createOptimizedPicture(src, alt = '', eager = false, breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }]) {
+function createOptimizedPicture(
+  src,
+  alt = '',
+  eager = false,
+  breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
+  isExternal,
+) {
   const url = new URL(src, window.location.href);
   const picture = document.createElement('picture');
-  const { pathname } = url;
+  // WARNING: isExternal is a custom implementation!
+  // The original implementation to retrieve the pathname is:
+  // const { pathname } = url;
+  const pathname = (isExternal && src) || url.pathname;
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
 
   // webp

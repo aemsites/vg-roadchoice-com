@@ -610,6 +610,17 @@ function checkLinkProps(links) {
 }
 
 /**
+ * @param {NodeList} elements list of tested elements
+ * @param {String} childrenCheck check that will be run for every element list
+ * @param {boolean} [isOpposite=false] Flag to contemplate an edge case that is the opposite case
+ * @returns list of elements that pass the children check
+ */
+export function getAllElWithChildren(elements, childrenCheck, isOpposite = false) {
+  if (isOpposite) return [...elements].filter((el) => !el.querySelector(childrenCheck));
+  return [...elements].filter((el) => el.querySelector(childrenCheck));
+}
+
+/**
  * Resolves a given url to a document to the language/folder context
  * by adding the locale to the url if it doesn't have it and should have
  * @param {string} urlPathToConvert the url path to convert
