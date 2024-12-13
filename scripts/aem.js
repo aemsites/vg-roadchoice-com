@@ -10,7 +10,12 @@
  * governing permissions and limitations under the License.
  */
 
-/* eslint-env browser */
+/*
+ * WARNING!!!
+ * There are some minor custom implelemtation in this file
+ * Look for comments starting with "WARNING:"
+ */
+
 function sampleRUM(checkpoint, data) {
   const timeShift = () => (window.performance ? window.performance.now() : Date.now() - window.hlx.rum.firstReadTime);
   try {
@@ -413,6 +418,16 @@ function decorateIcons(element, prefix = '') {
 }
 
 /**
+ * Add the image as background
+ * @param {Element} section the section container
+ * @param {string} picture the picture's link
+ */
+function addBackgroundImage(section, picture) {
+  section.classList.add('background');
+  section.style.backgroundImage = `url('${picture}')`;
+}
+
+/**
  * Decorates all sections in a container element.
  * @param {Element} main The container element
  */
@@ -445,6 +460,11 @@ function decorateSections(main) {
             .filter((style) => style)
             .map((style) => toClassName(style.trim()));
           styles.forEach((style) => section.classList.add(style));
+        } else if (key === 'background') {
+          // WARNING: This 'else if (key === 'background')' is a custom implementation!
+          // along side with the addBackgroundImage method
+          const picture = sectionMeta.querySelector('picture');
+          if (picture) addBackgroundImage(section, meta[key]);
         } else {
           section.dataset[toCamelCase(key)] = meta[key];
         }

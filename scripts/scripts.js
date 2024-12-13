@@ -6,6 +6,7 @@ import {
   decorateBlock,
   decorateButtons,
   decorateIcons,
+  decorateSections,
   decorateTemplateAndTheme,
   waitForFirstImage,
   getMetadata,
@@ -13,8 +14,6 @@ import {
   loadSections,
   loadBlock,
   loadCSS,
-  readBlockConfig,
-  toCamelCase,
   toClassName,
   createOptimizedPicture,
 } from './aem.js';
@@ -23,59 +22,6 @@ import { addFavIcon, createElement, getPlaceholders, loadDelayed, slugify, varia
 
 const disableHeader = getMetadata('disable-header').toLowerCase() === 'true';
 const disableFooter = getMetadata('disable-footer').toLowerCase() === 'true';
-
-/**
- * Add the image as background
- * @param {Element} section the section container
- * @param {string} picture the picture's link
- */
-function addBackgroundImage(section, picture) {
-  section.classList.add('background');
-  section.style.backgroundImage = `url('${picture}')`;
-}
-
-/**
- * Decorates all sections in a container element.
- * @param {Element} main The container element
- */
-export function decorateSections(main) {
-  main.querySelectorAll(':scope > div').forEach((section) => {
-    const wrappers = [];
-    let defaultContent = false;
-    [...section.children].forEach((e) => {
-      if (e.tagName === 'DIV' || !defaultContent) {
-        const wrapper = document.createElement('div');
-        wrappers.push(wrapper);
-        defaultContent = e.tagName !== 'DIV';
-        if (defaultContent) wrapper.classList.add('default-content-wrapper');
-      }
-      wrappers[wrappers.length - 1].append(e);
-    });
-    wrappers.forEach((wrapper) => section.append(wrapper));
-    section.classList.add('section');
-    section.dataset.sectionStatus = 'initialized';
-    section.style.display = 'none';
-
-    /* process section metadata */
-    const sectionMeta = section.querySelector('div.section-metadata');
-    if (sectionMeta) {
-      const meta = readBlockConfig(sectionMeta);
-      Object.keys(meta).forEach((key) => {
-        if (key === 'style') {
-          const styles = meta.style.split(',').map((style) => toClassName(style.trim()));
-          styles.forEach((style) => section.classList.add(style));
-        }
-        if (key === 'background') {
-          const picture = sectionMeta.querySelector('picture');
-          if (picture) addBackgroundImage(section, meta[key]);
-        } else {
-          section.dataset[toCamelCase(key)] = meta[key];
-        }
-      });
-      sectionMeta.parentNode.remove();
-    }
-  });
-}
 
 export function findAndCreateImageLink(node) {
   const links = node.querySelectorAll('picture ~ a');
