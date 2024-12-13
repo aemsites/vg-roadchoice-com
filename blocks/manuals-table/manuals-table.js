@@ -6,11 +6,11 @@ export default function decorate(block) {
     const tableColumns = row.querySelectorAll(':scope > div');
     const oneChild = tableColumns.length === 1;
     [...tableColumns].forEach((column) => {
-      const link = column.querySelector(':scope > a');
+      const link = column.querySelector(':scope > a, :scope > p > a');
       column.removeAttribute('data-valign');
       column.className = `${blockName}-column`;
       if (oneChild) column.parentElement.classList.add('one-child');
-      if (!link) {
+      if (!link && column.previousElementSibling) {
         column.previousElementSibling.classList.add('next-empty');
         column.classList.add('empty');
         return;

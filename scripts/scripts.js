@@ -18,7 +18,7 @@ import {
   createOptimizedPicture,
 } from './aem.js';
 
-import { addFavIcon, createElement, getPlaceholders, loadDelayed, slugify, variantsClassesToBEM, loadTemplate } from './common.js';
+import { addFavIcon, createElement, getPlaceholders, loadDelayed, variantsClassesToBEM, loadTemplate } from './common.js';
 
 const disableHeader = getMetadata('disable-header').toLowerCase() === 'true';
 const disableFooter = getMetadata('disable-footer').toLowerCase() === 'true';
@@ -131,6 +131,37 @@ function decorateSectionBackgrounds(main) {
 }
 
 /**
+ * Don't know what to name this function.
+ * This is legacy code that handles some special content...
+ * Will leave this here for now... :( sorry
+ * @param {Element} main The main element
+ */
+function decorateSpecial() {
+  const pElements = document.querySelectorAll('p');
+  pElements.forEach((el) => {
+    if (el.textContent === '[*space*]') {
+      const spaceSpan = createElement('span', { classes: 'space' });
+      el.replaceWith(spaceSpan);
+    }
+    if (el.textContent.includes('[*button*]')) {
+      const id = el.textContent
+        .match(/\((.*?)\)/)[1]
+        .toLowerCase()
+        .replace(/\s/g, '-');
+      const textContent = el.textContent.split(')')[1].trim();
+      const newBtn = createElement('a', {
+        classes: ['button', 'primary'],
+        props: { id },
+        textContent,
+      });
+      el.textContent = '';
+      el.classList.add('button-container');
+      el.appendChild(newBtn);
+    }
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -151,6 +182,7 @@ export function decorateMain(main, head) {
   decorateBlocks(main);
   decorateSectionBackgrounds(main);
   decorateLinks(main);
+  decorateSpecial();
 }
 
 /**
