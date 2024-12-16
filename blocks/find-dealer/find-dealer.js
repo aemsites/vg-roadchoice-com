@@ -1,5 +1,4 @@
-import { getAllElWithChildren } from '../../scripts/scripts.js';
-import { createElement } from '../../scripts/common.js';
+import { createElement, getAllElWithChildren } from '../../scripts/common.js';
 
 const blockName = 'find-dealer';
 

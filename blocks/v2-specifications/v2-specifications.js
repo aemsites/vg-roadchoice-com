@@ -1,4 +1,4 @@
-import { loadBlock } from '../../scripts/lib-franklin.js';
+import { loadBlock } from '../../scripts/aem.js';
 import { createElement, slugify, removeEmptyTags } from '../../scripts/common.js';
 
 const blockName = 'v2-specifications';

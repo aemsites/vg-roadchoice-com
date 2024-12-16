@@ -42,25 +42,6 @@
       }
     ]
   },
-  "projectConfig": {
-    "total": 3,
-    "offset": 0,
-    "limit": 3,
-    "data": [
-      {
-        "name": "GIT_OWNER",
-        "value": "aemsites"
-      },
-      {
-        "name": "GIT_REPO",
-        "value": "vg-roadchoice-com"
-      },
-      {
-        "name": "GLOBAL_SITEMAP_URL",
-        "value": "/sitemap.xml"
-      }
-    ]
-  },
   "dealerLocator": {
     "total": 3,
     "offset": 0,
@@ -110,7 +91,6 @@
   ":version": 3,
   ":names": [
     "cookieValues",
-    "projectConfig",
     "dealerLocator",
     "searchConfig"
   ],

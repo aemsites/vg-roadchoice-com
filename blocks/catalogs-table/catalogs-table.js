@@ -1,5 +1,5 @@
 import { createElement, getJsonFromUrl } from '../../scripts/common.js';
-import { readBlockConfig } from '../../scripts/lib-franklin.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 
 const blockName = 'catalogs-table';
 

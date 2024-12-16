@@ -1,4 +1,4 @@
-import { getMetadata } from '../../scripts/lib-franklin.js';
+import { getMetadata } from '../../scripts/aem.js';
 import { createElement, getTextLabel } from '../../scripts/common.js';
 
 const blockName = 'breadcrumb';
