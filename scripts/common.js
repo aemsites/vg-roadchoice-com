@@ -265,6 +265,7 @@ async function getConstantValues() {
  * @returns {Object} The object containing the extracted key-value pairs.
  */
 const extractObjectFromArray = (data) => {
+  if (!Array.isArray(data)) return {};
   const obj = {};
   for (const item of data) {
     try {
@@ -286,7 +287,7 @@ const extractObjectFromArray = (data) => {
  */
 function checkOneTrustGroup(groupName, cookieCheck = false) {
   const oneTrustCookie = decodeURIComponent(document.cookie.split(';').find((cookie) => cookie.trim().startsWith('OptanonConsent=')));
-  return cookieCheck || oneTrustCookie.includes(`${groupName}:1`);
+  return cookieCheck || (groupName && oneTrustCookie.includes(`${groupName}:1`));
 }
 
 /**
@@ -320,6 +321,7 @@ const getJsonFromUrl = async (route) => {
  *                     original input.
  */
 const formatStringToArray = (inputString) => {
+  if (typeof inputString !== 'string') return [];
   // eslint-disable-next-line no-useless-escape
   const cleanedString = inputString.replace(/[\[\]\\'"]+/g, '');
   return cleanedString

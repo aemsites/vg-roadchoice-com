@@ -2,7 +2,7 @@ import { loadScript } from '../../scripts/aem.js';
 import { DEALER_LOCATOR } from '../../scripts/common.js';
 
 // DEALER LOCATOR config coming from constants file.
-const { ENDPOINT_URL, API_KEY, BACKUP_URL } = DEALER_LOCATOR;
+const { ENDPOINT_URL = false, API_KEY = false, BACKUP_URL = false } = DEALER_LOCATOR;
 
 function escapeHTML(input) {
   return input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -26,15 +26,23 @@ export default async function decorate(block) {
       observer.disconnect();
     });
   });
+  if (!ENDPOINT_URL) {
+    console.error(
+      'The block is missing the %cENDPOINT_URL%c in the constants config for %cDEALER_LOCATOR',
+      'color: red;',
+      'color: initial;',
+      'color: red;',
+    );
+  }
   observer.observe(block, { attributes: true, attributeFilter: ['data-block-status'] });
   window.locatorConfig = {
     asist: false,
     showAsistDialog: true,
     consolidateFilters: true,
     selectedBrand: 'roadchoice',
-    dataSource: datasource,
-    backupUrl: BACKUP_URL,
-    apiKey: API_KEY,
+    dataSource: datasource || '',
+    backupUrl: BACKUP_URL || '',
+    apiKey: API_KEY || '',
     amenities: [
       'Appointments Accepted',
       'Bilingual Service',

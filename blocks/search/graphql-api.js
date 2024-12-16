@@ -30,6 +30,7 @@ async function fetchGraphQLData(graphqlQuery, endpoint) {
 
 export async function fetchSearchResults({ query, offset, make, model, searchType, category }) {
   const { SEARCH_URL_DEV, CROSS_REFERENCE_QUERY_NAME, PART_NUMBER_QUERY_NAME, MAX_PRODUCTS_PER_QUERY } = SEARCH_CONFIG;
+
   const queryName = searchType === 'cross' ? CROSS_REFERENCE_QUERY_NAME : PART_NUMBER_QUERY_NAME;
 
   const graphqlQuery = {
