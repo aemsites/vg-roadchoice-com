@@ -1,4 +1,4 @@
-import { loadScript } from '../../scripts/lib-franklin.js';
+import { loadScript } from '../../scripts/aem.js';
 import { DEALER_LOCATOR } from '../../scripts/common.js';
 
 // DEALER LOCATOR config coming from constants file.

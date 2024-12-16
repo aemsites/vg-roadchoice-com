@@ -1,5 +1,5 @@
 import { createElement, getTextLabel, getJsonFromUrl, getLocaleContextedUrl } from '../../scripts/common.js';
-import { getMetadata } from '../../scripts/lib-franklin.js';
+import { getMetadata } from '../../scripts/aem.js';
 
 const blockName = 'recommendations';
 const category = getMetadata('category');

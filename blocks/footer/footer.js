@@ -1,5 +1,5 @@
 import { checkLinkProps, createElement } from '../../scripts/common.js';
-import { decorateIcons, getMetadata } from '../../scripts/lib-franklin.js';
+import { decorateIcons, getMetadata } from '../../scripts/aem.js';
 
 const blockName = 'footer';
 

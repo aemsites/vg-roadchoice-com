@@ -1,4 +1,4 @@
-import { getMetadata } from '../../scripts/lib-franklin.js';
+import { getMetadata } from '../../scripts/aem.js';
 import { createElement } from '../../scripts/common.js';
 
 const title = getMetadata('og:title');
