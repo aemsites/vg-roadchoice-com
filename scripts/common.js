@@ -679,18 +679,17 @@ function isSocialAllowed() {
   return checkOneTrustGroup(COOKIE_CONFIGS.SOCIAL_COOKIE);
 }
 
-const { cookieValues, projectConfig, dealerLocator, searchConfig } = await getConstantValues();
+const { cookieValues, dealerLocator, searchConfig } = await getConstantValues();
 
 // This data comes from the sharepoint 'constants.xlsx' file
 const COOKIE_CONFIGS = formatValues(cookieValues?.data);
-const PROJECT_CONFIG = formatValues(projectConfig?.data);
 const DEALER_LOCATOR = formatValues(dealerLocator?.data);
 const SEARCH_CONFIG = formatValues(searchConfig?.data);
 
 const allLinks = [...document.querySelectorAll('a'), ...document.querySelectorAll('button')];
 checkLinkProps(allLinks);
 
-export { COOKIE_CONFIGS, PROJECT_CONFIG, DEALER_LOCATOR, SEARCH_CONFIG, DEFAULT_LIMIT };
+export { COOKIE_CONFIGS, DEALER_LOCATOR, SEARCH_CONFIG, DEFAULT_LIMIT };
 
 export {
   getLocaleContextedUrl,
