@@ -1,11 +1,8 @@
-import { sampleRUM, loadScript } from './lib-franklin.js';
+import { loadScript } from './aem.js';
 import { isPerformanceAllowed, isTargetingAllowed, COOKIE_CONFIGS, loadWorker } from './common.js';
 
 // COOKIE ACCEPTANCE AND IDs default to false in case no ID is present
 const { DATA_DOMAIN_SCRIPT = false, GTM_ID = false, HOTJAR_ID = false, ARTIBOT_ID = false, COOKIE_CHECK = true } = COOKIE_CONFIGS;
-
-// Core Web Vitals RUM collection
-sampleRUM('cwv');
 
 const avoidCookieCheck = COOKIE_CHECK === 'false';
 
@@ -23,6 +20,7 @@ if (avoidCookieCheck || isTargetingAllowed()) {
 
 // Prevent the cookie banner from loading when running in library
 if (
+  DATA_DOMAIN_SCRIPT &&
   !window.location.pathname.includes('srcdoc') &&
   !['localhost', 'hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((url) => window.location.host.includes(url))
 ) {

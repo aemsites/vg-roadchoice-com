@@ -1,4 +1,4 @@
-import { createElement, getLongJSONData, defaultLimit, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl } from '../../scripts/common.js';
 
 const url = new URL(window.location.href);
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
@@ -46,7 +46,7 @@ const getCategoryData = async (cat) => {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
     const products = await getLongJSONData({
       url: productDataUrl,
-      limit: defaultLimit,
+      limit: DEFAULT_LIMIT,
     });
     json.data = products;
     json.limit = 20;
@@ -74,7 +74,7 @@ const getFilterAttrib = async (cat) => {
   try {
     const filtersJson = await getLongJSONData({
       url: categoryMaster,
-      limit: defaultLimit,
+      limit: DEFAULT_LIMIT,
     });
 
     if (!filtersJson) throw new Error('Failed to fetch filter data');
