@@ -190,7 +190,8 @@ export function decorateMain(main, head) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  const meta = doc.querySelector('meta[name="i18n"]');
+  document.documentElement.lang = meta ? meta.content : 'en';
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   const { head } = doc;
