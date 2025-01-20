@@ -61,7 +61,6 @@ const getCategoryData = async (cat) => {
   } catch (err) {
     console.log('%cError fetching category data', 'color:red;background-color:aliceblue', err);
     window.location.href = get404PageUrl();
-    throw err;
   }
 };
 
