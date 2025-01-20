@@ -51,9 +51,7 @@ const getCategoryData = async (cat) => {
     json.data = products;
     json.limit = 20;
     json.total = products.length;
-    if (!json.data || json.data.length === 0) {
-      throw new Error(`No data found in "${cat}" category file`);
-    }
+    if (!json) throw new Error(`No data found in "${cat}" category file`);
     const event = new Event('CategoryDataLoaded');
     mainCategory = json.data[0].Category;
     window.categoryData = json.data;
