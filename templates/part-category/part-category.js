@@ -108,7 +108,7 @@ export default async function decorate(doc) {
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
   const title = createElement('h1', { classes: 'part-category-title' });
-  title.textContent = category.replaceAll('-', ' ');
+  title.textContent = category;
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
   section.classList.add('part-category');
   titleWrapper.appendChild(title);
@@ -129,7 +129,7 @@ export default async function decorate(doc) {
         classes: className,
         props: { href: `${url.origin}/part-category/?category=${category}` },
       });
-      link.textContent = category.replaceAll('-', ' ');
+      link.textContent = category;
       const breadcrumbItem = createElement('li', {
         classes: ['breadcrumb-item', `breadcrumb-item-${length}`],
       });
