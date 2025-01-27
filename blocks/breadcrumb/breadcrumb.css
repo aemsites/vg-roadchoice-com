@@ -64,6 +64,14 @@
 }
 
 @media (min-width: 768px) {
+  .breadcrumb .active-link::after {
+    content: '/';
+  }
+
+  .breadcrumb-item-2 .active-link::after {
+    content: unset;
+  }
+
   .breadcrumb-list .breadcrumb-item:nth-child(2) {
     display: block;
   }

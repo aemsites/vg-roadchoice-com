@@ -57,6 +57,7 @@ const getCategoryData = async (cat) => {
     window.categoryData = json.data;
     sessionStorage.setItem('amount', amount);
     document.dispatchEvent(event);
+    return products;
   } catch (err) {
     console.log('%cError fetching category data', 'color:red;background-color:aliceblue', err);
     window.location.href = get404PageUrl();
@@ -80,7 +81,7 @@ const getFilterAttrib = async (cat) => {
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
     const filterAttribs = filtersJson
-      .filter((el) => el.Subcategory.toLowerCase() === cat.toLowerCase().replaceAll('-', ' ') && el.Filter === '')
+      .filter((el) => el.Subcategory.toLowerCase().replace(/ /g, '-') === cat.toLowerCase() && el.Filter === '')
       .map((el) => el.Attributes);
 
     const event = new Event('FilterAttribsLoaded');
@@ -98,6 +99,23 @@ const resetCategoryData = () => {
   sessionStorage.removeItem('amount');
 };
 
+/**
+ * Updates the title's textContent based on the Subcategory from the product data.
+ * @param {HTMLElement} title - The title element to update.
+ * @param {string} category - The fallback category name.
+ * @param {Array} categoryData - The product data array to retrieve the Subcategory from.
+ */
+const updateTitleWithSubcategory = (title, category, categoryData) => {
+  const subcategory = Array.isArray(categoryData) && categoryData.length > 0 ? categoryData[0]?.Subcategory : null;
+  title.textContent = subcategory || category.replaceAll('-', ' ');
+
+  if (!subcategory) {
+    console.log(
+      subcategory === null ? 'No product data found, using fallback category' : 'No subcategory found in product data, using fallback category',
+    );
+  }
+};
+
 export default async function decorate(doc) {
   category = getCategory();
   if (!category) {
@@ -108,13 +126,13 @@ export default async function decorate(doc) {
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
   const title = createElement('h1', { classes: 'part-category-title' });
-  title.textContent = category.replaceAll('-', ' ');
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
   section.classList.add('part-category');
   titleWrapper.appendChild(title);
   section.prepend(titleWrapper);
   resetCategoryData();
-  await getCategoryData(category);
+  const categoryData = await getCategoryData(category);
+  updateTitleWithSubcategory(title, category, categoryData);
   getFilterAttrib(category);
 
   // update breadcrumb adding the category dynamically
@@ -129,7 +147,7 @@ export default async function decorate(doc) {
         classes: className,
         props: { href: `${url.origin}/part-category/?category=${category}` },
       });
-      link.textContent = category.replaceAll('-', ' ');
+      link.textContent = title.textContent;
       const breadcrumbItem = createElement('li', {
         classes: ['breadcrumb-item', `breadcrumb-item-${length}`],
       });
