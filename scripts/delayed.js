@@ -4,32 +4,9 @@ import { isPerformanceAllowed, isTargetingAllowed, COOKIE_CONFIGS, loadWorker } 
 // COOKIE ACCEPTANCE AND IDs default to false in case no ID is present
 const { DATA_DOMAIN_SCRIPT = false, GTM_ID = false, HOTJAR_ID = false, ARTIBOT_ID = false, COOKIE_CHECK = true } = COOKIE_CONFIGS;
 
-const avoidCookieCheck = COOKIE_CHECK === 'false';
-
-// COOKIE ACCEPTANCE CHECKING
-if (avoidCookieCheck || isPerformanceAllowed()) {
-  if (GTM_ID) loadGoogleTagManager();
-  if (HOTJAR_ID) loadHotjar();
-}
-
-if (avoidCookieCheck || isTargetingAllowed()) {
-  if (ARTIBOT_ID) loadArtibot();
-}
-
-// add more delayed functionality here
-
-// Prevent the cookie banner from loading when running in library
-if (
-  DATA_DOMAIN_SCRIPT &&
-  !window.location.pathname.includes('srcdoc') &&
-  !['localhost', 'hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((url) => window.location.host.includes(url))
-) {
-  loadScript('https://cdn.cookielaw.org/scripttemplates/otSDKStub.js', {
-    type: 'text/javascript',
-    charset: 'UTF-8',
-    'data-domain-script': DATA_DOMAIN_SCRIPT,
-  });
-}
+// Roadchoice specific code ↓
+// This Worker loads all the product information into de global object window
+const productsWorker = loadWorker();
 
 window.OptanonWrapper = () => {
   const currentOnetrustActiveGroups = window.OnetrustActiveGroups;
@@ -81,6 +58,32 @@ async function loadHotjar() {
   })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
 }
 
+function loadMaze() {
+  (function autoLoadMazeFunction(m, a, z, e) {
+    let t;
+    try {
+      t = m.sessionStorage.getItem('maze-us');
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (!t) {
+      t = new Date().getTime();
+      try {
+        m.sessionStorage.setItem('maze-us', t);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    const s = a.createElement('script');
+    s.src = `${z}?apiKey=${e}`;
+    s.async = true;
+    a.getElementsByTagName('head')[0].appendChild(s);
+    m.mazeUniversalSnippetApiKey = e;
+  })(window, document, 'https://snippet.maze.co/maze-universal-loader.js', '2852429c-8735-46e0-8655-38f2f515fa53');
+}
+
 async function loadArtibot() {
   // Artibot
   (async function (t, e) {
@@ -110,12 +113,41 @@ async function loadArtibot() {
   })(window, document);
 }
 
-// Roadchoice specific code ↓
-// This Worker loads all the product information into de global object window
-const productsWorker = loadWorker();
+function delayedInit() {
+  const avoidCookieCheck = COOKIE_CHECK === 'false';
+
+  // COOKIE ACCEPTANCE CHECKING
+  if (avoidCookieCheck || isPerformanceAllowed()) {
+    if (GTM_ID) loadGoogleTagManager();
+    if (HOTJAR_ID) loadHotjar();
+  }
+
+  if (avoidCookieCheck || isTargetingAllowed()) {
+    if (ARTIBOT_ID) loadArtibot();
+  }
+
+  loadMaze();
+
+  // add more delayed functionality here
+
+  // Prevent the cookie banner from loading when running in library
+  if (
+    DATA_DOMAIN_SCRIPT &&
+    !window.location.pathname.includes('srcdoc') &&
+    !['localhost', 'hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((url) => window.location.host.includes(url))
+  ) {
+    loadScript('https://cdn.cookielaw.org/scripttemplates/otSDKStub.js', {
+      type: 'text/javascript',
+      charset: 'UTF-8',
+      'data-domain-script': DATA_DOMAIN_SCRIPT,
+    });
+  }
+
+  // This searches for id="cookie-preference" button and displays the cookie preference center.
+  const preferenceBtn = document.querySelector('#cookie-preference');
+  if (preferenceBtn) preferenceBtn.addEventListener('click', () => window.OneTrust.ToggleInfoDisplay());
+}
+
+delayedInit();
 
 export const getProductsWorker = () => productsWorker;
-
-// This searches for id="cookie-preference" button and displays the cookie preference center.
-const preferenceBtn = document.querySelector('#cookie-preference');
-if (preferenceBtn) preferenceBtn.addEventListener('click', () => window.OneTrust.ToggleInfoDisplay());
