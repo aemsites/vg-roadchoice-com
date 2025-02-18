@@ -1,0 +1,106 @@
+.v2-custom-form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 540px;
+  padding: 50px 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.v2-custom-form label {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22.5px;
+  color: var(--c-medium-gray-1);
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+}
+
+.field-wrapper[required] label::after {
+  content: ' *';
+  color: var(--primary-red);
+}
+
+.v2-custom-form-container input,
+.v2-custom-form-container textarea,
+.v2-custom-form-container select {
+  background-color: var(--background-color);
+  border: 1px solid #a9a9a9;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 5px;
+  font-size: 15px;
+  line-height: 22.5px;
+}
+
+.v2-custom-form-container input:focus,
+.v2-custom-form-container textarea:focus,
+.v2-custom-form-container select:focus {
+  border-color: #0e909f;
+  outline: none;
+}
+
+.field-wrapper .error {
+  font-size: 12px;
+  color: var(--primary-red);
+}
+
+.form-submit-wrapper .button {
+  width: 100%;
+  background-color: var(--primary-red);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  color: var(--primary-white);
+  padding: 10px 30px;
+  border: 1px solid #979797;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.v2-custom-form-container.background {
+  --text-color: var(--primary-black);
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  max-width: none;
+  padding-bottom: 60px;
+}
+
+.v2-custom-form-container.background .default-content-wrapper,
+.v2-custom-form-container.background .v2-custom-form-wrapper {
+  max-width: 1270px;
+  margin: 0 auto;
+}
+
+.v2-custom-form-container.background > picture > img {
+  width: 100%;
+}
+
+.v2-custom-form-container.background label {
+  background-color: #fffa;
+}
+
+@media (min-width: 768px) {
+  .v2-custom-form-container form {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 8px 16px;
+    max-width: 720px;
+  }
+
+  .v2-custom-form-container .field-wrapper {
+    width: 100%;
+  }
+}
+
+@media (min-width: 992px) {
+  .v2-custom-form-container form {
+    max-width: 960px;
+  }
+}
