@@ -85,10 +85,6 @@
   width: 100%;
 }
 
-.v2-custom-form-container.background label {
-  background-color: #fffa;
-}
-
 @media (min-width: 768px) {
   .v2-custom-form-container form {
     display: flex;

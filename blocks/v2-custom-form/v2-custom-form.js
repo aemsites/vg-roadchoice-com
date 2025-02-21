@@ -70,6 +70,9 @@ async function submissionFailure() {
   });
   errorDiv.innerHTML = errorMessage(getMessageText(false, true), getMessageText(false, false));
   const form = document.querySelector('form[data-submitting=true]');
+  if (!form) {
+    return;
+  }
   form.setAttribute('data-submitting', 'false');
   form.querySelector('button[type="submit"]').disabled = false;
   form.replaceWith(errorDiv);
@@ -517,7 +520,7 @@ async function createForm(formURL) {
     if (form.hasAttribute('novalidate')) {
       isValid = form.checkValidity();
     }
-    // After submission, the form should clear the error messages if the fields are valid.
+    // after been submitted, the form needs to clean the error messages if the fields are valid
     cleanErrorMessages(form);
     e.preventDefault();
     if (isValid) {
@@ -532,11 +535,17 @@ async function createForm(formURL) {
 
 function decorateTitles(block) {
   const previousSibling = block.parentElement.previousElementSibling;
-  if (!previousSibling) return;
+  if (!previousSibling) {
+    return;
+  }
   const title = previousSibling.querySelector('h3');
   const subtitle = previousSibling.querySelector('h5');
-  if (title) title.classList.add('h3');
-  if (subtitle) subtitle.classList.add('h5');
+  if (title) {
+    title.classList.add('h3');
+  }
+  if (subtitle) {
+    subtitle.classList.add('h5');
+  }
 }
 
 export default async function decorate(block) {
@@ -551,5 +560,11 @@ export default async function decorate(block) {
       block.lastElementChild.remove();
     }
     formLink.replaceWith(form);
+
+    // in case the form has any kind of error, the form will be replaced with the error message
+    window.addEventListener('unhandledrejection', ({ reason, error }) => {
+      console.error('Unhandled rejection. Error submitting form:', { reason, error });
+      submissionFailure();
+    });
   }
 }
