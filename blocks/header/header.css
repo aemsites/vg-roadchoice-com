@@ -427,16 +427,16 @@ header .nav-tools .categories a {
   }
 
   header .nav-tools .categories[aria-expanded="true"] .level-2 {
-    padding: 6rem 6rem 20rem;
+    --categories-padding: 3rem 3rem 20rem;
+    --categories-gap: 6rem 2rem;
+    --categories-height: 1340px;
+
+    padding: var(--categories-padding);
     display: flex;
     flex-flow: column wrap;
-    gap: 8rem 3rem;
-    height: 1450px;
+    gap: var(--categories-gap);
+    height: var(--categories-height);
     font-size: var(--nav-font-size);
-  }
-
-  .nav-tools .categories .level-2 > li {
-    width: 20rem;
   }
 
   .nav-tools .categories .level-2 > li > a {
@@ -454,6 +454,13 @@ header .nav-tools .categories a {
     flex-direction: column;
     row-gap: 1rem;
     line-height: 1.2;
-    width: 15rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  header .nav-tools .categories[aria-expanded="true"] .level-2 {
+    --categories-padding: 6rem 6rem 20rem;
+    --categories-gap: 8rem 3rem;
+    --categories-height: 1450px;
   }
 }
