@@ -68,7 +68,7 @@
     "data": [
       {
         "name": "SEARCH_URL_DEV",
-        "value": "https://search-api-qa-eds.aws.43636.vnonprod.com/search"
+        "value": "https://kb3ko4nzt2.execute-api.eu-west-1.amazonaws.com/prod/search"
       },
       {
         "name": "CROSS_REFERENCE_QUERY_NAME",
