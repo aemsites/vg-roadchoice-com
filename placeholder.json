@@ -44,8 +44,8 @@
       "Text": "Part Number"
     },
     {
-      "Key": "part",
-      "Text": "Part"
+      "Key": "parts",
+      "Text": "Parts"
     },
     {
       "Key": "pagination_text",
