@@ -44,6 +44,10 @@
       "Text": "Part Number"
     },
     {
+      "Key": "parts",
+      "Text": "Parts"
+    },
+    {
       "Key": "pagination_text",
       "Text": "Showing top [$] results"
     },
