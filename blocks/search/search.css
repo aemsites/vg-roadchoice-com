@@ -17,7 +17,7 @@
   flex-direction: column;
   gap: 2rem 4rem;
   padding-block-end: 1rem;
-  font-feature-settings: "ss03" 1;
+  font-feature-settings: 'ss03' 1;
 }
 
 .search .search-form .hide {
@@ -30,7 +30,7 @@
   color: var(--primary-red);
   cursor: pointer;
   border-radius: 10px;
-  font-feature-settings: "ss03" 1;
+  font-feature-settings: 'ss03' 1;
 }
 
 .search .shadow {
@@ -102,7 +102,7 @@
 .search .search__filters__container select {
   padding: 1.5rem;
   border-radius: 5px;
-  font-feature-settings: "ss03" 1;
+  font-feature-settings: 'ss03' 1;
 }
 
 .search .search__buttons__wrapper,

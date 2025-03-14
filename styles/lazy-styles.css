@@ -5,50 +5,55 @@
 @font-face {
   font-family: 'Nexa Regular';
   src: url('../fonts/NexaRegular.eot') format('eot');
-  src: url('../fonts/NexaRegular.woff2') format('woff2'),
-  url('../fonts/NexaRegular.woff') format('woff'),
-  url('../fonts/NexaRegular.ttf') format('truetype'),
-  url('../fonts/NexaRegular.otf') format('opentype');
+  src:
+    url('../fonts/NexaRegular.woff2') format('woff2'),
+    url('../fonts/NexaRegular.woff') format('woff'),
+    url('../fonts/NexaRegular.ttf') format('truetype'),
+    url('../fonts/NexaRegular.otf') format('opentype');
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Nexa Bold';
   src: url('../fonts/NexaBold.eot') format('eot');
-  src: url('../fonts/NexaBold.woff2') format('woff2'),
-  url('../fonts/NexaBold.woff') format('woff'),
-  url('../fonts/NexaBold.ttf') format('truetype'),
-  url('../fonts/NexaBold.otf') format('opentype');
+  src:
+    url('../fonts/NexaBold.woff2') format('woff2'),
+    url('../fonts/NexaBold.woff') format('woff'),
+    url('../fonts/NexaBold.ttf') format('truetype'),
+    url('../fonts/NexaBold.otf') format('opentype');
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Nexa XBold';
   src: url('../fonts/NexaXBold.eot') format('eot');
-  src: url('../fonts/NexaXBold.woff2') format('woff2'),
-  url('../fonts/NexaXBold.woff') format('woff'),
-  url('../fonts/NexaXBold.ttf') format('truetype'),
-  url('../fonts/NexaXBold.otf') format('opentype');
+  src:
+    url('../fonts/NexaXBold.woff2') format('woff2'),
+    url('../fonts/NexaXBold.woff') format('woff'),
+    url('../fonts/NexaXBold.ttf') format('truetype'),
+    url('../fonts/NexaXBold.otf') format('opentype');
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Nexa Heavy';
   src: url('../fonts/NexaHeavy.eot') format('eot');
-  src: url('../fonts/NexaHeavy.woff2') format('woff2'),
-  url('../fonts/NexaHeavy.woff') format('woff'),
-  url('../fonts/NexaHeavy.ttf') format('truetype'),
-  url('../fonts/NexaHeavy.otf') format('opentype');
+  src:
+    url('../fonts/NexaHeavy.woff2') format('woff2'),
+    url('../fonts/NexaHeavy.woff') format('woff'),
+    url('../fonts/NexaHeavy.ttf') format('truetype'),
+    url('../fonts/NexaHeavy.otf') format('opentype');
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Nexa Black';
   src: url('../fonts/NexaBlack.eot') format('eot');
-  src: url('../fonts/NexaBlack.woff2') format('woff2'),
-  url('../fonts/NexaBlack.woff') format('woff'),
-  url('../fonts/NexaBlack.ttf') format('truetype'),
-  url('../fonts/NexaBlack.otf') format('opentype');
+  src:
+    url('../fonts/NexaBlack.woff2') format('woff2'),
+    url('../fonts/NexaBlack.woff') format('woff'),
+    url('../fonts/NexaBlack.ttf') format('truetype'),
+    url('../fonts/NexaBlack.otf') format('opentype');
   font-display: swap;
 }
 
@@ -69,7 +74,7 @@
   src: url('../fonts/fontawesome-webfont.woff') format('woff');
   font-weight: 400;
   font-style: normal;
-  font-display: swap
+  font-display: swap;
 }
 
 @font-face {
@@ -77,7 +82,7 @@
   src: url('../fonts/fa-brands-400.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
-  font-display: swap
+  font-display: swap;
 }
 
 .fa {
@@ -86,7 +91,7 @@
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transform: translate(0,0)
+  transform: translate(0, 0);
 }
 
 .fa-brands {
@@ -94,178 +99,184 @@
 }
 
 .fa-angle-right::before {
-  content: "\f105";
+  content: '\f105';
 }
 
 .fa-angle-left::before {
-  content: "\f104";
+  content: '\f104';
 }
 
 .fa-angle-up::before {
-  content: "\f106"
+  content: '\f106';
 }
 
 .fa-search::before {
-  content: "\f002"
+  content: '\f002';
 }
 
 .fa-plug::before {
-  content: "\f1e6"
+  content: '\f1e6';
 }
 
-.fa-facebook-f::before,.fa-facebook::before {
-  content: "\f09a"
+.fa-facebook-f::before,
+.fa-facebook::before {
+  content: '\f09a';
 }
 
 .fa-square-facebook::before {
-  content: "\f082"
+  content: '\f082';
 }
 
 .fa-bold::before {
-  content: "\f032"
+  content: '\f032';
 }
 
 .fa-engine-power::before {
-  content: "\e60c"
+  content: '\e60c';
 }
 
 .fa-play::before {
-  content: "\f04b"
+  content: '\f04b';
 }
 
 .fa-play-circle-o::before {
-  content: "\f01d"
+  content: '\f01d';
 }
 
 .fa-youtube::before {
-  content: "\f16a"
+  content: '\f16a';
 }
 
 .fa-linkedin::before {
-  content: "\f08c"
+  content: '\f08c';
 }
 
 .fa-linkedin-in::before {
-  content: "\f0e1"
+  content: '\f0e1';
 }
 
 .fa-instagram::before {
-  content: "\f16d"
+  content: '\f16d';
 }
 
 .fa-twitter::before {
-  content: "\f099"
+  content: '\f099';
 }
 
 .fa-x-twitter::before {
-  content: "\e61b"
+  content: '\e61b';
 }
 
-.fa-bolt::before,.fa-flash::before {
-  content: "\f0e7"
+.fa-bolt::before,
+.fa-flash::before {
+  content: '\f0e7';
 }
 
 .fa-plus::before {
-  content: "\f067"
+  content: '\f067';
 }
 
 .fa-info-circle::before {
-  content: "\f05a"
+  content: '\f05a';
 }
 
-.fa-close::before,.fa-remove::before,.fa-times::before {
-  content: "\f00d"
+.fa-close::before,
+.fa-remove::before,
+.fa-times::before {
+  content: '\f00d';
 }
 
 .fa-star::before {
-  content: "\f005"
+  content: '\f005';
 }
 
 .fa-star-o::before {
-  content: "\f006"
+  content: '\f006';
 }
 
-.fa-cut::before,.fa-scissors::before {
-  content: "\f0c4"
+.fa-cut::before,
+.fa-scissors::before {
+  content: '\f0c4';
 }
 
-.fa-copy::before,.fa-files-o::before {
-  content: "\f0c5"
+.fa-copy::before,
+.fa-files-o::before {
+  content: '\f0c5';
 }
 
 .fa-bars::before {
-  content: "\f0c9"
+  content: '\f0c9';
 }
 
 .fa-external-link::before {
-  content: "\f08e"
+  content: '\f08e';
 }
 
 .fa-refresh::before {
-  content: "\f021"
+  content: '\f021';
 }
 
 .fa-user::before {
-  content: "\f007"
+  content: '\f007';
 }
 
 .fa-clock-o::before {
-  content: "\f017";
+  content: '\f017';
 }
 
 .fa-calendar::before {
-  content: "\f073"
+  content: '\f073';
 }
 
 .fa-envelope::before {
-  content: "\f0e0"
+  content: '\f0e0';
 }
 
 .fa-caret-left::before {
-  content: "\f0d9"
+  content: '\f0d9';
 }
 
 .fa-caret-right::before {
-  content: "\f0da"
+  content: '\f0da';
 }
 
 .fa-caret-down::before {
-  content: "\f0d7"
+  content: '\f0d7';
 }
 
 .fa-caret-up::before {
-  content: "\f0d8"
+  content: '\f0d8';
 }
 
 .fa-arrow-right::before {
-  content: "\f061";
+  content: '\f061';
 }
 
 .fa-arrow-left::before {
-  content: "\f060";
+  content: '\f060';
 }
 
 .fa-truck::before {
-  content: "\f0d1"
+  content: '\f0d1';
 }
 
 .fa-dashboard::before {
-  content: "\f0e4"
+  content: '\f0e4';
 }
 
 .fa-cog::before {
-  content: "\f013"
+  content: '\f013';
 }
 
 .fa-check::before {
-  content: "\f00c"
+  content: '\f00c';
 }
 
 .fa-close::before {
-  content: "\f00d";
+  content: '\f00d';
 }
 
-.body-dealer-locator footer.footer-wrapper{
+.body-dealer-locator footer.footer-wrapper {
   display: none;
 }
 

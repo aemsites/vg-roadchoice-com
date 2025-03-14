@@ -76,9 +76,9 @@
   .search-results .search-results-section {
     display: grid;
     grid-template:
-      "filters title"
-      "filters pagination"
-      "filters results" / 30% 70%;
+      'filters title'
+      'filters pagination'
+      'filters results' / 30% 70%;
     grid-template-rows: auto auto 1fr;
     column-gap: 6rem;
   }

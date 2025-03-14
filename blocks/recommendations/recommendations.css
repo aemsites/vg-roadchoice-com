@@ -19,7 +19,7 @@ main .section > div + .recommendations-container {
   margin: auto;
 }
 
-.recommendations h3.title{
+.recommendations h3.title {
   color: var(--secondary-gray-1);
   font-size: var(--heading-font-size-m);
   text-transform: uppercase;
@@ -52,7 +52,7 @@ main .section > div + .recommendations-container {
 
 .recommendations .article .article-title::after {
   display: block;
-  content: "";
+  content: '';
   left: 0;
   width: 52%;
   height: 3px;

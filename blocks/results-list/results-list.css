@@ -1,4 +1,3 @@
-
 .results-list-wrapper {
   padding: 0 0 3rem;
 }
@@ -55,7 +54,6 @@ ul.results-list__list {
   align-items: baseline;
   color: var(--secondary-gray-4);
 }
-
 
 .product-card .part-number p.part-label {
   font-size: var(--body-font-size-xs);
