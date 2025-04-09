@@ -123,8 +123,7 @@ const updateTitleWithSubcategory = (title, category, categoryData) => {
  */
 const getSubtitleData = async (cat) => {
   try {
-    // todo change this to make it dynamic
-    const url = '/part-category/subcategory-text.json';
+    const url = getLocaleContextedUrl('/part-category/subcategory-text.json');
     const products = await getJsonFromUrl(url);
     const { data } = products;
     const result = data?.filter((obj) => obj.subcategory === cat);
