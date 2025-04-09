@@ -1,4 +1,4 @@
-import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl, checkLinkProps } from '../../scripts/common.js';
 
 const url = new URL(window.location.href);
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
@@ -116,6 +116,24 @@ const updateTitleWithSubcategory = (title, category, categoryData) => {
   }
 };
 
+/**
+ * Fetches and formats the subcategory data to build the subtitle.
+ * @returns {Object}
+ * @throws {Error} If the subcategory data is not found.
+ */
+const getSubtitleData = async (cat) => {
+  try {
+    // todo change this to make it dynamic
+    const url = '/part-category/subcategory-text.json';
+    const products = await getJsonFromUrl(url);
+    const { data } = products;
+    const result = data?.filter((obj) => obj.subcategory === cat);
+    return result[0];
+  } catch (err) {
+    console.log('%cError fetching subcategories', err);
+  }
+};
+
 export default async function decorate(doc) {
   category = getCategory();
   if (!category) {
@@ -126,10 +144,29 @@ export default async function decorate(doc) {
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
   const title = createElement('h1', { classes: 'part-category-title' });
+
+  titleWrapper.appendChild(title);
+
+  const subtitleObject = await getSubtitleData(category);
+  const { text, linkText, linkUrl } = subtitleObject;
+
+  const subtitle = createElement('p', { classes: 'part-category-subtitle' });
+  subtitle.textContent = text;
+
+  const subtitleLink = createElement('a', { props: { href: linkUrl } });
+  subtitleLink.textContent = linkText;
+  checkLinkProps([subtitleLink]);
+  if (subtitleLink) {
+    subtitle.insertAdjacentElement('beforeend', subtitleLink);
+  }
+  if (subtitle) {
+    titleWrapper.appendChild(subtitle);
+  }
+
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
   section.classList.add('part-category');
-  titleWrapper.appendChild(title);
   section.prepend(titleWrapper);
+
   resetCategoryData();
   const categoryData = await getCategoryData(category);
   updateTitleWithSubcategory(title, category, categoryData);
