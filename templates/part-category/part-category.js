@@ -127,6 +127,7 @@ const getSubtitleData = async (cat) => {
     const products = await getJsonFromUrl(url);
     const { data } = products;
     const result = data?.filter((obj) => obj.subcategory === cat);
+
     return result[0];
   } catch (err) {
     console.log('%cError fetching subcategories', err);
@@ -147,19 +148,23 @@ export default async function decorate(doc) {
   titleWrapper.appendChild(title);
 
   const subtitleObject = await getSubtitleData(category);
-  const { text, linkText, linkUrl } = subtitleObject;
-
-  const subtitle = createElement('p', { classes: 'part-category-subtitle' });
-  subtitle.textContent = text;
-
-  const subtitleLink = createElement('a', { props: { href: linkUrl } });
-  subtitleLink.textContent = linkText;
-  checkLinkProps([subtitleLink]);
-  if (subtitleLink) {
-    subtitle.insertAdjacentElement('beforeend', subtitleLink);
-  }
-  if (subtitle) {
-    titleWrapper.appendChild(subtitle);
+  if (subtitleObject) {
+    const { text, linkText, linkUrl } = subtitleObject;
+    if (text.length > 0) {
+      const subtitle = createElement('p', { classes: 'part-category-subtitle' });
+      subtitle.textContent = text;
+      if (linkText.length > 0) {
+        const subtitleLink = createElement('a', { props: { href: linkUrl } });
+        subtitleLink.textContent = linkText;
+        checkLinkProps([subtitleLink]);
+        if (subtitleLink) {
+          subtitle.insertAdjacentElement('beforeend', subtitleLink);
+        }
+      }
+      if (subtitle) {
+        titleWrapper.appendChild(subtitle);
+      }
+    }
   }
 
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
