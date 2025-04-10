@@ -1,4 +1,5 @@
 import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl, checkLinkProps } from '../../scripts/common.js';
+import { decorateLinks } from '../../scripts/scripts.js';
 
 const url = new URL(window.location.href);
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
@@ -124,11 +125,17 @@ const updateTitleWithSubcategory = (title, category, categoryData) => {
 const getSubtitleData = async (cat) => {
   try {
     const url = getLocaleContextedUrl('/part-category/subcategory-text.json');
-    const products = await getJsonFromUrl(url);
-    const { data } = products;
-    const result = data?.filter((obj) => obj.subcategory === cat);
-
-    return result[0];
+    const response = await getJsonFromUrl(url);
+    const { data } = response;
+    const result = data?.find((obj) => obj.subcategory === cat);
+    if (result) {
+      for (const key in result) {
+        if (result[key] === '') {
+          result[key] = null;
+        }
+      }
+    }
+    return result;
   } catch (err) {
     console.log('%cError fetching subcategories', err);
   }
@@ -148,23 +155,16 @@ export default async function decorate(doc) {
   titleWrapper.appendChild(title);
 
   const subtitleObject = await getSubtitleData(category);
-  if (subtitleObject) {
+  if (subtitleObject?.text) {
     const { text, linkText, linkUrl } = subtitleObject;
-    if (text.length > 0) {
-      const subtitle = createElement('p', { classes: 'part-category-subtitle' });
-      subtitle.textContent = text;
-      if (linkText.length > 0) {
-        const subtitleLink = createElement('a', { props: { href: linkUrl } });
-        subtitleLink.textContent = linkText;
-        checkLinkProps([subtitleLink]);
-        if (subtitleLink) {
-          subtitle.insertAdjacentElement('beforeend', subtitleLink);
-        }
-      }
-      if (subtitle) {
-        titleWrapper.appendChild(subtitle);
-      }
-    }
+    const subtitle = document.createRange().createContextualFragment(`
+      <p class='part-category-subtitle'>
+        ${text}
+        ${linkText?.length > 0 ? `<a href='${linkUrl}'>${linkText}</a>` : ''}
+      </p>
+    `);
+    decorateLinks(titleWrapper);
+    titleWrapper.appendChild(subtitle);
   }
 
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
