@@ -119,7 +119,7 @@ const updateTitleWithSubcategory = (title, category, categoryData) => {
 
 /**
  * Fetches and formats the subcategory data to build the subtitle.
- * @returns {Object}
+ * @returns {Object} The subcategory data as single object.
  * @throws {Error} If the subcategory data is not found.
  */
 const getSubtitleData = async (cat) => {
