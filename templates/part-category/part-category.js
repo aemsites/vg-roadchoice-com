@@ -1,4 +1,4 @@
-import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl, checkLinkProps } from '../../scripts/common.js';
+import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl } from '../../scripts/common.js';
 import { decorateLinks } from '../../scripts/scripts.js';
 
 const url = new URL(window.location.href);
@@ -163,8 +163,8 @@ export default async function decorate(doc) {
         ${linkText?.length > 0 ? `<a href='${linkUrl}'>${linkText}</a>` : ''}
       </p>
     `);
-    decorateLinks(titleWrapper);
     titleWrapper.appendChild(subtitle);
+    decorateLinks(titleWrapper);
   }
 
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
