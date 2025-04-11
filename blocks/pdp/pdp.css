@@ -9,8 +9,8 @@
 }
 
 .pdp-title {
- color: var(--primary-red);
- font-weight: 500;
+  color: var(--primary-red);
+  font-weight: 500;
 }
 
 .pdp-details-wrapper {
@@ -151,10 +151,9 @@
 
 .section.accordion h5::before {
   font-family: fontawesome, sans-serif;
-  content: "\f0d7";
+  content: '\f0d7';
   margin-right: 20px;
 }
-
 
 .section.accordion.pdp-part-fit {
   max-height: 82px;
@@ -182,22 +181,22 @@
 }
 
 .section.accordion.accordion-open h5::before {
-  content: "\f0d8";
+  content: '\f0d8';
 }
 
 .section.accordion.pdp-part-fit h5::before,
 .section.accordion.pdp-part-fit.accordion-open h5::before {
-  content: "\f06a";
+  content: '\f06a';
 }
 
 .section.accordion.pdp-part-fit h5::after {
   font-family: fontawesome, sans-serif;
-  content: "\f078";
+  content: '\f078';
   margin-left: auto;
 }
 
 .section.accordion.pdp-part-fit.accordion-open h5::after {
-  content: "\f077";
+  content: '\f077';
 }
 
 .pdp-part-fit-expanded {
@@ -211,10 +210,10 @@
   display: grid;
   gap: 14px 20px;
   grid-template:
-    "title" auto
-    "search" auto
-    "filter" auto
-    "count" auto  / 1fr;
+    'title' auto
+    'search' auto
+    'filter' auto
+    'count' auto / 1fr;
 }
 
 .pdp-part-fit-filter {
@@ -251,7 +250,7 @@
 .pdp-part-fit-search::before {
   position: absolute;
   font-family: fontawesome, sans-serif;
-  content: "\f002";
+  content: '\f002';
   top: 13px;
   left: 24px;
   bottom: 17px;
@@ -417,7 +416,6 @@
     grid-template-columns: 1fr 1fr;
   }
 
-
   .section.accordion h5 {
     font-size: var(--heading-font-size-s);
   }
@@ -439,7 +437,7 @@
     padding: 20px;
   }
 
-  .pdp-image-column{
+  .pdp-image-column {
     align-self: flex-start;
     margin-top: 70px;
   }
@@ -458,9 +456,9 @@
 
   .pdp-part-fit-header {
     grid-template:
-      "title search" auto
-      "filter filter" auto
-      "count count" auto / 1fr 400px;
+      'title search' auto
+      'filter filter' auto
+      'count count' auto / 1fr 400px;
   }
 
   .pdp-part-fit-list {

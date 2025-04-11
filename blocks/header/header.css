@@ -21,7 +21,7 @@ header nav {
   font-family: var(--body-ff);
 }
 
-header nav[aria-expanded="true"] {
+header nav[aria-expanded='true'] {
   overflow-y: auto;
   min-height: 100vh;
 }
@@ -59,7 +59,7 @@ header span.fa-arrow-left {
     min-width: 100%;
   }
 
-  header nav[aria-expanded="true"] {
+  header nav[aria-expanded='true'] {
     min-height: 0;
     overflow: visible;
   }
@@ -123,28 +123,28 @@ header nav .nav-hamburger-icon::after {
   background: currentcolor;
 }
 
-header nav[aria-expanded="false"] .nav-hamburger-icon,
-header nav[aria-expanded="false"] .nav-hamburger-icon::before,
-header nav[aria-expanded="false"] .nav-hamburger-icon::after {
+header nav[aria-expanded='false'] .nav-hamburger-icon,
+header nav[aria-expanded='false'] .nav-hamburger-icon::before,
+header nav[aria-expanded='false'] .nav-hamburger-icon::after {
   height: 2px;
   border-radius: 2px;
   background: currentcolor;
 }
 
-header nav[aria-expanded="false"] .nav-hamburger-icon::before {
+header nav[aria-expanded='false'] .nav-hamburger-icon::before {
   top: -10px;
 }
 
-header nav[aria-expanded="false"] .nav-hamburger-icon::after {
+header nav[aria-expanded='false'] .nav-hamburger-icon::after {
   top: 10px;
 }
 
-header nav[aria-expanded="true"] .nav-hamburger-icon {
+header nav[aria-expanded='true'] .nav-hamburger-icon {
   height: 30px;
 }
 
-header nav[aria-expanded="true"] .nav-hamburger-icon::before,
-header nav[aria-expanded="true"] .nav-hamburger-icon::after {
+header nav[aria-expanded='true'] .nav-hamburger-icon::before,
+header nav[aria-expanded='true'] .nav-hamburger-icon::after {
   top: 3px;
   left: 1px;
   transform: rotate(45deg);
@@ -154,7 +154,7 @@ header nav[aria-expanded="true"] .nav-hamburger-icon::after {
   border-radius: 2px;
 }
 
-header nav[aria-expanded="true"] .nav-hamburger-icon::after {
+header nav[aria-expanded='true'] .nav-hamburger-icon::after {
   top: unset;
   bottom: 3px;
   transform: rotate(-45deg);
@@ -237,7 +237,7 @@ header nav .nav-sections {
   height: 100%;
 }
 
-header nav[aria-expanded="true"] .nav-sections {
+header nav[aria-expanded='true'] .nav-sections {
   display: block;
   visibility: visible;
   align-self: start;
@@ -304,7 +304,7 @@ header span.icon {
     display: none;
   }
 
-  header nav[aria-expanded="true"] .nav-sections {
+  header nav[aria-expanded='true'] .nav-sections {
     align-self: unset;
   }
 
@@ -318,7 +318,7 @@ header span.icon {
     content: '';
     display: inline-block;
     position: absolute;
-    top: .5em;
+    top: 0.5em;
     right: 2px;
     transform: rotate(135deg);
     width: 6px;
@@ -329,7 +329,7 @@ header span.icon {
   }
 
   header nav .nav-sections .nav-drop:not(.categories):hover::after,
-  header nav .nav-sections .nav-drop[aria-expanded="true"]:not(.categories)::after {
+  header nav .nav-sections .nav-drop[aria-expanded='true']:not(.categories)::after {
     rotate: 180deg;
   }
 
@@ -346,7 +346,6 @@ header span.icon {
     font-family: var(--headings-ff-x-bold);
     font-size: var(--heading-font-size-xs);
   }
-
 
   header nav .nav-sections ul {
     display: flex;
@@ -371,7 +370,7 @@ header span.icon {
     position: relative;
   }
 
-  header nav .nav-sections > ul > li[aria-expanded="true"]:not(.categories) > ul,
+  header nav .nav-sections > ul > li[aria-expanded='true']:not(.categories) > ul,
   header nav .nav-sections > ul > li:not(.categories):hover > ul {
     display: block;
     position: absolute;
@@ -419,24 +418,24 @@ header .nav-tools .categories a {
 }
 
 @media (min-width: 992px) {
-  header .nav-tools .categories[aria-expanded="true"] {
+  header .nav-tools .categories[aria-expanded='true'] {
     background-color: var(--nav-background);
     display: block;
     overflow: scroll;
     height: 100vh;
   }
 
-  header .nav-tools .categories[aria-expanded="true"] .level-2 {
-    padding: 6rem 6rem 20rem;
+  header .nav-tools .categories[aria-expanded='true'] .level-2 {
+    --categories-padding: 3rem 3rem 20rem;
+    --categories-gap: 6rem 2rem;
+    --categories-height: 1340px;
+
+    padding: var(--categories-padding);
     display: flex;
     flex-flow: column wrap;
-    gap: 8rem 3rem;
-    height: 1450px;
+    gap: var(--categories-gap);
+    height: var(--categories-height);
     font-size: var(--nav-font-size);
-  }
-
-  .nav-tools .categories .level-2 > li {
-    width: 20rem;
   }
 
   .nav-tools .categories .level-2 > li > a {
@@ -444,7 +443,7 @@ header .nav-tools .categories a {
     font-family: var(--headings-ff-x-bold);
   }
 
-  .nav-tools .categories .level-2  a {
+  .nav-tools .categories .level-2 a {
     color: var(--nav-text-color);
   }
 
@@ -454,6 +453,13 @@ header .nav-tools .categories a {
     flex-direction: column;
     row-gap: 1rem;
     line-height: 1.2;
-    width: 15rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  header .nav-tools .categories[aria-expanded='true'] .level-2 {
+    --categories-padding: 6rem 6rem 20rem;
+    --categories-gap: 8rem 3rem;
+    --categories-height: 1450px;
   }
 }

@@ -128,12 +128,12 @@ main .section.carousel-container {
 }
 
 .carousel .carousel-arrows-left::after {
-  content: url("/icons/arrow-left.png");
+  content: url('/icons/arrow-left.png');
   cursor: pointer;
 }
 
 .carousel .carousel-arrows-right::after {
-  content: url("/icons/arrow-right.png");
+  content: url('/icons/arrow-right.png');
   cursor: pointer;
 }
 

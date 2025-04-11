@@ -48,7 +48,6 @@
   color: var(--primary-red);
 }
 
-
 @media (min-width: 523px) {
   .cookies-table {
     --text-scaling: 0.8;
