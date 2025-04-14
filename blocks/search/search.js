@@ -154,6 +154,25 @@ const showLoader = (resultsSection) => {
   return loadingElement;
 };
 
+/**
+ * returns the search title text based on the search type
+ * @description __cross-reference template text:__ _Search Results for Cross-Reference: [$q]_;
+ * @example 'Search Results for Cross-Reference: "123456"';
+ * @description part number template text: _Search Results for "[$1]" "[$2]" "[$q]" parts_;
+ * @example 'Search Results for "[make]" "[model]" "[part number or description]" parts';
+ * @param {string} searchType - the search type
+ * @param {string} query - the search query
+ * @param {string} make - the make of the product
+ * @param {string} model - the model of the product
+ * @returns {string} - the search title text
+ */
+const getSearchTitleText = ({ searchType, query, make, model }) => {
+  return getTextLabel(`SEARCH_RESULT:${searchType}_title`)
+    .replace('[$1]', make ? `"${make}" ` : '')
+    .replace('[$2]', model ? `"${model}" ` : '')
+    .replace('[$q]', query ? `"${query}"` : '');
+};
+
 const updateSearchResults = (results, searchType, query, make, model, resultsSection, resultsList, targetOffset) => {
   const searchResultsSection = document.querySelector('.search-results-section');
   const titleElement = searchResultsSection?.querySelector('.title');
@@ -163,9 +182,12 @@ const updateSearchResults = (results, searchType, query, make, model, resultsSec
       const liElement = productCard(result, searchType);
       resultsList?.appendChild(liElement);
     });
-    const titleContent = getTextLabel('search_results_title');
-    const type = searchType === 'cross' ? 'cross-reference' : 'parts';
-    const titleText = `${titleContent} ${searchType === 'cross' ? `${type}: "${query}"` : `${make || ''} ${model || ''} ${query} ${type}`}`;
+    const titleText = getSearchTitleText({
+      searchType,
+      query,
+      make,
+      model,
+    });
     if (titleElement) titleElement.textContent = titleText;
 
     updatePagination(resultsSection, targetOffset, results.length);
@@ -197,7 +219,7 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
 
 const showNoResultsMessage = (query, searchResultsSection) => {
   const titleElement = searchResultsSection?.querySelector('.title');
-  const titleText = getTextLabel('no_results_title').replace('[$]', `${query}`);
+  const titleText = getTextLabel('no_results_title').replace('[$]', query ? `"${query}"` : '');
   if (titleElement) titleElement.innerText = titleText;
   const fragment = document.createRange().createContextualFragment(noResultsTemplate);
   searchResultsSection?.classList.add('no-results');

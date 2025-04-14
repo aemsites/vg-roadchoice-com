@@ -36,8 +36,12 @@
       "Text": "Part Number/Description"
     },
     {
-      "Key": "search_results_title",
-      "Text": "Search Results for"
+      "Key": "SEARCH_RESULT:cross_title",
+      "Text": "Search Results for Cross-Reference: [$q]"
+    },
+    {
+      "Key": "SEARCH_RESULT:parts_title",
+      "Text": "Search Results for [$1][$2][$q] parts"
     },
     {
       "Key": "part_number",
