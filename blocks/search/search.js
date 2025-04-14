@@ -170,7 +170,7 @@ const getSearchTitleText = ({ searchType, query, make, model }) => {
   return getTextLabel(`SEARCH_RESULT:${searchType}_title`)
     .replace('[$1]', make ? `"${make}" ` : '')
     .replace('[$2]', model ? `"${model}" ` : '')
-    .replace('[$q]', `"${query}"`);
+    .replace('[$q]', query ? `"${query}"` : '');
 };
 
 const updateSearchResults = (results, searchType, query, make, model, resultsSection, resultsList, targetOffset) => {
