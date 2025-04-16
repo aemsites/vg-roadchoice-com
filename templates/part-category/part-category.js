@@ -1,4 +1,5 @@
-import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl } from '../../scripts/common.js';
+import { decorateLinks } from '../../scripts/scripts.js';
 
 const url = new URL(window.location.href);
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
@@ -116,6 +117,30 @@ const updateTitleWithSubcategory = (title, category, categoryData) => {
   }
 };
 
+/**
+ * Fetches and formats the subcategory data to build the subtitle.
+ * @returns {Object} The subcategory data as single object.
+ * @throws {Error} If the subcategory data is not found.
+ */
+const getSubtitleData = async (cat) => {
+  try {
+    const url = getLocaleContextedUrl('/part-category/subcategory-text.json');
+    const response = await getJsonFromUrl(url);
+    const { data } = response;
+    const result = data?.find((obj) => obj.subcategory === cat);
+    if (result) {
+      for (const key in result) {
+        if (result[key] === '') {
+          result[key] = null;
+        }
+      }
+    }
+    return result;
+  } catch (err) {
+    console.log('%cError fetching subcategories', err);
+  }
+};
+
 export default async function decorate(doc) {
   category = getCategory();
   if (!category) {
@@ -126,10 +151,26 @@ export default async function decorate(doc) {
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
   const title = createElement('h1', { classes: 'part-category-title' });
+
+  titleWrapper.appendChild(title);
+
+  const subtitleObject = await getSubtitleData(category);
+  if (subtitleObject?.text) {
+    const { text, linkText, linkUrl } = subtitleObject;
+    const subtitle = document.createRange().createContextualFragment(`
+      <p class='part-category-subtitle'>
+        ${text}
+        ${linkText?.length > 0 ? `<a href='${linkUrl}'>${linkText}</a>` : ''}
+      </p>
+    `);
+    titleWrapper.appendChild(subtitle);
+    decorateLinks(titleWrapper);
+  }
+
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
   section.classList.add('part-category');
-  titleWrapper.appendChild(title);
   section.prepend(titleWrapper);
+
   resetCategoryData();
   const categoryData = await getCategoryData(category);
   updateTitleWithSubcategory(title, category, categoryData);
