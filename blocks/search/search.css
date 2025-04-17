@@ -132,12 +132,14 @@
   gap: 10px;
   background: var(--primary-white);
   position: absolute;
-  width: 100%;
-  color: var(--primary-black);  
+  width: 99.4%;
+  color: var(--primary-black);
+  z-index: 2;
+  left: 2px;
 }
 
 .search__autosuggest-item {
-  padding: 12px 24px;
+  padding: 12px 15px;
 }
 
 .search__autosuggest-item:hover,
