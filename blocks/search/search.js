@@ -322,7 +322,7 @@ function addKeyUpEvent(form) {
     });
 
     input.addEventListener('keyup', (e) => {
-      if (['ArrowUp', 'ArrowDown'].includes(e.key)) {
+      if (wrapper?.children?.length && ['ArrowUp', 'ArrowDown'].includes(e.key)) {
         handleArrowKeys([...wrapper.children], e, activeClassName);
       }
     });
