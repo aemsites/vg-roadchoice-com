@@ -104,3 +104,55 @@ export async function fetchFilterFacets({ field, filter }) {
 
   return { facets: data.data[FILTER_FACETS_QUERY_NAME] };
 }
+
+export async function fetchCrossReferenceSuggest({ term, category }) {
+  const { SEARCH_URL_DEV, CROSS_REFERENCE_SUGGEST_QUERY_NAME, AUTOSUGGEST_SIZE_SUGGESTION } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${CROSS_REFERENCE_SUGGEST_QUERY_NAME}($term: String!, $sizeSuggestions: Int${category ? ', $categoryFilter: String' : ''}) {
+        ${CROSS_REFERENCE_SUGGEST_QUERY_NAME}(term: $term, sizeSuggestions: $sizeSuggestions${category ? ', categoryFilter: $categoryFilter' : ''}) {
+          terms
+        }
+      }
+    `,
+    variables: {
+      term,
+      sizeSuggestions: parseInt(AUTOSUGGEST_SIZE_SUGGESTION),
+      ...(category && { categoryFilter: category }),
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { facets: [], error };
+
+  return { suggestions: data.data[CROSS_REFERENCE_SUGGEST_QUERY_NAME] };
+}
+
+export async function fetchPartReferenceSuggest({ term, make, model, category }) {
+  const { SEARCH_URL_DEV, PART_REFERENCE_SUGGEST_QUERY_NAME, AUTOSUGGEST_SIZE_SUGGESTION } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${PART_REFERENCE_SUGGEST_QUERY_NAME}($term: String!, $sizeSuggestions: Int${ make? ', $makeFilter: String' : ''}${model? ', $modelFilter: String': ''}${category ? ', $categoryFilter: String' : ''}) {
+        ${PART_REFERENCE_SUGGEST_QUERY_NAME}(term: $term, sizeSuggestions: $sizeSuggestions${make? ', makeFilter: $makeFilter' : ''}${model? ', modelFilter: $modelFilter': ''}${category ? ', categoryFilter: $categoryFilter' : ''}) {
+          terms
+        }
+      }
+    `,
+    variables: {
+      term,
+      sizeSuggestions: parseInt(AUTOSUGGEST_SIZE_SUGGESTION),
+      ...(make && { makeFilter: make }),
+      ...(model && { modelFilter: model }),
+      ...(category && { categoryFilter: category }),
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { facets: [], error };
+
+  return { suggestions: data.data[PART_REFERENCE_SUGGEST_QUERY_NAME] };
+}
