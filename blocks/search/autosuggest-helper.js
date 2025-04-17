@@ -1,4 +1,3 @@
-
 import { fetchCrossReferenceSuggest, fetchPartReferenceSuggest } from './graphql-api.js';
 import { createElement } from '../../scripts/common.js';
 
@@ -39,9 +38,9 @@ function buildSuggestion(suggestions, form) {
   const searchBtn = form.querySelector(`.${blockName}__input-cr__submit`);
   const inputElement = [...form.querySelectorAll('input')].find((input) => input.offsetParent !== null);
   suggestions.forEach((suggestion) => {
-    const item = createElement('li', { classes: `${blockName}__autosuggest-item`, props: { role: 'option'} });
+    const item = createElement('li', { classes: `${blockName}__autosuggest-item`, props: { role: 'option' } });
     item.textContent = suggestion;
-    item.addEventListener('click',(e) => handleClickSuggestion(e, searchBtn, inputElement));
+    item.addEventListener('click', (e) => handleClickSuggestion(e, searchBtn, inputElement));
     suggestionElements.push(item);
   });
   return suggestionElements;
@@ -55,20 +54,16 @@ async function fetchAutoSuggestions(suggestParams) {
       term,
       ...(make && { make }),
       ...(model && { model }),
-      ...(category && { category })
+      ...(category && { category }),
     };
     results = await fetchPartReferenceSuggest(suggestParams);
   } else {
     results = await fetchCrossReferenceSuggest({ term });
   }
 
-  const { suggestions: { terms } = {}} = results;
+  const { suggestions: { terms } = {} } = results;
 
   return terms;
 }
 
-export {
-  fetchAutoSuggestions,
-  buildSuggestion,
-  handleArrowKeys
-}
+export { fetchAutoSuggestions, buildSuggestion, handleArrowKeys };

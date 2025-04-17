@@ -135,8 +135,8 @@ export async function fetchPartReferenceSuggest({ term, make, model, category })
 
   const graphqlQuery = {
     query: `
-      query ${PART_REFERENCE_SUGGEST_QUERY_NAME}($term: String!, $sizeSuggestions: Int${ make? ', $makeFilter: String' : ''}${model? ', $modelFilter: String': ''}${category ? ', $categoryFilter: String' : ''}) {
-        ${PART_REFERENCE_SUGGEST_QUERY_NAME}(term: $term, sizeSuggestions: $sizeSuggestions${make? ', makeFilter: $makeFilter' : ''}${model? ', modelFilter: $modelFilter': ''}${category ? ', categoryFilter: $categoryFilter' : ''}) {
+      query ${PART_REFERENCE_SUGGEST_QUERY_NAME}($term: String!, $sizeSuggestions: Int${make ? ', $makeFilter: String' : ''}${model ? ', $modelFilter: String' : ''}${category ? ', $categoryFilter: String' : ''}) {
+        ${PART_REFERENCE_SUGGEST_QUERY_NAME}(term: $term, sizeSuggestions: $sizeSuggestions${make ? ', makeFilter: $makeFilter' : ''}${model ? ', modelFilter: $modelFilter' : ''}${category ? ', categoryFilter: $categoryFilter' : ''}) {
           terms
         }
       }

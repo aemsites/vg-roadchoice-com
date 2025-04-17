@@ -79,7 +79,7 @@ const TEMPLATES = {
   <div class="search__autosuggest-container"> 
     <ul role="listbox" class="search__autosuggest-list"></ul>
   </div>
-  `
+  `,
 };
 
 const activeClassName = `${blockName}__autosuggest-item--active`;
@@ -294,7 +294,7 @@ function addKeyUpEvent(form) {
       if (!searchTerm) {
         wrapper.innerHTML = '';
         return;
-      } 
+      }
 
       if (searchTerm.length < 3 && wrapper.children.length) {
         wrapper.innerHTML = '';
