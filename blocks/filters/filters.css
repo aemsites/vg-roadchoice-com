@@ -24,7 +24,7 @@
 }
 
 .filters-section ul li.item:first-of-type {
-  border-top: 1px solid var(--primary-medium-gray);;
+  border-top: 1px solid var(--primary-medium-gray);
 }
 
 .filters-section ul li.item a {

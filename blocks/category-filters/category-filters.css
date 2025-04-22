@@ -32,7 +32,7 @@
 
 .category-filters-wrapper .category-filters-buttons-wrapper .clear-filter-btn,
 .category-filters-wrapper .category-filters-buttons-wrapper .apply-filter-btn {
-  font-feature-settings: "ss03" 1;
+  font-feature-settings: 'ss03' 1;
 }
 
 .category-filters-wrapper .category-filters-form .category-filters-buttons-wrapper {
@@ -66,7 +66,7 @@
 .category-filters-wrapper .category-filters-form .category-filters-buttons-wrapper .filter-btn:disabled {
   cursor: not-allowed;
   box-shadow: none;
-  opacity: .65;
+  opacity: 0.65;
 }
 
 .category-filters-wrapper .category-filters-list {

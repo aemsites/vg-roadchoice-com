@@ -3,7 +3,7 @@
   font-size: var(--body-font-size-s);
 }
 
-.footer  div {
+.footer div {
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -30,7 +30,7 @@
 
 .footer a:hover {
   background-color: var(--secondary-red);
-  transition: all .3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 .footer .footer-social-section ul {

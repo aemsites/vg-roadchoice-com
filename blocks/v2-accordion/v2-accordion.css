@@ -64,7 +64,7 @@
 
 /* Styles for nested accordion */
 .v2-accordion__item .v2-accordion__item:last-child {
-  border-bottom: 0
+  border-bottom: 0;
 }
 
 @media (min-width: 1200px) {

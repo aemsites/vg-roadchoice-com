@@ -2,13 +2,22 @@
   color: var(--primary-red);
 }
 
+.part-category .part-category-subtitle {
+  margin-bottom: 15px;
+}
+
+
+.part-category .part-category-subtitle a {
+  margin-left: 5px;
+}
+
 @media (min-width: 1200px) {
   .part-category {
     display: grid;
     grid-template:
-      "title title"
-      "filters pagination"
-      "filters results" / 30% 69%;
+      'title title'
+      'filters pagination'
+      'filters results' / 30% 69%;
     column-gap: 6rem;
     grid-template-rows: auto 4rem auto;
   }

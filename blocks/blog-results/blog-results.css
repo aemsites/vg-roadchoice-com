@@ -34,7 +34,7 @@
   font-size: var(--body-font-size-xs);
   padding: 15px;
   font-family: var(--ff-fontawesome);
-  content: "\f00d";
+  content: '\f00d';
   margin: 0 10px;
   border-radius: 50%;
   height: 10px;
@@ -50,7 +50,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  background-color: var( --c-light-gray);
+  background-color: var(--c-light-gray);
   justify-content: flex-end;
 }
 
@@ -80,7 +80,7 @@
   padding: 5px 0 5px 20px;
   text-transform: capitalize;
   border-top: 1px solid var(--secondary-gray-1);
-  background-color: var( --c-light-gray);
+  background-color: var(--c-light-gray);
 }
 
 .blog-results-sidebar .categories-section a.category:hover {
@@ -180,7 +180,6 @@
   pointer-events: auto;
   opacity: 1;
 }
-
 
 .blog-results-articles ul.pagination-list a:hover {
   background-color: var(--secondary-light-gray);
