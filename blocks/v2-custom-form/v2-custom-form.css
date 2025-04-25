@@ -103,3 +103,18 @@
     max-width: 960px;
   }
 }
+
+@media (min-width: 1200px) {
+  .v2-custom-form--double-column form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px 50px;
+    max-width: 840px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .v2-custom-form-container :is(.form-textarea-wrapper, .form-submit-wrapper) {
+    grid-column: 1 / -1;
+  }
+}
