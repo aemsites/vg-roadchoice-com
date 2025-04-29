@@ -28,7 +28,7 @@
 .v2-custom-form-container textarea,
 .v2-custom-form-container select {
   background-color: var(--background-color);
-  border: 1px solid #a9a9a9;
+  border: 1px solid var(--c-medium-gray-2);
   border-radius: 5px;
   color: var(--c-medium-gray-1);
   font-family: var(--body-ff);
@@ -60,7 +60,7 @@
   line-height: 24px;
   color: var(--primary-white);
   padding: 10px 30px;
-  border: 1px solid #979797;
+  border: 1px solid var(--c-medium-gray-2);
   border-radius: 5px;
   text-transform: uppercase;
 }
@@ -101,5 +101,17 @@
 @media (min-width: 992px) {
   .v2-custom-form-container form {
     max-width: 960px;
+  }
+
+  .v2-custom-form--double-column form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 16px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .v2-custom-form-container :is(.form-textarea-wrapper, .form-submit-wrapper) {
+    grid-column: 1 / -1;
   }
 }
