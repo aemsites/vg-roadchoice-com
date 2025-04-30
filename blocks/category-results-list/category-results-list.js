@@ -24,18 +24,11 @@ productsWorker.onmessage = ({ data }) => {
   }
 };
 
-const isTruckLibrary = (text) => text.includes('trucklibrary.com');
-
 const getImagesData = ({ productList, loadingElement, detail }) => {
   loadingElement.remove();
   products.forEach((prod, idx) => {
     prod.hasImage = false;
-    const filterLoop = detail.filter(
-      (e) =>
-        e['Part Number'] === prod['Base Part Number'] &&
-        ((isTruckLibrary(e['Image URL']) && e['Image URL'].includes('.0?$')) ||
-          (!isTruckLibrary(e['Image URL']) && e['Image URL'].includes('-0.jpg'))),
-    );
+    const filterLoop = detail.filter((e) => e['Part Number'] === prod['Base Part Number']);
     if (filterLoop.length >= 1) {
       prod.hasImage = true;
       prod.imgUrl = filterLoop[0]['Image URL'];
