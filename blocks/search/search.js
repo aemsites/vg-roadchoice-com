@@ -312,12 +312,10 @@ function addKeyUpEvent(form) {
         const suggestions = await fetchAutoSuggestions(params);
         isLoading = false;
         wrapper.innerHTML = '';
-        if (suggestions && suggestions.length) {
-          const listElements = buildSuggestion(suggestions, form);
-          wrapper.append(...listElements);
-          e.target.after(wrapper);
-          wrapper?.classList.add(`${blockName}__autosuggest-list--show`);
-        }
+        const listElements = buildSuggestion(suggestions, form);
+        wrapper.append(...listElements);
+        e.target.after(wrapper);
+        wrapper?.classList.add(`${blockName}__autosuggest-list--show`);
       }
     });
 

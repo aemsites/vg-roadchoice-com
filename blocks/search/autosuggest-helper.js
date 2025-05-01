@@ -1,5 +1,5 @@
 import { fetchCrossReferenceSuggest, fetchPartReferenceSuggest } from './graphql-api.js';
-import { createElement } from '../../scripts/common.js';
+import { createElement, getTextLabel } from '../../scripts/common.js';
 
 const blockName = 'search';
 
@@ -37,12 +37,18 @@ function buildSuggestion(suggestions, form) {
   const suggestionElements = [];
   const searchBtn = form.querySelector(`.${blockName}__input-cr__submit`);
   const inputElement = [...form.querySelectorAll('input')].find((input) => input.offsetParent !== null);
-  suggestions.forEach((suggestion) => {
-    const item = createElement('li', { classes: `${blockName}__autosuggest-item`, props: { role: 'option' } });
-    item.textContent = suggestion;
-    item.addEventListener('click', (e) => handleClickSuggestion(e, searchBtn, inputElement));
-    suggestionElements.push(item);
-  });
+  if (suggestions && suggestions.length) {
+    suggestions.forEach((suggestion) => {
+      const item = createElement('li', { classes: `${blockName}__autosuggest-item`, props: { role: 'option' } });
+      item.textContent = suggestion;
+      item.addEventListener('click', (e) => handleClickSuggestion(e, searchBtn, inputElement));
+      suggestionElements.push(item);
+    });
+  } else {
+    const noSuggestions = createElement('li', { classes: `${blockName}__autosuggest-item`, props: { role: 'option' } });
+    noSuggestions.textContent = getTextLabel('NoSuggestionText');
+    suggestionElements.push(noSuggestions);
+  }
   return suggestionElements;
 }
 
