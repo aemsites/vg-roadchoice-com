@@ -1,21 +1,23 @@
 .v2-custom-form-container form {
   display: flex;
   flex-direction: column;
+  justify-content: left;
   gap: 10px;
-  max-width: 540px;
-  padding: 50px 15px;
-  margin-left: auto;
-  margin-right: auto;
+  width: min(100%, 470px);
+  padding: 50px 0;
+}
+
+.v2-custom-form-container .v2-custom-form--centered form {
+  margin: 0 auto;
 }
 
 .v2-custom-form label {
   display: inline-block;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 22.5px;
+  font-size: var(--form-font-size);
+  font-weight: var(--form-font-weight);
+  line-height: var(--form-line-height);
   color: var(--c-medium-gray-1);
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding: 5px 0;
   margin-bottom: 8px;
 }
 
@@ -29,40 +31,35 @@
 .v2-custom-form-container select {
   background-color: var(--background-color);
   border: 1px solid var(--c-medium-gray-2);
-  border-radius: 5px;
+  border-radius: var(--form-border-radius);
   color: var(--c-medium-gray-1);
+  font-size: var(--form-font-size);
   font-family: var(--body-ff);
-  font-weight: bold;
   width: 100%;
   max-width: 100%;
-  padding: 10px 5px;
-  font-size: 15px;
-  line-height: 22.5px;
+  padding: 16px 16px 14px;
 }
 
 .v2-custom-form-container input:focus,
 .v2-custom-form-container textarea:focus,
 .v2-custom-form-container select:focus {
-  border-color: #0e909f;
+  border-color: var(--border-focus);
   outline: none;
 }
 
 .field-wrapper .error {
-  font-size: 12px;
-  color: var(--primary-red);
+  font-size: var(--form-error-font-size);
+  color: var(--error-color);
 }
 
 .form-submit-wrapper .button {
-  width: 100%;
-  background-color: var(--primary-red);
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 24px;
+  background-color: var(--button-active);
+  font-size: var(--body-font-size-m);
+  font-family: var(--body-ff);
   color: var(--primary-white);
-  padding: 10px 30px;
-  border: 1px solid var(--c-medium-gray-2);
-  border-radius: 5px;
+  padding: 13px 30px 10px;
   text-transform: uppercase;
+  margin: 0 auto;
 }
 
 .v2-custom-form-container.background {
@@ -77,7 +74,7 @@
 
 .v2-custom-form-container.background .default-content-wrapper,
 .v2-custom-form-container.background .v2-custom-form-wrapper {
-  max-width: 1270px;
+  max-width: 1170px;
   margin: 0 auto;
 }
 
@@ -108,7 +105,6 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 8px 16px;
     width: 100%;
-    margin: 0 auto;
   }
 
   .v2-custom-form-container :is(.form-textarea-wrapper, .form-submit-wrapper) {
