@@ -49,16 +49,6 @@ async function getCustomMessage(url) {
   return '';
 }
 
-function addHeaderWithMark(wrapper) {
-  const hasHeaderWithMark = wrapper.closest('.header-with-mark');
-  if (hasHeaderWithMark) {
-    const title = wrapper.querySelector('h1, h2, h3, h4, h5, h6');
-    if (title) {
-      title.classList.add('with-marker');
-    }
-  }
-}
-
 async function submissionSuccess() {
   sampleRUM('form:submit');
   const successDiv = createElement('div', {
@@ -67,16 +57,12 @@ async function submissionSuccess() {
   successDiv.innerHTML = successMessage(getMessageText(true, true), getMessageText(true, false));
   const form = document.querySelector('form[data-submitting=true]');
   const hasCustomMessage = form.dataset.customMessage;
-  const hasHeaderWithMark = form.closest('.header-with-mark');
 
   if (hasCustomMessage) {
     successDiv.innerHTML = await getCustomMessage(hasCustomMessage);
   }
   form.setAttribute('data-submitting', 'false');
   form.replaceWith(successDiv);
-  if (hasHeaderWithMark) {
-    addHeaderWithMark(successDiv);
-  }
 }
 
 async function submissionFailure() {
@@ -85,16 +71,12 @@ async function submissionFailure() {
   });
   errorDiv.innerHTML = errorMessage(getMessageText(false, true), getMessageText(false, false));
   const form = document.querySelector('form[data-submitting=true]');
-  const headerWithMark = form.closest('.header-with-mark');
   if (!form) {
     return;
   }
   form.setAttribute('data-submitting', 'false');
   form.querySelector('button[type="submit"]').disabled = false;
   form.replaceWith(errorDiv);
-  if (headerWithMark) {
-    addHeaderWithMark(errorDiv);
-  }
 }
 
 // callback
@@ -601,16 +583,11 @@ function decorateTitles(block) {
 }
 
 function addTitleText(titleText, block) {
-  const headerWithMark = block.closest('.header-with-mark');
-  const defaultContentWrapper = headerWithMark?.querySelector('.default-content-wrapper');
   const titleTextContent = createElement('div', {
     classes: [`${blockName}__title`],
   });
   titleTextContent.innerHTML = titleText.innerHTML;
   block.append(titleTextContent);
-  if (headerWithMark && !defaultContentWrapper) {
-    addHeaderWithMark(titleTextContent);
-  }
 }
 
 export default async function decorate(block) {
