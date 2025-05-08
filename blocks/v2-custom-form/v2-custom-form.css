@@ -47,9 +47,21 @@
   outline: none;
 }
 
+.v2-custom-form-container input:hover,
+.v2-custom-form-container textarea:hover,
+.v2-custom-form-container select:hover,
+.v2-custom-form-container .custom-dropdown__button:hover {
+  outline: var(--form-border-hover);
+  outline-offset: -2px;
+}
+
 .field-wrapper .error {
   font-size: var(--form-error-font-size);
   color: var(--error-color);
+}
+
+.field-wrapper.invalid :is(input, textarea, select, .custom-dropdown__button) {
+  border-color: var(--error-color);
 }
 
 .form-submit-wrapper .button {
