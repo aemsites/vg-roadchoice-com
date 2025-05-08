@@ -138,7 +138,8 @@
   left: 2px;
 }
 
-.search__autosuggest-item {
+.search__autosuggest-item,
+.search__autosuggest-item--no-results {
   padding: 12px 15px;
 }
 

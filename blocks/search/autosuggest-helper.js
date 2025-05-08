@@ -45,7 +45,7 @@ function buildSuggestion(suggestions, form) {
       suggestionElements.push(item);
     });
   } else {
-    const noSuggestions = createElement('li', { classes: `${blockName}__autosuggest-item`, props: { role: 'option' } });
+    const noSuggestions = createElement('li', { classes: `${blockName}__autosuggest-item--no-results` });
     noSuggestions.textContent = getTextLabel('NoSuggestionText');
     suggestionElements.push(noSuggestions);
   }
