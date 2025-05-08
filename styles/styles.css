@@ -69,7 +69,9 @@
   --text-color: var(--secondary-black);
   --button-active: var(--primary-red);
   --button-hover: var(--secondary-red);
-  --border-focus: #015fcc;
+  --border-focus: #0e909f;
+  --c-placeholder-text: var(--c-medium-gray-2);
+  --error-color: var(--primary-red);
 
   /* FONTS */
 
@@ -129,6 +131,13 @@
   --easing-entrance: cubic-bezier(0, 0, 0.4, 1);
   --easing-exit: cubic-bezier(0.2, 0, 1, 1);
   --easing-standard: cubic-bezier(0.2, 0, 0.1, 1);
+
+  /* Forms */
+  --form-font-size: 15px;
+  --form-error-font-size: 12px;
+  --form-line-height: 22.5px;
+  --form-font-weight: 700;
+  --form-border-radius: 5px;
 }
 
 @media (min-width: 992px) {

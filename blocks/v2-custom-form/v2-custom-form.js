@@ -3,7 +3,7 @@ import { getTextLabel, createElement, variantsClassesToBEM } from '../../scripts
 import { getCustomDropdown } from '../../../common/custom-dropdown/custom-dropdown.js';
 
 const blockName = 'v2-custom-form';
-const variantClasses = ['double-column'];
+const variantClasses = ['double-column', 'centered'];
 
 const successMessage = (successTitle, successText) => `<h3 class='${blockName}__title ${blockName}__title--success'>${successTitle}</h3>
 <p class='${blockName}__text ${blockName}__text--success'>${successText}</p>
@@ -80,7 +80,7 @@ async function submissionFailure() {
 }
 
 // callback
-window.logResult = function logResult(json) {
+window.showResult = function showResult(json) {
   if (json.result === 'success') {
     submissionSuccess();
   } else if (json.result === 'error') {
@@ -110,7 +110,7 @@ function constructPayload(form) {
       }
     }
   });
-  payload.callback = 'logResult';
+  payload.callback = 'showResult';
   return { payload };
 }
 
@@ -136,9 +136,10 @@ function setPlaceholder(element, fd) {
 }
 
 const constraintsDef = Object.entries({
-  'email|text': [
+  'email|text|textarea': [
     ['Max', 'maxlength'],
     ['Min', 'minlength'],
+    ['Pattern', 'pattern'],
   ],
   'number|range|date': ['Max', 'Min', 'Step'],
   file: ['Accept', 'Multiple'],
@@ -153,7 +154,7 @@ function setConstraints(element, fd) {
     constraints
       .filter(([nm]) => fd[nm])
       .forEach(([nm, htmlNm]) => {
-        element.setAttribute(htmlNm, fd[nm]);
+        element.setAttribute(htmlNm, htmlNm === 'pattern' ? fd[nm].replace(/^\/|\/$/g, '') : fd[nm]);
       });
   }
 }
@@ -215,7 +216,7 @@ function createFieldWrapper(fd, tagName = 'div') {
 function createButton(fd) {
   const wrapper = createFieldWrapper(fd);
   const button = createElement('button', {
-    classes: ['button', 'primary'],
+    classes: ['button', 'button--primary'],
     props: {
       type: fd.Type,
       id: fd.Id,
@@ -257,6 +258,7 @@ const withFieldWrapper = (element) => (fd) => {
 
 const createTextArea = withFieldWrapper((fd) => {
   const textArea = createElement('textarea');
+  setConstraints(textArea, fd);
   setPlaceholder(textArea, fd);
   return textArea;
 });
@@ -363,6 +365,10 @@ async function createCustomDropdown(fd) {
     mandatory: fd.Mandatory,
   };
   const customDropdown = await getCustomDropdown(configFd);
+  const select = customDropdown.querySelector('select');
+  // since dropdown is async, it replaces a temporary select
+  // we need to set again the invalid listener
+  select.addEventListener('invalid', showError);
   return customDropdown;
 }
 
@@ -432,27 +438,31 @@ async function fetchForm(pathname) {
 }
 
 function showError(evnt) {
-  const field = evnt.target;
-  const fieldWrapper = field.parentNode;
+  let field = evnt.target;
+  const fieldWrapper = field.closest('.field-wrapper');
   fieldWrapper.classList.add('invalid');
   let errorSpan = fieldWrapper.querySelector('span.error');
   if (!errorSpan) {
-    errorSpan = document.createElement('span');
-    errorSpan.classList.add('error');
+    errorSpan = createElement('span', { classes: 'error' });
     fieldWrapper.append(errorSpan);
   }
   errorSpan.innerText = field.validationMessage;
+  if (fieldWrapper.classList.contains('form-custom-dropdown-wrapper')) {
+    field = fieldWrapper.querySelector('.custom-dropdown__button');
+  }
   field.addEventListener('blur', hideError);
 }
 
 function hideError(evnt) {
-  const field = evnt.target;
-  const fieldWrapper = field.parentNode;
+  const isCustomDropdown = evnt.target.classList.contains('custom-dropdown__button');
+  const field = isCustomDropdown ? evnt.target.parentNode.querySelector('select') : evnt.target;
+  const fieldWrapper = field.closest('.field-wrapper');
+  const isValid = field.checkValidity();
   // to avoid showing error messages on blur
-  if (field.checkValidity()) {
-    fieldWrapper.classList.remove('invalid');
-  } else {
-    fieldWrapper.classList.add('invalid');
+  fieldWrapper.classList.toggle('invalid', !isValid);
+  const errorSpan = fieldWrapper.querySelector('span.error');
+  if (errorSpan && isValid) {
+    errorSpan.remove();
   }
 }
 
@@ -525,6 +535,11 @@ async function createForm(formURL) {
     cleanErrorMessages(form);
     e.preventDefault();
     if (isValid) {
+      const block = form.closest(`.${blockName}`);
+      const formTitle = block.querySelector(`.${blockName}__title`);
+      if (formTitle) {
+        formTitle.remove();
+      }
       e.submitter.setAttribute('disabled', '');
       form.dataset.action = e.submitter.formAction || SUBMIT_ACTION || pathname.split('.json')[0];
       handleSubmit(form);
@@ -549,10 +564,20 @@ function decorateTitles(block) {
   }
 }
 
+function addTitleText(titleText, block) {
+  const titleTextContent = createElement('div', {
+    classes: [`${blockName}__title`],
+  });
+  titleTextContent.innerHTML = titleText.innerHTML;
+  block.append(titleTextContent);
+}
+
 export default async function decorate(block) {
   variantsClassesToBEM(block.classList, variantClasses, blockName);
   const formLink = block.querySelector('a[href$=".json"]');
   const thankYouPage = [...block.querySelectorAll('a')].filter((a) => a.href.includes('thank-you'));
+  const formTitleContainer = block.querySelector(':scope > div:first-child > div');
+  const isFormLinkInsideTitleContainer = formLink && formTitleContainer.contains(formLink);
 
   if (formLink) {
     decorateTitles(block);
@@ -563,6 +588,9 @@ export default async function decorate(block) {
     }
     // clean the content block before appending the form
     block.innerText = '';
+    if (formTitleContainer && !isFormLinkInsideTitleContainer) {
+      addTitleText(formTitleContainer, block);
+    }
     block.append(form);
 
     // in case the form has any kind of error, the form will be replaced with the error message
