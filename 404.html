@@ -12,8 +12,37 @@
   <script src="/scripts/scripts.js" type="module" crossorigin="use-credentials"></script>
   <script type="module">
     import { sampleRUM } from '/scripts/aem.js';
+    import { getTextLabel } from '/scripts/common.js'
 
     window.addEventListener('load', () => {
+      if (document.referrer) {
+        const { origin, pathname } = new URL(document.referrer);
+        if (origin === window.location.origin) {
+          const main = document.querySelector('main.error');
+
+          const observer = new MutationObserver((mutations, observer) => {
+            const fragmentContainer = document.querySelector('.fragment');
+            if (fragmentContainer) {
+              const backLinkTitle = getTextLabel('404-back-link');
+              const btnContainer = document.createElement('p');
+              const backBtn = document.createElement('a');
+              backBtn.classList.add('button', 'button--primary');
+              backBtn.href = pathname;
+              backBtn.textContent = backLinkTitle;
+              backBtn.title = backLinkTitle;
+              btnContainer.append(backBtn);
+              fragmentContainer.append(btnContainer);
+              observer.disconnect();
+            }
+          });
+
+          observer.observe(main, {
+            childList: true,
+            subtree: true
+          });
+        }
+      }
+
       const breadcrumb = document.querySelector('[data-not-found]');
       const observer = new MutationObserver((list) => {
         list.forEach((item) => {
@@ -80,18 +109,10 @@
     </div>
 
     <!-- default section -->
-    <div class="default">
-      <h1>OUR BAD.</h1>
-      <p><strong>Looks like something went wrong on our end. We hate it when that happens.</strong></p>
-      <ul>
-        <li>
-          <p>Use the navigation above to find what you're looking for or go back to the  <a href="/">home page</a></p>
-        </li>
-        <li>
-          <p>Still can’t find what you’re looking for?&nbsp;<a href="/contact-us">Contact us</a></p>
-        </li>
-      </ul>
-      <p>We love receiving emails almost as much as we hate 404 pages.</p>
+    <div>
+      <div class="fragment" style="--section-padding-top: ">
+        <a href="/404" style="visibility: hidden;">/404</a>
+      </div>
     </div>
 
     <!-- find dealer -->
