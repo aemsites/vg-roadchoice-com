@@ -12,7 +12,7 @@
   <script src="/scripts/scripts.js" type="module" crossorigin="use-credentials"></script>
   <script type="module">
     import { sampleRUM } from '/scripts/aem.js';
-    import { getTextLabel } from '/scripts/common.js'
+    import { getTextLabel, createElement } from '/scripts/common.js';
 
     window.addEventListener('load', () => {
       if (document.referrer) {
@@ -25,11 +25,14 @@
             if (fragmentContainer) {
               const backLinkTitle = getTextLabel('404-back-link');
               const btnContainer = document.createElement('p');
-              const backBtn = document.createElement('a');
-              backBtn.classList.add('button', 'button--primary');
-              backBtn.href = pathname;
+              const backBtn = createElement('a', {
+                classes: ['button', 'button--primary'],
+                props: {
+                  href: pathname,
+                  title: backLinkTitle
+                }
+              });
               backBtn.textContent = backLinkTitle;
-              backBtn.title = backLinkTitle;
               btnContainer.append(backBtn);
               fragmentContainer.append(btnContainer);
               observer.disconnect();
