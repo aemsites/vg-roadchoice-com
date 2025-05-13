@@ -40,19 +40,20 @@
   padding: 16px 16px 14px;
 }
 
-.v2-custom-form-container input:focus,
-.v2-custom-form-container textarea:focus,
-.v2-custom-form-container select:focus {
-  border-color: var(--border-focus);
-  outline: none;
-}
-
 .v2-custom-form-container input:hover,
 .v2-custom-form-container textarea:hover,
 .v2-custom-form-container select:hover,
 .v2-custom-form-container .custom-dropdown__button:hover {
   outline: var(--form-border-hover);
   outline-offset: -2px;
+}
+
+.v2-custom-form-container input:focus,
+.v2-custom-form-container textarea:focus,
+.v2-custom-form-container select:focus,
+.v2-custom-form-container .custom-dropdown__button:hover {
+  border-color: var(--border-focus);
+  outline: none;
 }
 
 .field-wrapper .error {
