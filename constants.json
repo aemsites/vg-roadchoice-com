@@ -85,6 +85,18 @@
       {
         "name": "MAX_PRODUCTS_PER_QUERY",
         "value": "12"
+      },
+      {
+        "name": "PART_REFERENCE_SUGGEST_QUERY_NAME",
+        "value": "rcPartSuggest"
+      },
+      {
+        "name": "CROSS_REFERENCE_SUGGEST_QUERY_NAME",
+        "value": "rcCrossReferenceSuggest"
+      },
+      {
+        "name": "AUTOSUGGEST_SIZE_SUGGESTION",
+        "value": "5"
       }
     ]
   },
