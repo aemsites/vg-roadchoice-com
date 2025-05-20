@@ -1,7 +1,7 @@
 {
   "name": "roadchoice",
   "private": true,
-  "version": "16.0.0",
+  "version": "17.0.0",
   "description": "",
   "engines": {
     "node": ">=v20.15.1 <23",
@@ -12,9 +12,9 @@
     "dev:ca": "AEM_PAGES_URL=https://main--roadchoice-ca--volvogroup.aem.page aem up",
     "dev:mx": "AEM_PAGES_URL=https://main--roadchoice-mx--volvogroup.aem.page aem up",
     "lint:js": "eslint .",
-    "lint:css": "stylelint blocks/**/*.css styles/*.css",
+    "lint:css": "stylelint common/**/*.css blocks/**/*.css styles/*.css",
     "lint:js:fix": "eslint . --fix",
-    "lint:css:fix": "stylelint blocks/**/*.css styles/*.css --fix",
+    "lint:css:fix": "stylelint common/**/*.css blocks/**/*.css styles/*.css --fix",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:fix": "npm run lint:js:fix && npm run lint:css:fix",
     "format": "prettier --write \"**/*.{js,jsx}\"",
