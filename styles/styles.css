@@ -57,6 +57,7 @@
   --c-light-gray-2: #e1dfdd;
   --c-medium-gray-1: #727376;
   --c-medium-gray-2: #808080;
+  --c-medium-gray-3: #8d8d8d;
   --c-light-red: #deaeb1;
   --c-yellow: #f6ca45;
 
@@ -69,7 +70,9 @@
   --text-color: var(--secondary-black);
   --button-active: var(--primary-red);
   --button-hover: var(--secondary-red);
-  --border-focus: #015fcc;
+  --border-focus: #0e909f;
+  --c-placeholder-text: var(--c-medium-gray-2);
+  --error-color: var(--primary-red);
 
   /* FONTS */
 
@@ -129,6 +132,14 @@
   --easing-entrance: cubic-bezier(0, 0, 0.4, 1);
   --easing-exit: cubic-bezier(0.2, 0, 1, 1);
   --easing-standard: cubic-bezier(0.2, 0, 0.1, 1);
+
+  /* Forms */
+  --form-font-size: 15px;
+  --form-error-font-size: 12px;
+  --form-line-height: 22.5px;
+  --form-font-weight: 700;
+  --form-border-radius: 5px;
+  --form-border-hover: 2px solid var(--c-medium-gray-3);
 }
 
 @media (min-width: 992px) {

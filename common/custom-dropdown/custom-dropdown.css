@@ -15,15 +15,19 @@
   margin-bottom: 16px;
 }
 
+.custom-dropdown::placeholder {
+  color: var(--c-placeholder-text);
+}
+
 .custom-dropdown::after {
   display: block;
   content: url('../../icons/chevron-down.svg');
   position: absolute;
-  top: 38px;
+  top: 10px;
   right: 10px;
   height: 32px;
   width: 32px;
-  border-radius: var(--border-radius-small);
+  border-radius: var(--form-border-radius);
   pointer-events: none;
   padding: 4px;
 }
@@ -36,23 +40,24 @@
   display: flex;
   justify-content: space-between;
   position: relative;
-  background: var(--c-white);
-  letter-spacing: var(--f-body-letter-spacing);
-  line-height: var(--body-regular-line-height);
+  background: var(--primary-white);
+  line-height: var(--form-line-height);
   text-align: left;
-  color: var(--c-grey-4);
+  color: var(--c-medium-gray-1);
   padding: 16px;
-  border-radius: 4px;
-  border: 1px solid var(--c-grey-2);
-}
-
-.custom-dropdown__button:hover {
-  outline: 2px solid var(--border-focus);
+  border-radius: var(--form-border-radius);
+  border: 1px solid var(--c-medium-gray-1);
+  font-size: var(--form-font-size);
+  max-height: 50px;
 }
 
 .custom-dropdown__button:focus {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
+  border-color: var(--border-focus);
+  outline: none;
+}
+
+.custom-dropdown__button.placeholder-state {
+  color: var(--c-placeholder-text);
 }
 
 .custom-dropdown__option-list {
@@ -62,8 +67,8 @@
   position: absolute;
   top: calc(100% + 8px);
   width: 100%;
-  background-color: var(--c-white);
-  border-radius: var(--border-radius-small);
+  background-color: var(--primary-white);
+  border-radius: var(--form-border-radius);
   box-shadow:
     0 0.3px 2px 0 var(--color-bg-shadow, var(--color-bg-shadow)),
     0 3px 8px 0 var(--color-bg-shadow, var(--color-bg-shadow));
@@ -76,6 +81,7 @@
 }
 
 .custom-dropdown__option {
+  font-size: var(--form-font-size);
   padding: 10px 16px;
 }
 
@@ -86,7 +92,7 @@
 }
 
 .custom-dropdown__option[aria-selected='true'] {
-  background-color: var(--c-grey-100);
+  background-color: var(--c-light-gray);
   padding-right: 30px;
   position: relative;
 }
@@ -101,8 +107,8 @@
 }
 
 .custom-dropdown__option:hover {
-  background-color: var(--c-grey-50);
   cursor: pointer;
+  background-color: var(--c-light-gray);
 }
 
 @media (min-width: 744px) {
