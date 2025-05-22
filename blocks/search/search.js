@@ -3,9 +3,9 @@ import { fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
 import productCard from '../results-list/product-card.js';
 import { noResultsTemplate } from '../../templates/search-results/search-results.js';
 import { buildFilter } from '../filters/filters.js';
-import { handleArrowKeys, fetchAutoSuggestions, buildSuggestion } from './autosuggest-helper.js';
+import { handleArrowKeys, fetchAutoSuggestions, buildSuggestion, applyFuzzySearch } from './autosuggest-helper.js';
 
-const blockName = 'search';
+export const blockName = 'search';
 let isCrossRefActive = true;
 
 const PLACEHOLDERS = {
@@ -128,25 +128,32 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
   const urlParams = new URLSearchParams(window.location.search);
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
-  const query = urlParams.get('q');
-  const offsetParam = urlParams.get('offset');
-  const make = urlParams.get('make');
-  const model = urlParams.get('model');
-  const searchType = urlParams.get('st');
-  const category = urlParams.get('category');
-  const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+  const fuzzyTerm = urlParams.get('fuzzyTerm');
 
-  const loadingElement = showLoader(resultsSection);
-  const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
-  const searchParams = { query, offset, make, model, searchType, category };
-  const { results, categories } = await fetchSearchResults(searchParams);
-  loadingElement?.remove();
+  if (fuzzyTerm) {
+    applyFuzzySearch(fuzzyTerm);
+  } else {
+    const query = urlParams.get('q');
+    const offsetParam = urlParams.get('offset');
+    const make = urlParams.get('make');
+    const model = urlParams.get('model');
+    const searchType = urlParams.get('st');
+    const category = urlParams.get('category');
+    const fuzzySearch = urlParams.get('fuzzySearch') || false;
+    const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
-  if (!isFirstSet) {
-    updateUrl(targetOffset);
+    const loadingElement = showLoader(resultsSection);
+    const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
+    const searchParams = { query, offset, make, model, searchType, category, fuzzySearch: fuzzySearch };
+    const { results, categories } = await fetchSearchResults(searchParams);
+    loadingElement?.remove();
+
+    if (!isFirstSet) {
+      updateUrl(targetOffset);
+    }
+    updateSearchResults(results, searchType, query, make, model, resultsSection, resultsList, targetOffset);
+    updateFilters(categories);
   }
-  updateSearchResults(results, searchType, query, make, model, resultsSection, resultsList, targetOffset);
-  updateFilters(categories);
 };
 
 const updateUrl = (targetOffset) => {
@@ -229,7 +236,7 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
   }
 };
 
-const showNoResultsMessage = (query, searchResultsSection) => {
+export const showNoResultsMessage = (query, searchResultsSection) => {
   const titleElement = searchResultsSection?.querySelector('.title');
   const titleText = getTextLabel('no_results_title').replace('[$]', query ? `"${query}"` : '');
   if (titleElement) titleElement.innerText = titleText;
@@ -287,19 +294,25 @@ function getModelFilterValue(items) {
 }
 
 function addFormListener(form) {
-  form.onsubmit = (e) => {
+  form.onsubmit = async (e) => {
     e.preventDefault();
     const items = [...form];
     const value = getFieldValue(`${blockName}__input-${isCrossRefActive ? 'cr' : 'pn'}__input`, items);
-    const makeFilterValue = getMakeFilterValue(items);
-    const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
-    const searchType = isCrossRefActive
-      ? 'cross'
-      : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
-    const offset = 0;
+    const wrapper = form.querySelector(`.${blockName}__autosuggest-list`);
     const url = new URL(window.location.href);
     url.pathname = getLocaleContextedUrl('/search/');
-    url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
+
+    if (!isCrossRefActive && !wrapper?.children?.length && !url.search.includes('fuzzyTerm')) {
+      url.search = `?fuzzyTerm=${value}`;
+    } else {
+      const makeFilterValue = getMakeFilterValue(items);
+      const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
+      const searchType = isCrossRefActive
+        ? 'cross'
+        : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
+      const offset = 0;
+      url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
+    }
     window.location.href = url;
   };
 }
