@@ -156,3 +156,30 @@ export async function fetchPartReferenceSuggest({ term, make, model, category })
 
   return { suggestions: data.data[PART_REFERENCE_SUGGEST_QUERY_NAME] };
 }
+
+export async function fetchFuzzySuggest({ q }) {
+  const { SEARCH_URL_DEV, RC_PART_FUZZY_SEARCH, AUTOSUGGEST_SIZE_SUGGESTION } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${RC_PART_FUZZY_SEARCH}($q: String!) {
+        ${RC_PART_FUZZY_SEARCH}(q: $q) {
+          suggestions {
+            highlighted
+            text
+          }
+        }
+      }
+    `,
+    variables: {
+      q,
+      limit: parseInt(AUTOSUGGEST_SIZE_SUGGESTION),
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { facets: [], error };
+
+  return data.data[RC_PART_FUZZY_SEARCH];
+}
