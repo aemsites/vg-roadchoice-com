@@ -295,9 +295,12 @@ function checkOneTrustGroup(groupName, cookieCheck = false) {
  * @param {string} route get the Json data from the route
  * @returns {Object} the json data object
  */
-const getJsonFromUrl = async (route) => {
+const getJsonFromUrl = async (route, params = {}) => {
+  const requestUrl = new URL(route);
+  requestUrl.search = new URLSearchParams(params).toString();
+
   try {
-    const response = await fetch(route);
+    const response = await fetch(requestUrl);
     if (!response.ok) return null;
     const json = await response.json();
     return json;

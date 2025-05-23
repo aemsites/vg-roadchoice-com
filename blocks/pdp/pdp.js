@@ -23,9 +23,12 @@ function filterModelsBySKU(models, sku) {
 
 async function getPDPData(pathSegments) {
   const { category, sku } = pathSegments;
+  const requestUrl = window.location.origin + getLocaleContextedUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`);
 
   try {
-    const json = await getJsonFromUrl(getLocaleContextedUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`));
+    const json = await getJsonFromUrl(requestUrl, {
+      limit: 100000,
+    });
     if (!json) return null;
     return findPartBySKU(json?.data, sku);
   } catch (error) {
