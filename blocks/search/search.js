@@ -106,6 +106,10 @@ function addSearchByListeners(wrapper, form) {
       form.querySelector(`.${blockName}__make-filter__select`).selectedIndex = 0;
       resetModelsFilter(form.querySelector(`.${blockName}__model-filter__select`));
     }
+
+    if (e.target.classList.contains(`${blockName}__cross-reference__btn`)) {
+      document.querySelector(`.${blockName}__fuzzysearch-results-wrapper`)?.remove();
+    }
   };
 }
 
