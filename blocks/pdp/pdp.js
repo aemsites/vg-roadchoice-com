@@ -8,6 +8,17 @@ const docTypes = {
 };
 const docRange = document.createRange();
 
+function getJsonData(route) {
+  const requestUrl = new URL(window.location.origin + route);
+  requestUrl.search = new URLSearchParams({
+    limit: 100000,
+  }).toString();
+
+  return getJsonFromUrl(requestUrl, {
+    limit: 100000,
+  });
+}
+
 function getQueryParams() {
   const urlParams = new URLSearchParams(window.location.search);
   return { category: urlParams.get('category'), sku: urlParams.get('sku') };
@@ -25,7 +36,7 @@ async function getPDPData(pathSegments) {
   const { category, sku } = pathSegments;
 
   try {
-    const json = await getJsonFromUrl(getLocaleContextedUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`));
+    const json = await getJsonData(getLocaleContextedUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`));
     if (!json) return null;
     return findPartBySKU(json?.data, sku);
   } catch (error) {
@@ -171,7 +182,7 @@ function filterByDocType(data, type, category) {
 
 async function fetchDocs(category) {
   try {
-    const json = await getJsonFromUrl(getLocaleContextedUrl('/catalogs-categories.json'));
+    const json = await getJsonData(getLocaleContextedUrl('/catalogs-categories.json'));
     if (!json) return null;
     const data = json?.data;
     return {
@@ -220,7 +231,7 @@ function renderDocs(docs) {
 // Check if product has catalog, product sheet or e-catalogs section
 async function fetchSDS(category) {
   try {
-    const json = await getJsonFromUrl(getLocaleContextedUrl('/sds-categories.json'));
+    const json = await getJsonData(getLocaleContextedUrl('/sds-categories.json'));
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
@@ -253,7 +264,7 @@ function renderSDS(sdsList) {
 
 async function fetchBlogs(category) {
   try {
-    const json = await getJsonFromUrl(getLocaleContextedUrl('/blog/query-index.json'));
+    const json = await getJsonData(getLocaleContextedUrl('/blog/query-index.json'));
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
@@ -297,7 +308,7 @@ function renderBlogs(blogList) {
 
 async function getPartFitConfig(category) {
   try {
-    const json = await getJsonFromUrl(getLocaleContextedUrl('/product-fit-vehicles/product-fit-vehicles-config.json'));
+    const json = await getJsonData(getLocaleContextedUrl('/product-fit-vehicles/product-fit-vehicles-config.json'));
     if (!json) return null;
     return filterByCategory(json?.data, category);
   } catch (error) {
@@ -312,7 +323,7 @@ async function fetchPartFit(pathSegments) {
   const hasPartFit = await getPartFitConfig(category);
   if (hasPartFit?.length === 0) return null;
   try {
-    const json = await getJsonFromUrl(getLocaleContextedUrl(`/product-fit-vehicles/${category.replace(/[^\w]/g, '-')}-application-data.json`));
+    const json = await getJsonData(getLocaleContextedUrl(`/product-fit-vehicles/${category.replace(/[^\w]/g, '-')}-application-data.json`));
     if (!json) return null;
     return filterModelsBySKU(json?.data, sku);
   } catch (error) {
