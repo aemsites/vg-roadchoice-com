@@ -79,7 +79,7 @@ function handleFuzzyClick(e, searchBtn, form) {
 
 export async function applyFuzzySearch(fuzzyTerm) {
   const { suggestions } = await fetchFuzzySuggest({ q: fuzzyTerm });
-  const searchResultsSection = document.querySelector('.search-results-section');
+  const searchResultsSection = document.querySelector(`.${blockName}-results-wrapper`);
   if (suggestions && suggestions?.length) {
     const fuzzyWrapper = createElement('div', { classes: [`${blockName}__fuzzysearch-results-wrapper`] });
     const fuzzyText = createElement('span', { classes: [`${blockName}__fuzzysearch-results-text`] });

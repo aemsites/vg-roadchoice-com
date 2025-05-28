@@ -143,12 +143,12 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     const model = urlParams.get('model');
     const searchType = urlParams.get('st');
     const category = urlParams.get('category');
-    const fuzzySearch = urlParams.get('fuzzySearch') || false;
+    const applyFuzziness = urlParams.get('fuzzyness') ? true : false;
     const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
     const loadingElement = showLoader(resultsSection);
     const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
-    const searchParams = { query, offset, make, model, searchType, category, fuzzySearch: fuzzySearch };
+    const searchParams = { query, offset, make, model, searchType, category, applyFuzziness };
     const { results, categories } = await fetchSearchResults(searchParams);
     loadingElement?.remove();
 
@@ -305,8 +305,9 @@ function addFormListener(form) {
     const wrapper = form.querySelector(`.${blockName}__autosuggest-list`);
     const url = new URL(window.location.href);
     url.pathname = getLocaleContextedUrl('/search/');
+    const fuzzyTerm = url.searchParams.get('fuzzyTerm');
 
-    if (!isCrossRefActive && !wrapper?.children?.length && !url.search.includes('fuzzyTerm')) {
+    if (!isCrossRefActive && !wrapper?.children?.length && !fuzzyTerm) {
       url.search = `?fuzzyTerm=${value}`;
     } else {
       const makeFilterValue = getMakeFilterValue(items);
@@ -316,6 +317,9 @@ function addFormListener(form) {
         : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
       const offset = 0;
       url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
+      if (fuzzyTerm) {
+        url.search = `${url.search}&fuzzyness=${true}`;
+      }
     }
     window.location.href = url;
   };

@@ -159,6 +159,7 @@
 
 .search__fuzzysearch-results-list {
   display: flex;
+  flex-wrap: wrap;
   gap: 15px;
   color: var(--primary-red);
   font-weight: 700;
