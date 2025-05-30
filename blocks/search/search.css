@@ -151,6 +151,20 @@
   background-color: var(--secondary-light-gray);
 }
 
+.search__fuzzysearch-results-wrapper {
+  display: flex;
+  gap: 30px;
+  padding-bottom: 30px;
+}
+
+.search__fuzzysearch-results-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  color: var(--primary-red);
+  font-weight: 700;
+  cursor: pointer;
+}
 
 @media (min-width: 360px) {
   .search .search__input-cr__wrapper,

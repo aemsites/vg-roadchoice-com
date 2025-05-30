@@ -28,15 +28,15 @@ async function fetchGraphQLData(graphqlQuery, endpoint) {
   }
 }
 
-export async function fetchSearchResults({ query, offset, make, model, searchType, category }) {
+export async function fetchSearchResults({ query, offset, make, model, searchType, category, applyFuzziness }) {
   const { SEARCH_URL_DEV, CROSS_REFERENCE_QUERY_NAME, PART_NUMBER_QUERY_NAME, MAX_PRODUCTS_PER_QUERY } = SEARCH_CONFIG;
 
   const queryName = searchType === 'cross' ? CROSS_REFERENCE_QUERY_NAME : PART_NUMBER_QUERY_NAME;
 
   const graphqlQuery = {
     query: `
-      query ${queryName}($q: String!, $limit: Int, $offset: Int${searchType === 'parts' ? ', $makeFilter: String, $modelFilter: String' : ''}${category ? ', $categoryFilter: String' : ''}) {
-        ${queryName}(q: $q, limit: $limit, offset: $offset${searchType === 'parts' ? ', makeFilter: $makeFilter, modelFilter: $modelFilter' : ''}${category ? ', categoryFilter: $categoryFilter' : ''}) {
+      query ${queryName}($q: String!, $limit: Int, $offset: Int, ${searchType === 'parts' ? ', $makeFilter: String, $modelFilter: String' : ''}${category ? ', $categoryFilter: String' : ''}${applyFuzziness ? ', $applyFuzziness: Boolean' : ''}) {
+        ${queryName}(q: $q, limit: $limit, offset: $offset, ${searchType === 'parts' ? ', makeFilter: $makeFilter, modelFilter: $modelFilter' : ''}${category ? ', categoryFilter: $categoryFilter' : ''}${applyFuzziness ? ', applyFuzziness: $applyFuzziness' : ''}) {
           count
           items {
             score
@@ -65,6 +65,7 @@ export async function fetchSearchResults({ query, offset, make, model, searchTyp
       offset,
       ...(searchType === 'parts' && { makeFilter: make, modelFilter: model }),
       ...(category && { categoryFilter: category }),
+      ...(applyFuzziness && { applyFuzziness }),
     },
   };
 
@@ -155,4 +156,31 @@ export async function fetchPartReferenceSuggest({ term, make, model, category })
   if (error) return { facets: [], error };
 
   return { suggestions: data.data[PART_REFERENCE_SUGGEST_QUERY_NAME] };
+}
+
+export async function fetchFuzzySuggest({ q }) {
+  const { SEARCH_URL_DEV, RC_PART_FUZZY_SEARCH, AUTOSUGGEST_SIZE_SUGGESTION } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${RC_PART_FUZZY_SEARCH}($q: String!, $limit: Int) {
+        ${RC_PART_FUZZY_SEARCH}(q: $q,limit: $limit) {
+          suggestions {
+            highlighted
+            text
+          }
+        }
+      }
+    `,
+    variables: {
+      q,
+      limit: parseInt(AUTOSUGGEST_SIZE_SUGGESTION),
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { facets: [], error };
+
+  return data.data[RC_PART_FUZZY_SEARCH];
 }
