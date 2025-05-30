@@ -35,8 +35,8 @@ export async function fetchSearchResults({ query, offset, make, model, searchTyp
 
   const graphqlQuery = {
     query: `
-      query ${queryName}($q: String!, $limit: Int, $offset: Int, $applyFuzziness: Boolean,${searchType === 'parts' ? ', $makeFilter: String, $modelFilter: String' : ''}${category ? ', $categoryFilter: String' : ''}) {
-        ${queryName}(q: $q, limit: $limit, offset: $offset, applyFuzziness: $applyFuzziness${searchType === 'parts' ? ', makeFilter: $makeFilter, modelFilter: $modelFilter' : ''}${category ? ', categoryFilter: $categoryFilter' : ''}) {
+      query ${queryName}($q: String!, $limit: Int, $offset: Int, ${searchType === 'parts' ? ', $makeFilter: String, $modelFilter: String' : ''}${category ? ', $categoryFilter: String' : ''}) {
+        ${queryName}(q: $q, limit: $limit, offset: $offset, ${searchType === 'parts' ? ', makeFilter: $makeFilter, modelFilter: $modelFilter' : ''}${category ? ', categoryFilter: $categoryFilter' : ''}) {
           count
           items {
             score
@@ -63,7 +63,6 @@ export async function fetchSearchResults({ query, offset, make, model, searchTyp
       q: query,
       limit: parseInt(MAX_PRODUCTS_PER_QUERY),
       offset,
-      applyFuzziness,
       ...(searchType === 'parts' && { makeFilter: make, modelFilter: model }),
       ...(category && { categoryFilter: category }),
     },
