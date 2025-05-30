@@ -80,6 +80,7 @@ function handleFuzzyClick(e, searchBtn, form) {
 export async function applyFuzzySearch(fuzzyTerm) {
   const { suggestions } = await fetchFuzzySuggest({ q: fuzzyTerm });
   const searchResultsSection = document.querySelector(`.${blockName}-results-wrapper`);
+  const loadingElement = document.querySelector('.loading');
   if (suggestions && suggestions?.length) {
     const fuzzyWrapper = createElement('div', { classes: [`${blockName}__fuzzysearch-results-wrapper`] });
     const fuzzyText = createElement('span', { classes: [`${blockName}__fuzzysearch-results-text`] });
@@ -94,7 +95,6 @@ export async function applyFuzzySearch(fuzzyTerm) {
       list.append(listElement);
     });
     const pagination = document.querySelector('.pagination-wrapper');
-    const loadingElement = document.querySelector('.loading');
     const partBtn = document.querySelector(`.${blockName}__part-number__btn`);
 
     pagination?.classList.add('hide');
@@ -104,7 +104,9 @@ export async function applyFuzzySearch(fuzzyTerm) {
     fuzzyWrapper.append(fuzzyText, list);
     searchResultsSection?.prepend(fuzzyWrapper);
   } else {
-    showNoResultsMessage('', searchResultsSection);
+    const searchList = searchResultsSection.querySelector(`.${blockName}-results-section`);
+    showNoResultsMessage('', searchList);
+    loadingElement?.remove();
   }
 }
 

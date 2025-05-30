@@ -134,7 +134,7 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
   const resultsList = document.querySelector('.results-list__list');
   const fuzzyTerm = urlParams.get('fuzzyTerm');
 
-  if (fuzzyTerm) {
+  if (fuzzyTerm?.length) {
     applyFuzzySearch(fuzzyTerm);
   } else {
     const query = urlParams.get('q');
@@ -143,12 +143,17 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     const model = urlParams.get('model');
     const searchType = urlParams.get('st');
     const category = urlParams.get('category');
-    const applyFuzziness = urlParams.get('fuzzyness') ? true : false;
     const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
     const loadingElement = showLoader(resultsSection);
     const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
-    const searchParams = { query, offset, make, model, searchType, category, applyFuzziness };
+    const searchParams = { query, offset, make, model, searchType, category };
+
+    if (!isCrossRefActive) {
+      const applyFuzziness = urlParams.get('fuzzyness') ? true : false;
+      searchParams.applyFuzziness = applyFuzziness;
+    }
+
     const { results, categories } = await fetchSearchResults(searchParams);
     loadingElement?.remove();
 
