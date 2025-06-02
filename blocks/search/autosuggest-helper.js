@@ -103,11 +103,8 @@ export async function applyFuzzySearch(fuzzyTerm) {
 
     fuzzyWrapper.append(fuzzyText, list);
     searchResultsSection?.prepend(fuzzyWrapper);
-  } else {
-    const searchList = searchResultsSection.querySelector(`.${blockName}-results-section`);
-    showNoResultsMessage('', searchList);
-    loadingElement?.remove();
   }
+  return suggestions;
 }
 
 export { fetchAutoSuggestions, buildSuggestion, handleArrowKeys };

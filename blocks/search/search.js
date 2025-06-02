@@ -133,9 +133,17 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
   const fuzzyTerm = urlParams.get('fuzzyTerm');
+  const loadingElement = showLoader(resultsSection);
 
   if (fuzzyTerm?.length) {
-    applyFuzzySearch(fuzzyTerm);
+    const suggestions = await applyFuzzySearch(fuzzyTerm);
+    if (!suggestions?.length) {
+      const url = new URL(window.location);
+      url.searchParams.delete('fuzzyTerm');
+      url.searchParams.set('q', fuzzyTerm);
+      window.history.pushState({}, '', url);
+      getAndApplySearchResults({ isFirstSet: true });
+    }
   } else {
     const query = urlParams.get('q');
     const offsetParam = urlParams.get('offset');
@@ -145,7 +153,6 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     const category = urlParams.get('category');
     const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
-    const loadingElement = showLoader(resultsSection);
     const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
     const searchParams = { query, offset, make, model, searchType, category };
 
@@ -311,13 +318,12 @@ function addFormListener(form) {
     const url = new URL(window.location.href);
     url.pathname = getLocaleContextedUrl('/search/');
     const fuzzyTerm = url.searchParams.get('fuzzyTerm');
-    const fuzzyResults = document.querySelector(`.${blockName}__fuzzysearch-results-wrapper`);
+    const makeFilterValue = getMakeFilterValue(items);
+    const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
 
-    if (!isCrossRefActive && !wrapper?.children?.length && !fuzzyResults) {
-      url.search = `?fuzzyTerm=${value}`;
+    if (!isCrossRefActive && !wrapper?.children?.length && !fuzzyTerm) {
+      url.search = `?fuzzyTerm=${value}&st=parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
     } else {
-      const makeFilterValue = getMakeFilterValue(items);
-      const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
       const searchType = isCrossRefActive
         ? 'cross'
         : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
