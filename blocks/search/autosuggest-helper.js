@@ -1,6 +1,6 @@
 import { fetchCrossReferenceSuggest, fetchPartReferenceSuggest, fetchFuzzySuggest } from './graphql-api.js';
 import { createElement, getTextLabel } from '../../scripts/common.js';
-import { showNoResultsMessage, blockName } from './search.js';
+import { blockName } from './search.js';
 
 function handleArrowKeys(list, event, activeClassName) {
   const activeItem = list.find((item) => item.classList.contains(activeClassName));
@@ -28,6 +28,9 @@ function handleArrowKeys(list, event, activeClassName) {
 function handleClickSuggestion(e, searchBtn, inputElement) {
   if (inputElement) {
     inputElement.value = e.target.textContent;
+    const url = new URL(window.location);
+    url.searchParams.set('fuzzyness', true);
+    window.history.pushState({}, '', url);
     searchBtn?.click();
   }
 }
