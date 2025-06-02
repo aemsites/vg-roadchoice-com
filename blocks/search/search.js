@@ -311,8 +311,9 @@ function addFormListener(form) {
     const url = new URL(window.location.href);
     url.pathname = getLocaleContextedUrl('/search/');
     const fuzzyTerm = url.searchParams.get('fuzzyTerm');
+    const fuzzyResults = document.querySelector(`.${blockName}__fuzzysearch-results-wrapper`);
 
-    if (!isCrossRefActive && !wrapper?.children?.length && !fuzzyTerm) {
+    if (!isCrossRefActive && !wrapper?.children?.length && !fuzzyResults) {
       url.search = `?fuzzyTerm=${value}`;
     } else {
       const makeFilterValue = getMakeFilterValue(items);
