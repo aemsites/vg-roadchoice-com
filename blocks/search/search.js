@@ -3,9 +3,9 @@ import { fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
 import productCard from '../results-list/product-card.js';
 import { noResultsTemplate } from '../../templates/search-results/search-results.js';
 import { buildFilter } from '../filters/filters.js';
-import { handleArrowKeys, fetchAutoSuggestions, buildSuggestion } from './autosuggest-helper.js';
+import { handleArrowKeys, fetchAutoSuggestions, buildSuggestion, applyFuzzySearch } from './autosuggest-helper.js';
 
-const blockName = 'search';
+export const blockName = 'search';
 let isCrossRefActive = true;
 
 const PLACEHOLDERS = {
@@ -106,6 +106,10 @@ function addSearchByListeners(wrapper, form) {
       form.querySelector(`.${blockName}__make-filter__select`).selectedIndex = 0;
       resetModelsFilter(form.querySelector(`.${blockName}__model-filter__select`));
     }
+
+    if (e.target.classList.contains(`${blockName}__cross-reference__btn`)) {
+      document.querySelector(`.${blockName}__fuzzysearch-results-wrapper`)?.remove();
+    }
   };
 }
 
@@ -128,25 +132,44 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
   const urlParams = new URLSearchParams(window.location.search);
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
-  const query = urlParams.get('q');
-  const offsetParam = urlParams.get('offset');
-  const make = urlParams.get('make');
-  const model = urlParams.get('model');
-  const searchType = urlParams.get('st');
-  const category = urlParams.get('category');
-  const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+  const fuzzyTerm = urlParams.get('fuzzyTerm');
 
-  const loadingElement = showLoader(resultsSection);
-  const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
-  const searchParams = { query, offset, make, model, searchType, category };
-  const { results, categories } = await fetchSearchResults(searchParams);
-  loadingElement?.remove();
+  if (fuzzyTerm?.length) {
+    const suggestions = await applyFuzzySearch(fuzzyTerm);
+    if (!suggestions?.length) {
+      const url = new URL(window.location);
+      url.searchParams.delete('fuzzyTerm');
+      url.searchParams.set('q', fuzzyTerm);
+      window.history.pushState({}, '', url);
+      getAndApplySearchResults({ isFirstSet: true });
+    }
+  } else {
+    const query = urlParams.get('q');
+    const offsetParam = urlParams.get('offset');
+    const make = urlParams.get('make');
+    const model = urlParams.get('model');
+    const searchType = urlParams.get('st');
+    const category = urlParams.get('category');
+    const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
-  if (!isFirstSet) {
-    updateUrl(targetOffset);
+    const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
+    const searchParams = { query, offset, make, model, searchType, category };
+    const loadingElement = showLoader(resultsSection);
+
+    if (!isCrossRefActive) {
+      const applyFuzziness = urlParams.get('fuzzyness') ? true : false;
+      searchParams.applyFuzziness = applyFuzziness;
+    }
+
+    const { results, categories } = await fetchSearchResults(searchParams);
+    loadingElement?.remove();
+
+    if (!isFirstSet) {
+      updateUrl(targetOffset);
+    }
+    updateSearchResults(results, searchType, query, make, model, resultsSection, resultsList, targetOffset);
+    updateFilters(categories);
   }
-  updateSearchResults(results, searchType, query, make, model, resultsSection, resultsList, targetOffset);
-  updateFilters(categories);
 };
 
 const updateUrl = (targetOffset) => {
@@ -229,7 +252,7 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
   }
 };
 
-const showNoResultsMessage = (query, searchResultsSection) => {
+export const showNoResultsMessage = (query, searchResultsSection) => {
   const titleElement = searchResultsSection?.querySelector('.title');
   const titleText = getTextLabel('no_results_title').replace('[$]', query ? `"${query}"` : '');
   if (titleElement) titleElement.innerText = titleText;
@@ -287,19 +310,30 @@ function getModelFilterValue(items) {
 }
 
 function addFormListener(form) {
-  form.onsubmit = (e) => {
+  form.onsubmit = async (e) => {
     e.preventDefault();
     const items = [...form];
     const value = getFieldValue(`${blockName}__input-${isCrossRefActive ? 'cr' : 'pn'}__input`, items);
-    const makeFilterValue = getMakeFilterValue(items);
-    const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
-    const searchType = isCrossRefActive
-      ? 'cross'
-      : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
-    const offset = 0;
+    const wrapper = form.querySelector(`.${blockName}__autosuggest-list`);
     const url = new URL(window.location.href);
     url.pathname = getLocaleContextedUrl('/search/');
-    url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
+    const fuzzyTerm = url.searchParams.get('fuzzyTerm');
+    const fuzzyness = url.searchParams.get('fuzzyness');
+    const makeFilterValue = getMakeFilterValue(items);
+    const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
+
+    if (!isCrossRefActive && !wrapper?.children?.length && !fuzzyness) {
+      url.search = `?fuzzyTerm=${value}&st=parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
+    } else {
+      const searchType = isCrossRefActive
+        ? 'cross'
+        : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
+      const offset = 0;
+      url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
+      if (fuzzyTerm) {
+        url.search = `${url.search}&fuzzyness=${true}`;
+      }
+    }
     window.location.href = url;
   };
 }

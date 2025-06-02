@@ -97,6 +97,10 @@
       {
         "name": "AUTOSUGGEST_SIZE_SUGGESTION",
         "value": "5"
+      },
+      {
+        "name": "RC_PART_FUZZY_SEARCH",
+        "value": "rcpartdidyoumean"
       }
     ]
   },
