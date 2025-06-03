@@ -3,8 +3,9 @@ import { fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
 import productCard from '../results-list/product-card.js';
 import { noResultsTemplate } from '../../templates/search-results/search-results.js';
 import { buildFilter } from '../filters/filters.js';
+import { handleArrowKeys, fetchAutoSuggestions, buildSuggestion, applyFuzzySearch } from './autosuggest-helper.js';
 
-const blockName = 'search';
+export const blockName = 'search';
 let isCrossRefActive = true;
 
 const PLACEHOLDERS = {
@@ -50,7 +51,9 @@ const TEMPLATES = {
   <div class="search__input-cr__container">
     <label class="search__input-cr__label">Cross-Reference Number</label>
     <div class="search__input-cr__wrapper">
-      <input class="search__input-cr__input shadow" type="search" placeholder="${PLACEHOLDERS.crossReference}" />
+      <div class="search__autosuggest-wrapper">
+        <input class="search__input-cr__input shadow" type="search" placeholder="${PLACEHOLDERS.crossReference}"  aria-autocomplete="suggest"/>
+      </div>
       <button class="button search__input-cr__submit shadow search-button" type="submit">
         SEARCH &nbsp;
         <span class="fa fa-search"></span>
@@ -62,7 +65,9 @@ const TEMPLATES = {
   <div class="search__input-pn__container">
     <label class="search__input-pn__label">${PLACEHOLDERS.partNumberLabel}</label>
     <div class="search__input-pn__wrapper">
-      <input class="search__input-pn__input shadow" type="search" placeholder="${PLACEHOLDERS.partNumber}" />
+      <div class="search__autosuggest-wrapper">
+        <input class="search__input-pn__input shadow" type="search" placeholder="${PLACEHOLDERS.partNumber}" aria-autocomplete="suggest" />
+      </div>
       <button class="button search__input-pn__submit shadow search-button" type="submit">
         SEARCH &nbsp;
         <span class="fa fa-search"></span>
@@ -70,7 +75,14 @@ const TEMPLATES = {
     </div>
   </div>
   `,
+  autosuggestWrapper: `
+  <div class="search__autosuggest-container"> 
+    <ul role="listbox" class="search__autosuggest-list"></ul>
+  </div>
+  `,
 };
+
+const activeClassName = `${blockName}__autosuggest-item--active`;
 
 function resetModelsFilter(models, disabled = true) {
   models.innerHTML = TEMPLATES.filtersResetOpt;
@@ -94,6 +106,10 @@ function addSearchByListeners(wrapper, form) {
       form.querySelector(`.${blockName}__make-filter__select`).selectedIndex = 0;
       resetModelsFilter(form.querySelector(`.${blockName}__model-filter__select`));
     }
+
+    if (e.target.classList.contains(`${blockName}__cross-reference__btn`)) {
+      document.querySelector(`.${blockName}__fuzzysearch-results-wrapper`)?.remove();
+    }
   };
 }
 
@@ -116,25 +132,44 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
   const urlParams = new URLSearchParams(window.location.search);
   const resultsSection = document.querySelector('.results-list__section');
   const resultsList = document.querySelector('.results-list__list');
-  const query = urlParams.get('q');
-  const offsetParam = urlParams.get('offset');
-  const make = urlParams.get('make') === 'null' ? undefined : urlParams.get('make');
-  const model = urlParams.get('model') === 'null' ? undefined : urlParams.get('model');
-  const searchType = urlParams.get('st');
-  const category = urlParams.get('category');
-  const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+  const fuzzyTerm = urlParams.get('fuzzyTerm');
 
-  const loadingElement = showLoader(resultsSection);
-  const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
-  const searchParams = { query, offset, make, model, searchType, category };
-  const { results, categories } = await fetchSearchResults(searchParams);
-  loadingElement?.remove();
+  if (fuzzyTerm?.length) {
+    const suggestions = await applyFuzzySearch(fuzzyTerm);
+    if (!suggestions?.length) {
+      const url = new URL(window.location);
+      url.searchParams.delete('fuzzyTerm');
+      url.searchParams.set('q', fuzzyTerm);
+      window.history.pushState({}, '', url);
+      getAndApplySearchResults({ isFirstSet: true });
+    }
+  } else {
+    const query = urlParams.get('q');
+    const offsetParam = urlParams.get('offset');
+    const make = urlParams.get('make');
+    const model = urlParams.get('model');
+    const searchType = urlParams.get('st');
+    const category = urlParams.get('category');
+    const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
 
-  if (!isFirstSet) {
-    updateUrl(targetOffset);
+    const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
+    const searchParams = { query, offset, make, model, searchType, category };
+    const loadingElement = showLoader(resultsSection);
+
+    if (!isCrossRefActive) {
+      const applyFuzziness = urlParams.get('fuzzyness') ? true : false;
+      searchParams.applyFuzziness = applyFuzziness;
+    }
+
+    const { results, categories } = await fetchSearchResults(searchParams);
+    loadingElement?.remove();
+
+    if (!isFirstSet) {
+      updateUrl(targetOffset);
+    }
+    updateSearchResults(results, searchType, query, make, model, resultsSection, resultsList, targetOffset);
+    updateFilters(categories);
   }
-  updateSearchResults(results, searchType, query, make, model, resultsSection, resultsList, targetOffset);
-  updateFilters(categories);
 };
 
 const updateUrl = (targetOffset) => {
@@ -217,7 +252,7 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
   }
 };
 
-const showNoResultsMessage = (query, searchResultsSection) => {
+export const showNoResultsMessage = (query, searchResultsSection) => {
   const titleElement = searchResultsSection?.querySelector('.title');
   const titleText = getTextLabel('no_results_title').replace('[$]', query ? `"${query}"` : '');
   if (titleElement) titleElement.innerText = titleText;
@@ -259,38 +294,108 @@ async function getAndApplyFiltersData(form) {
 }
 
 function getFieldValue(selector, items) {
-  return items.filter((item) => item.classList.contains(selector))[0]?.value;
+  const field = items.find((item) => item.classList.contains(selector));
+  if (field && field.value && field.value !== 'null') {
+    return field.value;
+  }
+  return null;
+}
+
+function getMakeFilterValue(items) {
+  return getFieldValue(`${blockName}__make-filter__select`, items);
+}
+
+function getModelFilterValue(items) {
+  return getFieldValue(`${blockName}__model-filter__select`, items);
 }
 
 function addFormListener(form) {
-  form.onsubmit = (e) => {
+  form.onsubmit = async (e) => {
     e.preventDefault();
     const items = [...form];
     const value = getFieldValue(`${blockName}__input-${isCrossRefActive ? 'cr' : 'pn'}__input`, items);
-    const makeFilterValue = getFieldValue(`${blockName}__make-filter__select`, items);
-    const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
-    const searchType = isCrossRefActive
-      ? 'cross'
-      : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
-    const offset = 0;
+    const wrapper = form.querySelector(`.${blockName}__autosuggest-list`);
     const url = new URL(window.location.href);
     url.pathname = getLocaleContextedUrl('/search/');
-    url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
+    const fuzzyTerm = url.searchParams.get('fuzzyTerm');
+    const fuzzyness = url.searchParams.get('fuzzyness');
+    const makeFilterValue = getMakeFilterValue(items);
+    const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
+
+    if (!isCrossRefActive && !wrapper?.children?.length && !fuzzyness) {
+      url.search = `?fuzzyTerm=${value}&st=parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
+    } else {
+      const searchType = isCrossRefActive
+        ? 'cross'
+        : `parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
+      const offset = 0;
+      url.search = `?q=${value}&st=${searchType}&offset=${offset}`;
+      if (fuzzyTerm) {
+        url.search = `${url.search}&fuzzyness=${true}`;
+      }
+    }
     window.location.href = url;
   };
+}
+
+function addKeyUpEvent(form) {
+  const crInput = form.querySelector(`.${blockName}__input-cr__input`);
+  const partInput = form.querySelector(`.${blockName}__input-pn__input`);
+  const items = [...form];
+  const wrapper = form.querySelector(`.${blockName}__autosuggest-list`);
+  let isLoading = false;
+  [crInput, partInput].forEach((input) => {
+    input.addEventListener('input', async (e) => {
+      const searchTerm = e.target.value;
+      if (!searchTerm) {
+        wrapper.innerHTML = '';
+        return;
+      }
+
+      if (searchTerm.length < 3 && wrapper.children.length) {
+        wrapper.innerHTML = '';
+      }
+
+      if (searchTerm.length > 2 && !isLoading) {
+        const params = {
+          term: searchTerm,
+          isCrossRefActive: isCrossRefActive,
+        };
+        if (!isCrossRefActive) {
+          params.make = getMakeFilterValue(items);
+          params.model = getModelFilterValue(items);
+        }
+        const suggestions = await fetchAutoSuggestions(params);
+        isLoading = false;
+        wrapper.innerHTML = '';
+        const listElements = buildSuggestion(suggestions, form);
+        wrapper.append(...listElements);
+        e.target.after(wrapper);
+        wrapper?.classList.add(`${blockName}__autosuggest-list--show`);
+      }
+    });
+
+    input.addEventListener('keyup', (e) => {
+      if (wrapper?.children?.length && ['ArrowUp', 'ArrowDown'].includes(e.key)) {
+        handleArrowKeys([...wrapper.children], e, activeClassName);
+      }
+    });
+  });
 }
 
 export default function decorate(block) {
   const formWrapper = createElement('div', { classes: `${blockName}-wrapper` });
   const form = createElement('form', { classes: `${blockName}-form` });
   const pnContainer = createElement('div', { classes: [`${blockName}__filters-input__container`, 'hide'] });
+  const list = createElement('ul', { classes: `${blockName}__autosuggest-list`, props: { role: 'listbox' } });
   form.innerHTML = TEMPLATES.searchBy + TEMPLATES.inputCR;
   // Part number input and its filters are hidden by default
   pnContainer.innerHTML = TEMPLATES.filters + TEMPLATES.inputPN;
-  form.appendChild(pnContainer);
+  form.append(pnContainer, list);
   // add listeners and fill filters with data
   addSearchByListeners(form.querySelector(`.${blockName}__buttons__wrapper`), form);
   getAndApplyFiltersData(form);
+  addKeyUpEvent(form);
   addFormListener(form);
   // insert templates to form
   formWrapper.appendChild(form);

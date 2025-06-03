@@ -130,6 +130,14 @@
     {
       "Key": "V2CustomForm:ErrorSubmissionText",
       "Text": "Information not sent. Please, try again later."
+    },
+    {
+      "Key": "NoSuggestionText",
+      "Text": "No suggestions for the term"
+    },
+    {
+      "Key": "DidyouMeanText",
+      "Text": "Did you mean?"
     }
   ],
   ":type": "sheet"
