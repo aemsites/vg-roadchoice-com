@@ -58,6 +58,7 @@
   --c-medium-gray-1: #727376;
   --c-medium-gray-2: #808080;
   --c-medium-gray-3: #8d8d8d;
+  --c-medium-gray-4: #a9a9a9;
   --c-light-red: #deaeb1;
   --c-yellow: #f6ca45;
 
@@ -139,7 +140,7 @@
   --form-line-height: 22.5px;
   --form-font-weight: 700;
   --form-border-radius: 5px;
-  --form-border-hover: 2px solid var(--c-medium-gray-3);
+  --form-border-hover: 2px solid var(--c-medium-gray-4);
 }
 
 @media (min-width: 992px) {
@@ -281,6 +282,7 @@ main .section {
   }
 }
 
+.button--primary,
 a.button {
   display: block;
   width: fit-content;
@@ -292,6 +294,7 @@ a.button {
   padding: 13px 30px 10px;
 }
 
+.button:hover,
 a.button:hover {
   cursor: pointer;
 }
@@ -455,4 +458,17 @@ main .section.section--no-vertical-padding {
 .video__playback-button .icon svg {
   height: var(--playback-button-size);
   width: var(--playback-button-size);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
