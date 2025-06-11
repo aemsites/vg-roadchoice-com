@@ -141,7 +141,7 @@
 
   /* Buttons */
   --btn-border-radius: 6px;
-    --btn-color-primary: var(--primary-white);
+  --btn-color-primary: var(--primary-white);
   --btn-bg-color-primary: var(--primary-red);
   --btn-bg-color-primary-hover: var(--secondary-red);
   --btn-color-secondary: var(--primary-red);

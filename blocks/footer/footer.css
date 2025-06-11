@@ -23,6 +23,7 @@
 }
 
 .footer a {
+  border-radius: var(--btn-border-radius);
   text-decoration: none;
   line-height: 25px;
   padding: 7px 15px 5px;
