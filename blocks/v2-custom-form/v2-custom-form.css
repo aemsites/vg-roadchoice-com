@@ -66,13 +66,13 @@
 }
 
 .form-submit-wrapper .button {
-  background-color: var(--button-active);
+  background-color: var(--btn-bg-color-primary);
   font-size: var(--body-font-size-m);
   font-family: var(--body-ff);
   color: var(--primary-white);
   padding: 13px 30px 10px;
-  text-transform: uppercase;
   margin: 0 auto;
+  border-radius: var(--btn-border-radius);
 }
 
 .v2-custom-form-container.background {

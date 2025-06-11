@@ -68,8 +68,6 @@
   --overlay-background-color: var(--primary-light-gray);
   --highlight-background-color: var(--secondary-light-gray);
   --text-color: var(--secondary-black);
-  --button-active: var(--primary-red);
-  --button-hover: var(--secondary-red);
   --border-focus: #0e909f;
   --c-placeholder-text: var(--c-medium-gray-2);
   --error-color: var(--primary-red);
@@ -140,6 +138,15 @@
   --form-font-weight: 700;
   --form-border-radius: 5px;
   --form-border-hover: 2px solid var(--c-medium-gray-3);
+
+  /* Buttons */
+  --btn-border-radius: 6px;
+    --btn-color-primary: var(--primary-white);
+  --btn-bg-color-primary: var(--primary-red);
+  --btn-bg-color-primary-hover: var(--secondary-red);
+  --btn-color-secondary: var(--primary-red);
+  --btn-bg-color-secondary: var(--primary-white);
+  --btn-bg-color-secondary-hover: var(--c-light-gray);
 }
 
 @media (min-width: 992px) {
@@ -284,16 +291,27 @@ main .section {
 a.button {
   display: block;
   width: fit-content;
-  background-color: var(--button-active);
+  background-color: var(--btn-bg-color-primary);
   color: var(--primary-white);
   font-size: var(--body-font-size-m);
-  text-transform: uppercase;
   text-decoration: none;
   padding: 13px 30px 10px;
+  border-radius: var(--btn-border-radius);
+}
+
+em a.button {
+  font-style: normal;
+  color: var(--btn-color-secondary);
+  background-color: var(--btn-bg-color-secondary);
 }
 
 a.button:hover {
   cursor: pointer;
+  background-color: var(--btn-bg-color-primary-hover);
+}
+
+em a.button:hover {
+  background-color: var(--btn-bg-color-secondary-hover);
 }
 
 .text-center {
