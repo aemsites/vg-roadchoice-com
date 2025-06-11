@@ -19,9 +19,12 @@ function getJsonData(route) {
   });
 }
 
-function getQueryParams() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return { category: urlParams.get('category'), sku: urlParams.get('sku') };
+function getPathParams() {
+  const parts = window.location.pathname.split('/');
+  return {
+    category: decodeURIComponent(parts[2] || ''),
+    sku: decodeURIComponent(parts[3] || ''),
+  };
 }
 
 function findPartBySKU(parts, sku) {
@@ -463,6 +466,19 @@ function updateMetadata(part) {
   setOrCreateMetadata('twitter:description', part['Part Name']);
 }
 
+function updateCanonicalUrl(category, sku) {
+  const existing = document.querySelector('link[rel="canonical"]');
+  const canonicalUrl = `https://www.roadchoice.com/parts/${category}/${sku}`;
+  if (existing) {
+    existing.setAttribute('href', canonicalUrl);
+  } else {
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'canonical');
+    link.setAttribute('href', canonicalUrl);
+    document.head.appendChild(link);
+  }
+}
+
 function updateImageMetadata(images) {
   setOrCreateMetadata('og:image', images[0]['Image URL']);
   setOrCreateMetadata('twitter:image', images[0]['Image URL']);
@@ -501,7 +517,8 @@ function renderBreadcrumbs(part) {
 }
 
 export default async function decorate(block) {
-  const pathSegments = getQueryParams();
+  const pathSegments = getPathParams();
+  updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
 
   getPDPData(pathSegments).then((part) => {

@@ -31,7 +31,10 @@ const productCard = (product, searchType) => {
   const { category, path, name, partNumber, hasImage, imgUrl } = object;
 
   const item = createElement('li', { classes: blockName });
-  const linkUrl = getLocaleContextedUrl(path || `/parts?category=${category.replace(/[^\w]/g, '-').toLowerCase()}&sku=${partNumber}`);
+  const safeCategory = category.replace(/[^\w]/g, '-').toLowerCase();
+  const safePartNumber = encodeURIComponent(partNumber);
+  const linkUrl = getLocaleContextedUrl(path || `/parts/${safeCategory}/${safePartNumber}`);
+
   const imageLink = createElement('a', { classes: 'image-link', props: { href: linkUrl } });
 
   const productImageUrl = imgUrl;
