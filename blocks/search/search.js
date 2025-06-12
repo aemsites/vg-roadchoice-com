@@ -140,6 +140,7 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
       const url = new URL(window.location);
       url.searchParams.delete('fuzzyTerm');
       url.searchParams.set('q', fuzzyTerm);
+      url.searchParams.set('q', fuzzyTerm === 'null' ? '' : fuzzyTerm);
       window.history.pushState({}, '', url);
       getAndApplySearchResults({ isFirstSet: true });
     }
