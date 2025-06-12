@@ -139,6 +139,11 @@ async function handleSubmit(form) {
   if (form.getAttribute('data-submitting') !== 'true') {
     form.setAttribute('data-submitting', 'true');
     await prepareRequest(form);
+    // scrolls the view to the top of the form after submission
+    const container = form.closest(`.${blockName}-container`);
+    const yOffset = -120; // adjust this value as needed (negative means up)
+    const y = container.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
   }
 }
 
