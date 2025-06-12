@@ -145,7 +145,8 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
       getAndApplySearchResults({ isFirstSet: true });
     }
   } else {
-    const query = urlParams.get('q');
+    const queryTerm = urlParams.get('q');
+    const query = queryTerm === 'null' ? '' : queryTerm;
     const offsetParam = urlParams.get('offset');
     const make = urlParams.get('make');
     const model = urlParams.get('model');
