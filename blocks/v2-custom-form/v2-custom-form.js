@@ -141,7 +141,7 @@ async function handleSubmit(form) {
     await prepareRequest(form);
     // scrolls the view to the top of the form after submission
     const container = form.closest(`.${blockName}-container`);
-    const yOffset = -120; // adjust this value as needed (negative means up)
+    const yOffset = document.querySelector('header')?.offsetHeight * -1; // use header height if available
     const y = container.getBoundingClientRect().top + window.pageYOffset + yOffset;
     window.scrollTo({ top: y, behavior: 'smooth' });
   }
