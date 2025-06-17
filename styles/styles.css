@@ -58,6 +58,7 @@
   --c-medium-gray-1: #727376;
   --c-medium-gray-2: #808080;
   --c-medium-gray-3: #8d8d8d;
+  --c-medium-gray-4: #a9a9a9;
   --c-light-red: #deaeb1;
   --c-yellow: #f6ca45;
 
@@ -68,8 +69,6 @@
   --overlay-background-color: var(--primary-light-gray);
   --highlight-background-color: var(--secondary-light-gray);
   --text-color: var(--secondary-black);
-  --button-active: var(--primary-red);
-  --button-hover: var(--secondary-red);
   --border-focus: #0e909f;
   --c-placeholder-text: var(--c-medium-gray-2);
   --error-color: var(--primary-red);
@@ -139,7 +138,16 @@
   --form-line-height: 22.5px;
   --form-font-weight: 700;
   --form-border-radius: 5px;
-  --form-border-hover: 2px solid var(--c-medium-gray-3);
+  --form-border-hover: 2px solid var(--c-medium-gray-4);
+
+  /* Buttons */
+  --btn-border-radius: 6px;
+  --btn-color-primary: var(--primary-white);
+  --btn-bg-color-primary: var(--primary-red);
+  --btn-bg-color-primary-hover: var(--secondary-red);
+  --btn-color-secondary: var(--primary-red);
+  --btn-bg-color-secondary: var(--primary-white);
+  --btn-bg-color-secondary-hover: var(--c-light-gray);
 }
 
 @media (min-width: 992px) {
@@ -281,19 +289,32 @@ main .section {
   }
 }
 
+.button--primary,
 a.button {
   display: block;
   width: fit-content;
-  background-color: var(--button-active);
+  background-color: var(--btn-bg-color-primary);
   color: var(--primary-white);
   font-size: var(--body-font-size-m);
-  text-transform: uppercase;
   text-decoration: none;
   padding: 13px 30px 10px;
+  border-radius: var(--btn-border-radius);
 }
 
+em a.button {
+  font-style: normal;
+  color: var(--btn-color-secondary);
+  background-color: var(--btn-bg-color-secondary);
+}
+
+.button:hover,
 a.button:hover {
   cursor: pointer;
+  background-color: var(--btn-bg-color-primary-hover);
+}
+
+em a.button:hover {
+  background-color: var(--btn-bg-color-secondary-hover);
 }
 
 .text-center {
@@ -455,4 +476,17 @@ main .section.section--no-vertical-padding {
 .video__playback-button .icon svg {
   height: var(--playback-button-size);
   width: var(--playback-button-size);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }

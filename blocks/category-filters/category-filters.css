@@ -59,7 +59,7 @@
 
 .category-filters-wrapper .category-filters-form .category-filters-buttons-wrapper .filter-btn.secondary {
   background-color: var(--primary-white);
-  color: var(--button-active);
+  color: var(--btn-bg-color-primary);
   border: var(--table-border);
 }
 

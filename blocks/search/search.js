@@ -140,11 +140,13 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
       const url = new URL(window.location);
       url.searchParams.delete('fuzzyTerm');
       url.searchParams.set('q', fuzzyTerm);
+      url.searchParams.set('q', fuzzyTerm === 'null' ? '' : fuzzyTerm);
       window.history.pushState({}, '', url);
       getAndApplySearchResults({ isFirstSet: true });
     }
   } else {
-    const query = urlParams.get('q');
+    const queryTerm = urlParams.get('q');
+    const query = queryTerm === 'null' ? '' : queryTerm;
     const offsetParam = urlParams.get('offset');
     const make = urlParams.get('make');
     const model = urlParams.get('model');
