@@ -256,7 +256,7 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
 
 export const showNoResultsMessage = (query, searchResultsSection) => {
   const titleElement = searchResultsSection?.querySelector('.title');
-  const titleText = getTextLabel('no_results_title').replace('[$]', query ? `"${query}"` : '');
+  const titleText = getTextLabel('no_results_title').replace('[$]', query ? query : '');
   if (titleElement) titleElement.innerText = titleText;
   const fragment = document.createRange().createContextualFragment(noResultsTemplate);
   searchResultsSection?.classList.add('no-results');
