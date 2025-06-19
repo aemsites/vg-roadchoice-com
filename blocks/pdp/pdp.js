@@ -3,8 +3,8 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 
 const blockName = 'pdp';
 const docTypes = {
-  catalog: 'catalog',
-  manual: 'manual',
+  catalog: ['catalog', 'product-data-sheet'],
+  manual: ['manual'],
 };
 const docRange = document.createRange();
 
@@ -174,7 +174,7 @@ async function fetchCategoryKeys(category) {
 function filterByDocType(data, type, category) {
   return groupByLanguage(
     filterByCategory(
-      data.filter((doc) => doc.type.toLowerCase() === type),
+      data.filter((doc) => type.includes(doc.type.toLowerCase())),
       category,
     ),
   );
@@ -197,7 +197,7 @@ async function fetchDocs(category) {
 
 function renderDocsSection(docsList, sectionType) {
   const section = document.querySelector(`.${blockName}-${sectionType}`);
-  const sectionWrapper = section.querySelector('.default-content-wrapper');
+  const sectionWrapper = section?.querySelector('.default-content-wrapper');
   if (!section || !sectionWrapper || !Object.keys(docsList)?.length) return;
 
   const fragment = docRange.createContextualFragment(`
