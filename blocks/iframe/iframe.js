@@ -3,8 +3,6 @@ import { createElement, variantsClassesToBEM } from '../../scripts/common.js';
 const blockName = 'iframe';
 const variantClasses = ['fullscreen'];
 
-const getIframeSrc = (block) => block.querySelector('a')?.getAttribute('href') || '';
-
 const getFixedHeight = (block) => [...block.classList].find((cls) => /^[0-9]+px$/.test(cls));
 
 const enableFullscreenMode = (block) => {
@@ -19,7 +17,7 @@ export default async function decorate(block) {
   variantsClassesToBEM(block.classList, variantClasses, blockName);
 
   const isFullscreen = block.classList.contains(`${blockName}--fullscreen`);
-  const src = getIframeSrc(block);
+  const src = block.querySelector('a')?.getAttribute('href') || '';
 
   const iframe = createElement('iframe', {
     props: {
