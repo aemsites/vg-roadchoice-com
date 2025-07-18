@@ -140,11 +140,13 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
       const url = new URL(window.location);
       url.searchParams.delete('fuzzyTerm');
       url.searchParams.set('q', fuzzyTerm);
+      url.searchParams.set('q', fuzzyTerm === 'null' ? '' : fuzzyTerm);
       window.history.pushState({}, '', url);
       getAndApplySearchResults({ isFirstSet: true });
     }
   } else {
-    const query = urlParams.get('q');
+    const queryTerm = urlParams.get('q');
+    const query = queryTerm === 'null' ? '' : queryTerm;
     const offsetParam = urlParams.get('offset');
     const make = urlParams.get('make');
     const model = urlParams.get('model');
@@ -254,7 +256,7 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
 
 export const showNoResultsMessage = (query, searchResultsSection) => {
   const titleElement = searchResultsSection?.querySelector('.title');
-  const titleText = getTextLabel('no_results_title').replace('[$]', query ? `"${query}"` : '');
+  const titleText = getTextLabel('no_results_title').replace('[$]', query ? query : '');
   if (titleElement) titleElement.innerText = titleText;
   const fragment = document.createRange().createContextualFragment(noResultsTemplate);
   searchResultsSection?.classList.add('no-results');

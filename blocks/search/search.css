@@ -29,7 +29,7 @@
   background-color: var(--primary-white);
   color: var(--primary-red);
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: var(--btn-border-radius);
   font-feature-settings: 'ss03' 1;
 }
 
