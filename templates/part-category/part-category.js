@@ -30,9 +30,8 @@ function get404PageUrl() {
  * @returns {string|null} The category name or _null_.
  */
 const getCategory = () => {
-  const urlParams = new URLSearchParams(url.search);
-
-  return urlParams.get('category') || null;
+  const parts = window.location.pathname.split('/');
+  return decodeURIComponent(parts[2] || '').trim() || null;
 };
 
 /**
@@ -147,6 +146,10 @@ export default async function decorate(doc) {
     window.location.href = get404PageUrl();
     return;
   }
+  const canonical = document.createElement('link');
+  canonical.setAttribute('rel', 'canonical');
+  canonical.setAttribute('href', `https://www.roadchoice.com/part-category/${category}`);
+  document.head.appendChild(canonical);
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
@@ -186,7 +189,7 @@ export default async function decorate(doc) {
       const { className } = lastElLink;
       const link = createElement('a', {
         classes: className,
-        props: { href: `${url.origin}/part-category/?category=${category}` },
+        props: { href: `${url.origin}/part-category/${category}` },
       });
       link.textContent = title.textContent;
       const breadcrumbItem = createElement('li', {
