@@ -460,7 +460,6 @@ function setOrCreateMetadata(propName, propVal) {
 
 function updateMetadata(part) {
   document.title = `${part['Base Part Number']} – Road Choice`;
-  setOrCreateMetadata('description', part['Part Name']);
   setOrCreateMetadata('og:title', part['Base Part Number']);
   setOrCreateMetadata('og:description', part['Part Name']);
   setOrCreateMetadata('og:url', window.location.href);
