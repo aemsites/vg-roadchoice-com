@@ -26,12 +26,20 @@ function get404PageUrl() {
  */
 
 /**
- * Returns the category name from the URL query string, or _null_ if it is not present.
- * @returns {string|null} The category name or _null_.
+ * Extracts the category name from the URL path.
+ * Returns `null` if the path is `/part-category/`, or points to an index file
+ * (e.g., used as a template page for clean URLs).
+ *
+ * @returns {string|null} The category name from the URL path, or `null` if it's the index/template.
  */
 const getCategory = () => {
   const parts = window.location.pathname.split('/');
-  return decodeURIComponent(parts[2] || '').trim() || null;
+  const segment = decodeURIComponent(parts[2] || '').trim();
+  // Allow page to load if no segment — it’s the template
+  if (!segment || ['index', 'index.html', 'index.docx'].includes(segment.toLowerCase())) {
+    return null;
+  }
+  return segment;
 };
 
 /**
@@ -143,7 +151,7 @@ const getSubtitleData = async (cat) => {
 export default async function decorate(doc) {
   category = getCategory();
   if (!category) {
-    window.location.href = get404PageUrl();
+    console.log('No category provided — assuming this is the category template');
     return;
   }
   const canonical = document.createElement('link');
