@@ -469,7 +469,7 @@ function updateMetadata(part) {
 
 function updateCanonicalUrl(category, sku) {
   const existing = document.querySelector('link[rel="canonical"]');
-  const canonicalUrl = `https://www.roadchoice.com/parts/${category}/${sku}`;
+  const canonicalUrl = `${window.location.origin}${getLocaleContextedUrl(`/parts/${category}/${sku}`)}`;
   if (existing) {
     existing.setAttribute('href', canonicalUrl);
   } else {
