@@ -19,19 +19,6 @@ function getJsonData(route) {
   });
 }
 
-function getLocalizedProductDataUrl(category) {
-  const path = window.location.pathname;
-  const match = path.match(/^\/(en-ca|fr-ca)\//);
-  const locale = match ? match[1] : null;
-  const fileName = `rc-${category.replace(/[^\w]/g, '-')}.json`;
-
-  if (locale === 'en-ca' || locale === 'fr-ca') {
-    return `/${locale}/product-data/${fileName}`;
-  }
-
-  return `/product-data/${fileName}`;
-}
-
 function getPathParams() {
   const parts = window.location.pathname.split('/');
   return {
@@ -52,8 +39,7 @@ async function getPDPData(pathSegments) {
   const { category, sku } = pathSegments;
 
   try {
-    const productDataUrl = getLocalizedProductDataUrl(category);
-    const json = await getJsonData(getLocaleContextedUrl(productDataUrl));
+    const json = await getJsonData(getLocaleContextedUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`));
     if (!json) return null;
     return findPartBySKU(json?.data, sku);
   } catch (error) {
