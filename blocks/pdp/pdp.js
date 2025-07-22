@@ -21,9 +21,13 @@ function getJsonData(route) {
 
 function getPathParams() {
   const parts = window.location.pathname.split('/');
+  // Detect and skip market prefix if present (e.g., "en-ca", "fr-ca")
+  const hasLocalePrefix = ['en-ca', 'fr-ca', 'es-mx'].includes(parts[1]);
+  const baseIndex = hasLocalePrefix ? 2 : 1;
+
   return {
-    category: decodeURIComponent(parts[2] || ''),
-    sku: decodeURIComponent(parts[3] || ''),
+    category: decodeURIComponent(parts[baseIndex + 1] || ''),
+    sku: decodeURIComponent(parts[baseIndex + 2] || ''),
   };
 }
 
