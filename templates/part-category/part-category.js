@@ -230,40 +230,41 @@ export default async function decorate(doc) {
         return;
       }
 
-      // Clean existing dynamic breadcrumb items to prevent duplication
-      const dynamicBreadcrumbs = breadcrumbList.querySelectorAll('.breadcrumb-item-dynamic');
-      dynamicBreadcrumbs.forEach((el) => el.remove());
+      // Remove last breadcrumb item (it's the current category, which we’ll replace)
+      const lastItem = breadcrumbList.lastElementChild;
+      if (lastItem) breadcrumbList.removeChild(lastItem);
 
-      const baseIndex = breadcrumbList.children.length;
+      let index = breadcrumbList.children.length;
 
-      // Build the new breadcrumb for the main category if present
+      // If mainCategory is present, add it before the final category
       if (mainCategory) {
-        const mainCatSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
-        const mainCatLink = createElement('a', {
+        const mainSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
+        const mainLink = createElement('a', {
           classes: 'breadcrumb-link',
-          props: { href: `${url.origin}/part-category/${mainCatSlug}` },
+          props: { href: `${url.origin}/part-category/${mainSlug}` },
         });
-        mainCatLink.textContent = mainCategory;
+        mainLink.textContent = mainCategory;
 
-        const mainCatItem = createElement('li', {
-          classes: ['breadcrumb-item', `breadcrumb-item-${baseIndex}`, 'breadcrumb-item-dynamic'],
+        const mainItem = createElement('li', {
+          classes: ['breadcrumb-item', `breadcrumb-item-${index}`],
         });
-        mainCatItem.appendChild(mainCatLink);
-        breadcrumbList.appendChild(mainCatItem);
+        mainItem.appendChild(mainLink);
+        breadcrumbList.appendChild(mainItem);
+        index += 1;
       }
 
-      // Then add the current subcategory (category in URL)
-      const categoryLink = createElement('a', {
+      // Add final category (the one from the URL)
+      const finalLink = createElement('a', {
         classes: 'breadcrumb-link active-link',
         props: { href: `${url.origin}/part-category/${category}` },
       });
-      categoryLink.textContent = title.textContent;
+      finalLink.textContent = title.textContent;
 
-      const subCatItem = createElement('li', {
-        classes: ['breadcrumb-item', `breadcrumb-item-${baseIndex + 1}`, 'breadcrumb-item-dynamic'],
+      const finalItem = createElement('li', {
+        classes: ['breadcrumb-item', `breadcrumb-item-${index}`],
       });
-      subCatItem.appendChild(categoryLink);
-      breadcrumbList.appendChild(subCatItem);
+      finalItem.appendChild(finalLink);
+      breadcrumbList.appendChild(finalItem);
 
       observer.disconnect();
     }
