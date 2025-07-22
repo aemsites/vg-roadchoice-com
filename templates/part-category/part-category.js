@@ -218,35 +218,45 @@ export default async function decorate(doc) {
   updateTitleWithSubcategory(title, category, categoryData);
   getFilterAttrib(category);
 
-  // update breadcrumb adding the category dynamically
+  // Update breadcrumb dynamically once the block is loaded
   const observer = new MutationObserver((mutations) => {
     const { target } = mutations[0];
     if (target.dataset.blockStatus === 'loaded') {
       const breadcrumbList = target.querySelector('.breadcrumb-list');
-      const lastElLink = breadcrumbList.lastElementChild.firstElementChild;
-      const { length } = breadcrumbList.children;
-      const { className } = lastElLink;
-      const link = createElement('a', {
-        classes: className,
+      if (!breadcrumbList) {
+        console.warn('Breadcrumb list not found');
+        observer.disconnect();
+        return;
+      }
+
+      const breadcrumbItems = breadcrumbList.querySelectorAll('.breadcrumb-item');
+      const currentLength = breadcrumbItems.length;
+
+      const lastBreadcrumbLink = breadcrumbList.lastElementChild?.querySelector('a');
+      const titleText = title.textContent;
+      const newLink = createElement('a', {
+        classes: lastBreadcrumbLink?.className || 'breadcrumb-link',
         props: { href: `${url.origin}/part-category/${category}` },
       });
-      link.textContent = title.textContent;
-      const breadcrumbItem = createElement('li', {
-        classes: ['breadcrumb-item', `breadcrumb-item-${length}`],
-      });
+      newLink.textContent = titleText;
 
-      if (mainCategory) {
-        mainCategory = mainCategory.toLowerCase();
-        lastElLink.href += `${mainCategory.replace(/\s/g, '-')}`;
-        lastElLink.textContent = mainCategory;
-      } else {
-        lastElLink.href = url.origin;
+      const newBreadcrumbItem = createElement('li', {
+        classes: ['breadcrumb-item', `breadcrumb-item-${currentLength}`],
+      });
+      newBreadcrumbItem.appendChild(newLink);
+      breadcrumbList.appendChild(newBreadcrumbItem);
+
+      if (mainCategory && lastBreadcrumbLink) {
+        const mainCatSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
+        lastBreadcrumbLink.href += mainCatSlug;
+        lastBreadcrumbLink.textContent = mainCategory;
+      } else if (lastBreadcrumbLink) {
+        lastBreadcrumbLink.href = url.origin;
       }
-      breadcrumbItem.appendChild(link);
-      breadcrumbList.appendChild(breadcrumbItem);
 
       observer.disconnect();
     }
   });
+
   observer.observe(breadcrumbBlock, { attributes: true, attributeFilter: ['data-block-status'] });
 }
