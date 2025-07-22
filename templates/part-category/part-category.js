@@ -33,15 +33,10 @@ function get404PageUrl() {
  * @returns {string|null} The category name from the URL path, or `null` if it's the index/template.
  */
 const getCategory = () => {
-  const path = window.location.pathname;
-  const parts = path.split('/');
-  const segment = decodeURIComponent(parts[2] || '').trim();
-
-  console.log(`[Routing] Current path: ${path}`);
-  console.log(`[Routing] Detected category segment: "${segment}"`);
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
 
   if (!segment || ['index', 'index.html', 'index.docx', 'landing', 'landing.docx'].includes(segment.toLowerCase())) {
-    console.log('[Routing] No category detected — this is the template page.');
     return null;
   }
 
