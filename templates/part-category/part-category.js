@@ -221,38 +221,49 @@ export default async function decorate(doc) {
   // Update breadcrumb dynamically once the block is loaded
   const observer = new MutationObserver((mutations) => {
     const { target } = mutations[0];
+
     if (target.dataset.blockStatus === 'loaded') {
       const breadcrumbList = target.querySelector('.breadcrumb-list');
       if (!breadcrumbList) {
-        console.warn('Breadcrumb list not found');
+        console.warn('No breadcrumb list found.');
         observer.disconnect();
         return;
       }
 
-      const breadcrumbItems = breadcrumbList.querySelectorAll('.breadcrumb-item');
-      const currentLength = breadcrumbItems.length;
+      // Clean existing dynamic breadcrumb items to prevent duplication
+      const dynamicBreadcrumbs = breadcrumbList.querySelectorAll('.breadcrumb-item-dynamic');
+      dynamicBreadcrumbs.forEach((el) => el.remove());
 
-      const lastBreadcrumbLink = breadcrumbList.lastElementChild?.querySelector('a');
-      const titleText = title.textContent;
-      const newLink = createElement('a', {
-        classes: lastBreadcrumbLink?.className || 'breadcrumb-link',
+      const baseIndex = breadcrumbList.children.length;
+
+      // Build the new breadcrumb for the main category if present
+      if (mainCategory) {
+        const mainCatSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
+        const mainCatLink = createElement('a', {
+          classes: 'breadcrumb-link',
+          props: { href: `${url.origin}/part-category/${mainCatSlug}` },
+        });
+        mainCatLink.textContent = mainCategory;
+
+        const mainCatItem = createElement('li', {
+          classes: ['breadcrumb-item', `breadcrumb-item-${baseIndex}`, 'breadcrumb-item-dynamic'],
+        });
+        mainCatItem.appendChild(mainCatLink);
+        breadcrumbList.appendChild(mainCatItem);
+      }
+
+      // Then add the current subcategory (category in URL)
+      const categoryLink = createElement('a', {
+        classes: 'breadcrumb-link active-link',
         props: { href: `${url.origin}/part-category/${category}` },
       });
-      newLink.textContent = titleText;
+      categoryLink.textContent = title.textContent;
 
-      const newBreadcrumbItem = createElement('li', {
-        classes: ['breadcrumb-item', `breadcrumb-item-${currentLength}`],
+      const subCatItem = createElement('li', {
+        classes: ['breadcrumb-item', `breadcrumb-item-${baseIndex + 1}`, 'breadcrumb-item-dynamic'],
       });
-      newBreadcrumbItem.appendChild(newLink);
-      breadcrumbList.appendChild(newBreadcrumbItem);
-
-      if (mainCategory && lastBreadcrumbLink) {
-        const mainCatSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
-        lastBreadcrumbLink.href += mainCatSlug;
-        lastBreadcrumbLink.textContent = mainCategory;
-      } else if (lastBreadcrumbLink) {
-        lastBreadcrumbLink.href = url.origin;
-      }
+      subCatItem.appendChild(categoryLink);
+      breadcrumbList.appendChild(subCatItem);
 
       observer.disconnect();
     }
