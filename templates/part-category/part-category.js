@@ -33,12 +33,15 @@ function get404PageUrl() {
  * @returns {string|null} The category name from the URL path, or `null` if it's the index/template.
  */
 const getCategory = () => {
-  const parts = window.location.pathname.split('/');
+  const path = window.location.pathname;
+  const parts = path.split('/');
   const segment = decodeURIComponent(parts[2] || '').trim();
-  console.log(`[Router] URL Path Segment Detected: "${segment}"`);
+
+  console.log(`[Routing] Current path: ${path}`);
+  console.log(`[Routing] Detected category segment: "${segment}"`);
 
   if (!segment || ['index', 'index.html', 'index.docx', 'landing', 'landing.docx'].includes(segment.toLowerCase())) {
-    console.log('[Router] Detected index or template route. No category loaded.');
+    console.log('[Routing] No category detected — this is the template page.');
     return null;
   }
 
@@ -47,46 +50,47 @@ const getCategory = () => {
 
 /**
  * Loads product data for the given category and updates internal state and sessionStorage.
- * If the data file does not exist, is empty, or fails to parse, the state is reset and an empty array is returned.
+ * If the data file does not exist or contains no products, the state is reset and an empty array is returned.
  *
  * @param {string} cat - The category name.
  * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
-  const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
-  console.log(`[CategoryData] Requested category: "${cat}"`);
-  console.log(`[CategoryData] Attempting to load: ${productDataUrl}`);
-
   try {
+    const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
+
+    console.log(`[CategoryData] Loading data for category: "${cat}"`);
+    console.log(`[CategoryData] Fetching URL: ${productDataUrl}`);
+
     const products = await getLongJSONData({
       url: productDataUrl,
       limit: DEFAULT_LIMIT,
     });
 
-    if (!Array.isArray(products)) {
-      console.warn('[CategoryData] Loaded data is not an array:', products);
-    }
-
-    if (!products || products.length === 0) {
-      console.warn(`[CategoryData] No products found in file for category "${cat}".`);
+    if (!Array.isArray(products) || products.length === 0) {
+      console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
       json.data = [];
       json.limit = 0;
       json.total = 0;
       return [];
     }
 
+    console.log(`[CategoryData] Number of products fetched: ${products.length}`);
+    console.log('[CategoryData] Sample product:', products[0]);
+
     json.data = products;
     json.limit = 20;
     json.total = products.length;
 
-    console.log(`[CategoryData] Loaded ${products.length} products for "${cat}".`);
-    console.log('[CategoryData] Sample product:', products[0]);
-
-    mainCategory = products[0]?.Category || 'Unknown';
+    mainCategory = json.data[0]?.Category;
     console.log(`[CategoryData] Main category resolved as: "${mainCategory}"`);
 
-    window.categoryData = products;
+    if (!mainCategory) {
+      console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
+    }
+
+    window.categoryData = json.data;
     sessionStorage.setItem('amount', amount);
 
     const event = new Event('CategoryDataLoaded');
@@ -95,7 +99,6 @@ const getCategoryData = async (cat) => {
     return products;
   } catch (err) {
     console.error('%c[CategoryData] Error fetching category data', 'color:red;background-color:aliceblue', err);
-    console.error('[CategoryData] Failed URL:', productDataUrl);
     window.location.href = get404PageUrl();
   }
 };
