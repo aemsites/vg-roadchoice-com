@@ -43,11 +43,12 @@ const getCategory = () => {
 };
 
 /**
- * Updates the sessionStorage with the category data and the amount of products to show.
- * @param {string} cat The category name.
- * @returns {void}
- * @throws {Error} If the category data is not found.
- * @emits {Event} _CategoryDataLoaded_ When the category data is loaded.
+ * Loads product data for the given category and updates internal state and sessionStorage.
+ * If the data file does not exist or contains no products, the state is reset and an empty array is returned.
+ *
+ * @param {string} cat - The category name.
+ * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
+ * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
   try {
@@ -56,15 +57,25 @@ const getCategoryData = async (cat) => {
       url: productDataUrl,
       limit: DEFAULT_LIMIT,
     });
+
+    if (!Array.isArray(products) || products.length === 0) {
+      json.data = [];
+      json.limit = 0;
+      json.total = 0;
+      return [];
+    }
+
     json.data = products;
     json.limit = 20;
     json.total = products.length;
-    if (!json) throw new Error(`No data found in "${cat}" category file`);
-    const event = new Event('CategoryDataLoaded');
+
     mainCategory = json.data[0].Category;
     window.categoryData = json.data;
     sessionStorage.setItem('amount', amount);
+
+    const event = new Event('CategoryDataLoaded');
     document.dispatchEvent(event);
+
     return products;
   } catch (err) {
     console.log('%cError fetching category data', 'color:red;background-color:aliceblue', err);
