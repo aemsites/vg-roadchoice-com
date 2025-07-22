@@ -69,7 +69,7 @@ const getCategoryData = async (cat) => {
     json.limit = 20;
     json.total = products.length;
 
-    mainCategory = json.data[0].Category;
+    mainCategory = json.data[0]?.Category;
     window.categoryData = json.data;
     sessionStorage.setItem('amount', amount);
 
