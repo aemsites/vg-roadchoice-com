@@ -27,21 +27,21 @@ function get404PageUrl() {
 
 /**
  * Extracts the category name from the URL path.
- * Supports localized paths like `/en-ca/part-category/...` and default `/part-category/...`.
- * Returns `null` if the path is for the template (e.g., `/landing`, `/index`, etc.).
+ * Returns `null` if the path is `/part-category/`, or points to an index/landing file
+ * (e.g., used as a template page for clean URLs).
  *
  * @returns {string|null} The category name from the URL path, or `null` if it's the index/template.
  */
 const getCategory = () => {
-  const parts = window.location.pathname.split('/');
-  // Check if the URL is localized (e.g., /en-ca/ or /fr-ca/)
-  const isLocalized = ['en-ca', 'fr-ca', 'es-mx'].includes(parts[1]?.toLowerCase());
+  const path = window.location.pathname;
+  const parts = path.split('/');
+  const segment = decodeURIComponent(parts[2] || '').trim();
 
-  // For localized URLs, category is in segment 3: /en-ca/part-category/clamps
-  // For default, it's in segment 2: /part-category/clamps
-  const segment = decodeURIComponent(isLocalized ? parts[3] || '' : parts[2] || '').trim();
+  console.log(`[Routing] Current path: ${path}`);
+  console.log(`[Routing] Detected category segment: "${segment}"`);
 
   if (!segment || ['index', 'index.html', 'index.docx', 'landing', 'landing.docx'].includes(segment.toLowerCase())) {
+    console.log('[Routing] No category detected — this is the template page.');
     return null;
   }
 
