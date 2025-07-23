@@ -27,16 +27,17 @@ function get404PageUrl() {
 
 /**
  * Extracts the category name from the URL path.
- * Returns `null` if the path is `/part-category/`, or points to an index/landing file
- * (e.g., used as a template page for clean URLs).
  *
- * @returns {string|null} The category name from the URL path, or `null` if it's the index/template.
+ * Returns `null` if the path points to a clean-URL template page (e.g., a category landing page),
+ * typically represented by `/part-category/`, `/en-ca/part-category/`, etc.
+ *
+ * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
 const getCategory = () => {
   const parts = window.location.pathname.split('/').filter(Boolean);
   const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
 
-  if (!segment || ['index', 'index.html', 'index.docx', 'landing', 'landing.docx'].includes(segment.toLowerCase())) {
+  if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
     return null;
   }
 
