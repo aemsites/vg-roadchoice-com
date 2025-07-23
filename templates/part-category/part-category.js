@@ -1,7 +1,6 @@
 import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl } from '../../scripts/common.js';
 import { decorateLinks } from '../../scripts/scripts.js';
 
-const url = new URL(window.location.href);
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
 const amount = 12;
 let category;
@@ -176,7 +175,7 @@ export default async function decorate(doc) {
   }
   const canonical = document.createElement('link');
   canonical.setAttribute('rel', 'canonical');
-  canonical.setAttribute('href', `${window.location.origin}${getLocaleContextedUrl(`/part-category/${category}`)}`);
+  canonical.setAttribute('href', `${window.location.origin}${getLocaleContextedUrl(`/part-category/${category}/`)}`);
   document.head.appendChild(canonical);
 
   const main = doc.querySelector('main');
@@ -231,7 +230,7 @@ export default async function decorate(doc) {
         const mainSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
         const mainLink = createElement('a', {
           classes: 'breadcrumb-link',
-          props: { href: getLocaleContextedUrl(`/part-category/${mainSlug}`) },
+          props: { href: getLocaleContextedUrl(`/part-category/${mainSlug}/`) },
         });
         mainLink.textContent = mainCategory;
 
@@ -246,7 +245,7 @@ export default async function decorate(doc) {
       // Add final category (the one from the URL)
       const finalLink = createElement('a', {
         classes: 'breadcrumb-link active-link',
-        props: { href: getLocaleContextedUrl(`/part-category/${category}`) },
+        props: { href: getLocaleContextedUrl(`/part-category/${category}/`) },
       });
       finalLink.textContent = title.textContent;
 
