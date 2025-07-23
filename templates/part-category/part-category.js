@@ -176,8 +176,9 @@ export default async function decorate(doc) {
   }
   const canonical = document.createElement('link');
   canonical.setAttribute('rel', 'canonical');
-  canonical.setAttribute('href', `https://www.roadchoice.com/part-category/${category}`);
+  canonical.setAttribute('href', `${window.location.origin}${getLocaleContextedUrl(`/part-category/${category}`)}`);
   document.head.appendChild(canonical);
+
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
