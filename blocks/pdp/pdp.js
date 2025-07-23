@@ -1,5 +1,5 @@
 import { createElement, getTextLabel, getJsonFromUrl, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl } from '../../scripts/common.js';
-import { createOptimizedPicture } from '../../scripts/aem.js';
+import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 
 const blockName = 'pdp';
 const docTypes = {
@@ -493,6 +493,9 @@ function renderBreadcrumbs(part) {
   const breadcrumbSection = document.querySelector('.section.breadcrumbs');
   if (!breadcrumbSection) return;
 
+  const locale = getMetadata('locale')?.toLowerCase();
+  const prefix = locale ? `/${locale}` : '';
+
   const categorySlug = part.Category.toLowerCase().replace(/[^\w]/g, '-');
   const subcategorySlug = part.Subcategory.toLowerCase().replace(/[^\w]/g, '-');
 
@@ -502,15 +505,15 @@ function renderBreadcrumbs(part) {
         <div class="breadcrumb-content">
           <ul class="breadcrumb-list">
             <li class="breadcrumb-item breadcrumb-item-0">
-              <a class="breadcrumb-link" href="${getLocaleContextedUrl('/')}">Road Choice</a>
+              <a class="breadcrumb-link" href="${prefix}/">Road Choice</a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-1">
-              <a class="breadcrumb-link" href="${getLocaleContextedUrl(`/part-category/${categorySlug}`)}">
+              <a class="breadcrumb-link" href="${prefix}/part-category/${categorySlug}">
                 ${part.Category}
               </a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-2">
-              <a class="breadcrumb-link active-link" href="${getLocaleContextedUrl(`/part-category/${subcategorySlug}`)}">
+              <a class="breadcrumb-link active-link" href="${prefix}/part-category/${subcategorySlug}">
                 ${part.Subcategory}
               </a>
             </li>
@@ -519,6 +522,7 @@ function renderBreadcrumbs(part) {
       </div>
     </div>
   `);
+
   breadcrumbSection.append(breadcrumbs);
 }
 
