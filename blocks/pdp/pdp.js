@@ -20,7 +20,10 @@ function getJsonData(route) {
 }
 
 function getPathParams() {
-  const parts = window.location.pathname.split('/');
+  // Remove trailing slash if present
+  const cleanPath = window.location.pathname.replace(/\/$/, '');
+  const parts = cleanPath.split('/');
+
   // Detect and skip market prefix if present
   const hasLocalePrefix = ['en-ca', 'fr-ca'].includes(parts[1]);
   const baseIndex = hasLocalePrefix ? 2 : 1;
