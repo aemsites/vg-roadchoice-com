@@ -1,4 +1,4 @@
-import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl } from '../../scripts/common.js';
+import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl, setOrCreateMetadata } from '../../scripts/common.js';
 import { decorateLinks } from '../../scripts/scripts.js';
 
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
@@ -167,17 +167,47 @@ const getSubtitleData = async (cat) => {
   }
 };
 
+/**
+ * Sets the canonical URL for the current category page.
+ *
+ * This helps search engines understand the preferred URL for the content,
+ * avoiding duplicate indexing issues. The canonical link is appended to
+ * the <head> element with the proper locale context.
+ *
+ * @param {string} category - The category slug to include in the canonical URL.
+ */
+function setCanonicalUrl(category) {
+  const canonical = document.createElement('link');
+  canonical.setAttribute('rel', 'canonical');
+  canonical.setAttribute('href', `${window.location.origin}${getLocaleContextedUrl(`/part-category/${category}`)}`);
+  document.head.appendChild(canonical);
+}
+
+/**
+ * Sets page metadata for a category page, including <title>, Open Graph, and Twitter tags.
+ *
+ * @param {string} category - The category slug from the URL.
+ */
+function updateMetadata(category) {
+  const readableCategory = category.replace(/-/g, ' ');
+  const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
+  const title = `Road Choice - ${capitalizedCategory}`;
+  const description = `Explore parts in the ${capitalizedCategory} category.`;
+  document.title = title;
+  setOrCreateMetadata('og:title', title);
+  setOrCreateMetadata('og:description', description);
+  setOrCreateMetadata('twitter:title', title);
+  setOrCreateMetadata('twitter:description', description);
+}
+
 export default async function decorate(doc) {
   category = getCategory();
   if (!category) {
     console.log('No category provided — assuming this is the category template');
     return;
   }
-  const canonical = document.createElement('link');
-  canonical.setAttribute('rel', 'canonical');
-  canonical.setAttribute('href', `${window.location.origin}${getLocaleContextedUrl(`/part-category/${category}`)}`);
-  document.head.appendChild(canonical);
-
+  setCanonicalUrl(category);
+  updateMetadata(category);
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });

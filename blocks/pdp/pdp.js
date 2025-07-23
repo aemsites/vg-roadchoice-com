@@ -1,4 +1,12 @@
-import { createElement, getTextLabel, getJsonFromUrl, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl } from '../../scripts/common.js';
+import {
+  createElement,
+  getTextLabel,
+  getJsonFromUrl,
+  getLongJSONData,
+  DEFAULT_LIMIT,
+  getLocaleContextedUrl,
+  setOrCreateMetadata,
+} from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 
 const blockName = 'pdp';
@@ -450,23 +458,8 @@ function renderPartFit(partFitData) {
   partFitContainer.classList.remove('hide');
 }
 
-function setOrCreateMetadata(propName, propVal) {
-  const meta = document.head.querySelector(`meta[property="${propName}"]`);
-  if (meta) {
-    meta.setAttribute('content', propVal);
-  } else {
-    const newMeta = createElement('meta', {
-      props: {
-        property: propName,
-        content: propVal,
-      },
-    });
-    document.head.appendChild(newMeta);
-  }
-}
-
 function updateMetadata(part) {
-  document.title = `${part['Base Part Number']} – Road Choice`;
+  document.title = `Road Choice - ${part['Base Part Number']}`;
   setOrCreateMetadata('og:title', part['Base Part Number']);
   setOrCreateMetadata('og:description', part['Part Name']);
   setOrCreateMetadata('og:url', window.location.href);

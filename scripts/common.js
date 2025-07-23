@@ -665,6 +665,30 @@ const formatValues = (values = []) => {
   }, {});
 };
 
+/**
+ * Sets or creates a meta tag with the specified Open Graph or Twitter property and value.
+ *
+ * If a meta tag with the given `property` already exists in the document head, its `content`
+ * attribute is updated with `propVal`. If it does not exist, a new meta tag is created and appended.
+ *
+ * @param {string} propName - The `property` attribute of the meta tag (e.g., "og:title", "twitter:description").
+ * @param {string} propVal - The value to set for the meta tag's `content` attribute.
+ */
+function setOrCreateMetadata(propName, propVal) {
+  const meta = document.head.querySelector(`meta[property="${propName}"]`);
+  if (meta) {
+    meta.setAttribute('content', propVal);
+  } else {
+    const newMeta = createElement('meta', {
+      props: {
+        property: propName,
+        content: propVal,
+      },
+    });
+    document.head.appendChild(newMeta);
+  }
+}
+
 function isPerformanceAllowed() {
   return checkOneTrustGroup(COOKIE_CONFIGS.PERFORMANCE_COOKIE);
 }
@@ -717,6 +741,7 @@ export {
   getPlaceholders,
   getTextLabel,
   getLanguagePath,
+  setOrCreateMetadata,
 };
 
 // Not used in this project:
