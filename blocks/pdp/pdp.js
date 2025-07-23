@@ -476,7 +476,7 @@ function updateMetadata(part) {
 
 function updateCanonicalUrl(category, sku) {
   const existing = document.querySelector('link[rel="canonical"]');
-  const canonicalUrl = `${window.location.origin}${getLocaleContextedUrl(`/parts/${category}/${sku}/`)}`;
+  const canonicalUrl = `${window.location.origin}${getLocaleContextedUrl(`/parts/${category}/${sku}`)}`;
   if (existing) {
     existing.setAttribute('href', canonicalUrl);
   } else {
@@ -511,12 +511,12 @@ function renderBreadcrumbs(part) {
               <a class="breadcrumb-link" href="${prefix}/">Road Choice</a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-1">
-              <a class="breadcrumb-link" href="${prefix}/part-category/${categorySlug}/">
+              <a class="breadcrumb-link" href="${prefix}/part-category/${categorySlug}">
                 ${part.Category}
               </a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-2">
-              <a class="breadcrumb-link active-link" href="${prefix}/part-category/${subcategorySlug}/">
+              <a class="breadcrumb-link active-link" href="${prefix}/part-category/${subcategorySlug}">
                 ${part.Subcategory}
               </a>
             </li>
