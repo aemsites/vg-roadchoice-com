@@ -56,9 +56,6 @@ const getCategoryData = async (cat) => {
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
 
-    console.log(`[CategoryData] Loading data for category: "${cat}"`);
-    console.log(`[CategoryData] Fetching URL: ${productDataUrl}`);
-
     const products = await getLongJSONData({
       url: productDataUrl,
       limit: DEFAULT_LIMIT,
@@ -72,15 +69,11 @@ const getCategoryData = async (cat) => {
       return [];
     }
 
-    console.log(`[CategoryData] Number of products fetched: ${products.length}`);
-    console.log('[CategoryData] Sample product:', products[0]);
-
     json.data = products;
     json.limit = 20;
     json.total = products.length;
 
     mainCategory = json.data[0]?.Category;
-    console.log(`[CategoryData] Main category resolved as: "${mainCategory}"`);
 
     if (!mainCategory) {
       console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
