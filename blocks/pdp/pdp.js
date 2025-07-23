@@ -21,7 +21,7 @@ function getJsonData(route) {
 
 function getPathParams() {
   const parts = window.location.pathname.split('/');
-  // Detect and skip market prefix if present (e.g., "en-ca", "fr-ca")
+  // Detect and skip market prefix if present
   const hasLocalePrefix = ['en-ca', 'fr-ca'].includes(parts[1]);
   const baseIndex = hasLocalePrefix ? 2 : 1;
 
