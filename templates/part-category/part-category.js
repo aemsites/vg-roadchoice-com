@@ -231,7 +231,7 @@ export default async function decorate(doc) {
         const mainSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
         const mainLink = createElement('a', {
           classes: 'breadcrumb-link',
-          props: { href: `${url.origin}/part-category/${mainSlug}` },
+          props: { href: getLocaleContextedUrl(`/part-category/${mainSlug}`) },
         });
         mainLink.textContent = mainCategory;
 
@@ -246,7 +246,7 @@ export default async function decorate(doc) {
       // Add final category (the one from the URL)
       const finalLink = createElement('a', {
         classes: 'breadcrumb-link active-link',
-        props: { href: `${url.origin}/part-category/${category}` },
+        props: { href: getLocaleContextedUrl(`/part-category/${category}`) },
       });
       finalLink.textContent = title.textContent;
 
