@@ -493,7 +493,6 @@ function renderBreadcrumbs(part) {
   const breadcrumbSection = document.querySelector('.section.breadcrumbs');
   if (!breadcrumbSection) return;
 
-  const localePrefix = getLocaleContextedUrl('/'); // e.g., "/en-ca/"
   const categorySlug = part.Category.toLowerCase().replace(/[^\w]/g, '-');
   const subcategorySlug = part.Subcategory.toLowerCase().replace(/[^\w]/g, '-');
 
@@ -503,17 +502,15 @@ function renderBreadcrumbs(part) {
         <div class="breadcrumb-content">
           <ul class="breadcrumb-list">
             <li class="breadcrumb-item breadcrumb-item-0">
-              <a class="breadcrumb-link" href="${localePrefix}">Road Choice</a>
+              <a class="breadcrumb-link" href="${getLocaleContextedUrl('/')}">Road Choice</a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-1">
-              <a class="breadcrumb-link"
-                href="${getLocaleContextedUrl(`/part-category/${categorySlug}`)}">
+              <a class="breadcrumb-link" href="${getLocaleContextedUrl(`/part-category/${categorySlug}`)}">
                 ${part.Category}
               </a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-2">
-              <a class="breadcrumb-link"
-                href="${getLocaleContextedUrl(`/part-category/${subcategorySlug}`)}">
+              <a class="breadcrumb-link active-link" href="${getLocaleContextedUrl(`/part-category/${subcategorySlug}`)}">
                 ${part.Subcategory}
               </a>
             </li>
