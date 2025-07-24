@@ -15,6 +15,7 @@ const docTypes = {
   manual: ['manual'],
 };
 const docRange = document.createRange();
+const SUPPORTED_LOCALES_WITH_PREFIX = ['en-ca', 'fr-ca'];
 
 function getJsonData(route) {
   const requestUrl = new URL(window.location.origin + route);
@@ -33,12 +34,14 @@ function getPathParams() {
   const parts = cleanPath.split('/');
 
   // Detect and skip market prefix if present
-  const hasLocalePrefix = ['en-ca', 'fr-ca'].includes(parts[1]);
+  const hasLocalePrefix = SUPPORTED_LOCALES_WITH_PREFIX.includes(parts[1]);
   const baseIndex = hasLocalePrefix ? 2 : 1;
+  const CATEGORY_INDEX = baseIndex + 1;
+  const SKU_INDEX = baseIndex + 2;
 
   return {
-    category: decodeURIComponent(parts[baseIndex + 1] || ''),
-    sku: decodeURIComponent(parts[baseIndex + 2] || ''),
+    category: decodeURIComponent(parts[CATEGORY_INDEX] || ''),
+    sku: decodeURIComponent(parts[SKU_INDEX] || ''),
   };
 }
 
