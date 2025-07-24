@@ -1,5 +1,6 @@
 :root {
   --breadcrumb-hover: #15909c;
+  --ellipse-width: 100%;
 }
 
 .section.breadcrumb-container {
@@ -43,6 +44,17 @@
 .breadcrumb-list li a {
   display: inline-flex;
   width: max-content;
+}
+
+.breadcrumb-item:has(.active-link) {
+  width: var(--ellipse-width);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.breadcrumb-item .active-link {
+  display: inline;
 }
 
 .breadcrumb-list .breadcrumb-item:nth-child(2) {
