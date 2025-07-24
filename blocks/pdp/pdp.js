@@ -490,7 +490,8 @@ function renderBreadcrumbs(part) {
   if (!breadcrumbSection) return;
 
   const locale = getMetadata('locale')?.toLowerCase();
-  const prefix = locale ? `/${locale}` : '';
+  const isLocalizedMarket = ['en-ca', 'fr-ca'].includes(locale);
+  const prefix = isLocalizedMarket ? `/${locale}` : '';
 
   const categorySlug = part.Category.toLowerCase().replace(/[^\w]/g, '-');
   const subcategorySlug = part.Subcategory.toLowerCase().replace(/[^\w]/g, '-');
