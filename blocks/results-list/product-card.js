@@ -33,7 +33,7 @@ const productCard = (product, searchType) => {
   const item = createElement('li', { classes: blockName });
   const safeCategory = category.replace(/[^\w]/g, '-').toLowerCase();
   const safePartNumber = encodeURIComponent(partNumber);
-  const linkUrl = getLocaleContextedUrl(path || `/parts/${safeCategory}/${safePartNumber}`);
+  const linkUrl = getLocaleContextedUrl(path || `/parts/${safeCategory}/${safePartNumber}/`);
 
   const imageLink = createElement('a', { classes: 'image-link', props: { href: linkUrl } });
 
