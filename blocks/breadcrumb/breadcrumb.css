@@ -1,6 +1,5 @@
 :root {
   --breadcrumb-hover: #15909c;
-  --ellipse-width: 100%;
 }
 
 .section.breadcrumb-container {
@@ -50,7 +49,7 @@
 }
 
 .breadcrumb-list .breadcrumb-item:last-of-type {
-  width: var(--ellipse-width);
+  width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
