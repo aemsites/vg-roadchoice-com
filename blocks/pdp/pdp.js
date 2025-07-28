@@ -1,5 +1,13 @@
-import { createElement, getTextLabel, getJsonFromUrl, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl } from '../../scripts/common.js';
-import { createOptimizedPicture } from '../../scripts/aem.js';
+import {
+  createElement,
+  getTextLabel,
+  getJsonFromUrl,
+  getLongJSONData,
+  DEFAULT_LIMIT,
+  getLocaleContextedUrl,
+  setOrCreateMetadata,
+} from '../../scripts/common.js';
+import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 
 const blockName = 'pdp';
 const docTypes = {
@@ -7,6 +15,7 @@ const docTypes = {
   manual: ['manual'],
 };
 const docRange = document.createRange();
+const SUPPORTED_LOCALES_WITH_PREFIX = ['en-ca', 'fr-ca'];
 
 function getJsonData(route) {
   const requestUrl = new URL(window.location.origin + route);
@@ -19,9 +28,21 @@ function getJsonData(route) {
   });
 }
 
-function getQueryParams() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return { category: urlParams.get('category'), sku: urlParams.get('sku') };
+function getPathParams() {
+  // Remove trailing slash if present
+  const cleanPath = window.location.pathname.replace(/\/$/, '');
+  const parts = cleanPath.split('/');
+
+  // Detect and skip market prefix if present
+  const hasLocalePrefix = SUPPORTED_LOCALES_WITH_PREFIX.includes(parts[1]);
+  const baseIndex = hasLocalePrefix ? 2 : 1;
+  const CATEGORY_INDEX = baseIndex + 1;
+  const SKU_INDEX = baseIndex + 2;
+
+  return {
+    category: decodeURIComponent(parts[CATEGORY_INDEX] || ''),
+    sku: decodeURIComponent(parts[SKU_INDEX] || ''),
+  };
 }
 
 function findPartBySKU(parts, sku) {
@@ -440,27 +461,26 @@ function renderPartFit(partFitData) {
   partFitContainer.classList.remove('hide');
 }
 
-function setOrCreateMetadata(propName, propVal) {
-  const meta = document.head.querySelector(`meta[property="${propName}"]`);
-  if (meta) {
-    meta.setAttribute('content', propVal);
-  } else {
-    const newMeta = createElement('meta', {
-      props: {
-        property: propName,
-        content: propVal,
-      },
-    });
-    document.head.appendChild(newMeta);
-  }
-}
-
 function updateMetadata(part) {
+  document.title = `Road Choice - ${part['Base Part Number']}`;
   setOrCreateMetadata('og:title', part['Base Part Number']);
   setOrCreateMetadata('og:description', part['Part Name']);
   setOrCreateMetadata('og:url', window.location.href);
   setOrCreateMetadata('twitter:title', part['Base Part Number']);
   setOrCreateMetadata('twitter:description', part['Part Name']);
+}
+
+function updateCanonicalUrl(category, sku) {
+  const existing = document.querySelector('link[rel="canonical"]');
+  const canonicalUrl = `${window.location.origin}${getLocaleContextedUrl(`/parts/${category}/${sku}`)}`;
+  if (existing) {
+    existing.setAttribute('href', canonicalUrl);
+  } else {
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'canonical');
+    link.setAttribute('href', canonicalUrl);
+    document.head.appendChild(link);
+  }
 }
 
 function updateImageMetadata(images) {
@@ -472,23 +492,28 @@ function renderBreadcrumbs(part) {
   const breadcrumbSection = document.querySelector('.section.breadcrumbs');
   if (!breadcrumbSection) return;
 
+  const locale = getMetadata('locale')?.toLowerCase();
+  const isLocalizedMarket = ['en-ca', 'fr-ca'].includes(locale);
+  const prefix = isLocalizedMarket ? `/${locale}` : '';
+
+  const categorySlug = part.Category.toLowerCase().replace(/[^\w]/g, '-');
+  const subcategorySlug = part.Subcategory.toLowerCase().replace(/[^\w]/g, '-');
+
   const breadcrumbs = docRange.createContextualFragment(`
     <div class="breadcrumb-wrapper">
       <div class="breadcrumb block">
         <div class="breadcrumb-content">
           <ul class="breadcrumb-list">
             <li class="breadcrumb-item breadcrumb-item-0">
-              <a class="breadcrumb-link" href="/">Road Choice</a>
+              <a class="breadcrumb-link" href="${prefix}/">Road Choice</a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-1">
-              <a class="breadcrumb-link"
-                href="/part-category/${part.Category.toLowerCase().replace(/[^\w]/g, '-')}">
+              <a class="breadcrumb-link" href="${prefix}/part-category/${categorySlug}">
                 ${part.Category}
               </a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-2">
-              <a class="breadcrumb-link"
-                href="/part-category/?category=${part.Subcategory.toLowerCase().replace(/[^\w]/g, '-')}">
+              <a class="breadcrumb-link active-link" href="${prefix}/part-category/${subcategorySlug}">
                 ${part.Subcategory}
               </a>
             </li>
@@ -497,11 +522,13 @@ function renderBreadcrumbs(part) {
       </div>
     </div>
   `);
+
   breadcrumbSection.append(breadcrumbs);
 }
 
 export default async function decorate(block) {
-  const pathSegments = getQueryParams();
+  const pathSegments = getPathParams();
+  updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
 
   getPDPData(pathSegments).then((part) => {

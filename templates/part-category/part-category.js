@@ -1,7 +1,6 @@
-import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl } from '../../scripts/common.js';
+import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl, setOrCreateMetadata } from '../../scripts/common.js';
 import { decorateLinks } from '../../scripts/scripts.js';
 
-const url = new URL(window.location.href);
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
 const amount = 12;
 let category;
@@ -26,41 +25,68 @@ function get404PageUrl() {
  */
 
 /**
- * Returns the category name from the URL query string, or _null_ if it is not present.
- * @returns {string|null} The category name or _null_.
+ * Extracts the category name from the URL path.
+ *
+ * Returns `null` if the path points to a clean-URL template page (e.g., a category landing page),
+ * typically represented by `/part-category/`, `/en-ca/part-category/`, etc.
+ *
+ * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
 const getCategory = () => {
-  const urlParams = new URLSearchParams(url.search);
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
 
-  return urlParams.get('category') || null;
+  if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
+    return null;
+  }
+
+  return segment;
 };
 
 /**
- * Updates the sessionStorage with the category data and the amount of products to show.
- * @param {string} cat The category name.
- * @returns {void}
- * @throws {Error} If the category data is not found.
- * @emits {Event} _CategoryDataLoaded_ When the category data is loaded.
+ * Loads product data for the given category and updates internal state and sessionStorage.
+ * If the data file does not exist or contains no products, the state is reset and an empty array is returned.
+ *
+ * @param {string} cat - The category name.
+ * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
+ * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
+
     const products = await getLongJSONData({
       url: productDataUrl,
       limit: DEFAULT_LIMIT,
     });
+
+    if (!Array.isArray(products) || products.length === 0) {
+      console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
+      json.data = [];
+      json.limit = 0;
+      json.total = 0;
+      return [];
+    }
+
     json.data = products;
     json.limit = 20;
     json.total = products.length;
-    if (!json) throw new Error(`No data found in "${cat}" category file`);
-    const event = new Event('CategoryDataLoaded');
-    mainCategory = json.data[0].Category;
+
+    mainCategory = json.data[0]?.Category;
+
+    if (!mainCategory) {
+      console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
+    }
+
     window.categoryData = json.data;
     sessionStorage.setItem('amount', amount);
+
+    const event = new Event('CategoryDataLoaded');
     document.dispatchEvent(event);
+
     return products;
   } catch (err) {
-    console.log('%cError fetching category data', 'color:red;background-color:aliceblue', err);
+    console.error('%c[CategoryData] Error fetching category data', 'color:red;background-color:aliceblue', err);
     window.location.href = get404PageUrl();
   }
 };
@@ -141,12 +167,47 @@ const getSubtitleData = async (cat) => {
   }
 };
 
+/**
+ * Sets the canonical URL for the current category page.
+ *
+ * This helps search engines understand the preferred URL for the content,
+ * avoiding duplicate indexing issues. The canonical link is appended to
+ * the <head> element with the proper locale context.
+ *
+ * @param {string} category - The category slug to include in the canonical URL.
+ */
+function setCanonicalUrl(category) {
+  const canonical = document.createElement('link');
+  canonical.setAttribute('rel', 'canonical');
+  canonical.setAttribute('href', `${window.location.origin}${getLocaleContextedUrl(`/part-category/${category}`)}`);
+  document.head.appendChild(canonical);
+}
+
+/**
+ * Sets page metadata for a category page, including <title>, Open Graph, and Twitter tags.
+ *
+ * @param {string} category - The category slug from the URL.
+ */
+function updateMetadata(category) {
+  const readableCategory = category.replace(/-/g, ' ');
+  const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
+  const title = `Road Choice - ${capitalizedCategory}`;
+  const description = `Explore parts in the ${capitalizedCategory} category.`;
+  document.title = title;
+  setOrCreateMetadata('og:title', title);
+  setOrCreateMetadata('og:description', description);
+  setOrCreateMetadata('twitter:title', title);
+  setOrCreateMetadata('twitter:description', description);
+}
+
 export default async function decorate(doc) {
   category = getCategory();
   if (!category) {
-    window.location.href = get404PageUrl();
+    console.log('No category provided — assuming this is the category template');
     return;
   }
+  setCanonicalUrl(category);
+  updateMetadata(category);
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
@@ -176,35 +237,57 @@ export default async function decorate(doc) {
   updateTitleWithSubcategory(title, category, categoryData);
   getFilterAttrib(category);
 
-  // update breadcrumb adding the category dynamically
+  // Update breadcrumb dynamically once the block is loaded
   const observer = new MutationObserver((mutations) => {
     const { target } = mutations[0];
+
     if (target.dataset.blockStatus === 'loaded') {
       const breadcrumbList = target.querySelector('.breadcrumb-list');
-      const lastElLink = breadcrumbList.lastElementChild.firstElementChild;
-      const { length } = breadcrumbList.children;
-      const { className } = lastElLink;
-      const link = createElement('a', {
-        classes: className,
-        props: { href: `${url.origin}/part-category/?category=${category}` },
-      });
-      link.textContent = title.textContent;
-      const breadcrumbItem = createElement('li', {
-        classes: ['breadcrumb-item', `breadcrumb-item-${length}`],
-      });
-
-      if (mainCategory) {
-        mainCategory = mainCategory.toLowerCase();
-        lastElLink.href += `${mainCategory.replace(/\s/g, '-')}`;
-        lastElLink.textContent = mainCategory;
-      } else {
-        lastElLink.href = url.origin;
+      if (!breadcrumbList) {
+        console.warn('No breadcrumb list found.');
+        observer.disconnect();
+        return;
       }
-      breadcrumbItem.appendChild(link);
-      breadcrumbList.appendChild(breadcrumbItem);
+
+      // Remove last breadcrumb item (it's the current category, which we’ll replace)
+      const lastItem = breadcrumbList.lastElementChild;
+      if (lastItem) breadcrumbList.removeChild(lastItem);
+
+      let index = breadcrumbList.children.length;
+
+      // If mainCategory is present, add it before the final category
+      if (mainCategory) {
+        const mainSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
+        const mainLink = createElement('a', {
+          classes: 'breadcrumb-link',
+          props: { href: getLocaleContextedUrl(`/part-category/${mainSlug}`) },
+        });
+        mainLink.textContent = mainCategory;
+
+        const mainItem = createElement('li', {
+          classes: ['breadcrumb-item', `breadcrumb-item-${index}`],
+        });
+        mainItem.appendChild(mainLink);
+        breadcrumbList.appendChild(mainItem);
+        index += 1;
+      }
+
+      // Add final category (the one from the URL)
+      const finalLink = createElement('a', {
+        classes: 'breadcrumb-link active-link',
+        props: { href: getLocaleContextedUrl(`/part-category/${category}`) },
+      });
+      finalLink.textContent = title.textContent;
+
+      const finalItem = createElement('li', {
+        classes: ['breadcrumb-item', `breadcrumb-item-${index}`],
+      });
+      finalItem.appendChild(finalLink);
+      breadcrumbList.appendChild(finalItem);
 
       observer.disconnect();
     }
   });
+
   observer.observe(breadcrumbBlock, { attributes: true, attributeFilter: ['data-block-status'] });
 }
