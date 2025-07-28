@@ -32,8 +32,12 @@
   margin: 0 auto;
 }
 
-.breadcrumb a.breadcrumb-link {
+.breadcrumb .breadcrumb-item {
   color: var(--secondary-gray-4);
+}
+
+.breadcrumb a.breadcrumb-link {
+  color: inherit;
   text-decoration: none;
   font-size: var(--body-font-size-s);
   text-transform: capitalize;
@@ -44,10 +48,6 @@
   width: max-content;
 }
 
-.breadcrumb a:hover {
-  color: var(--breadcrumb-hover);
-}
-
 .breadcrumb-list .breadcrumb-item:last-of-type {
   width: 100%;
   overflow: hidden;
@@ -56,12 +56,17 @@
   padding: 0 15px 0 0;
 }
 
-.breadcrumb-list .breadcrumb-item:last-of-type a {
-  display: inline;
-}
-
 .breadcrumb-list .breadcrumb-item:nth-child(2) {
   display: none;
+}
+
+.breadcrumb a:hover,
+.breadcrumb-list .breadcrumb-item:last-of-type:has(a:hover) {
+  color: var(--breadcrumb-hover);
+}
+
+.breadcrumb-list .breadcrumb-item:last-of-type a {
+  display: inline;
 }
 
 .breadcrumb .breadcrumb-item:not(:last-of-type) a::after {
