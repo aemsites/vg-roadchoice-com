@@ -28,12 +28,12 @@ const optimizePicture = (imgUrl) => createOptimizedPicture(imgUrl, 'product imag
 const productCard = (product, searchType) => {
   const object = getProperties(product, searchType);
 
-  const { category, path, name, partNumber, hasImage, imgUrl } = object;
+  const { category, name, partNumber, hasImage, imgUrl } = object;
 
   const item = createElement('li', { classes: blockName });
   const safeCategory = category.replace(/[^\w]/g, '-').toLowerCase();
   const safePartNumber = encodeURIComponent(partNumber);
-  const linkUrl = getLocaleContextedUrl(path || `/parts/${safeCategory}/${safePartNumber}/`);
+  const linkUrl = getLocaleContextedUrl(`/parts/${safeCategory}/${safePartNumber}/`);
 
   const imageLink = createElement('a', { classes: 'image-link', props: { href: linkUrl } });
 
