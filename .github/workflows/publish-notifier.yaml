@@ -1,4 +1,4 @@
-name: RoadChoice Search Connector - Create_os_documents
+name: RoadChoice Search Connector
 
 on:
   repository_dispatch:
@@ -26,5 +26,20 @@ jobs:
         BODY='"'$PAGE_PATH'"'
         BODY="$(echo "$BODY" | jq -c)"
         response=$(curl -s -H "x-api-key: ${{ secrets.ROADCHOICE_API_KEY }}" -X POST "$URI" -d "$BODY")
+        echo "response: $response"
+      shell: bash
+  notify-doc-data-updater:
+    if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && contains(github.event.client_payload.path, '/product-data/') && github.event.client_payload.path != '/product-data/road-choice-make-model-part-filter-options.json'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify document_data_updater endpoint
+      run: |
+        sleep 50s
+        PAGE_PATH=$(echo "${{ github.event.client_payload.path }}")
+        WEBSITE_NAME="${{ github.event.client_payload.site }}"
+        URI=$(echo "${{ vars.DOC_UPDATER_API_GATEWAY_DOMAIN }}/$WEBSITE_NAME")
+        BODY='"'$PAGE_PATH'"'
+        BODY="$(echo "$BODY" | jq -c)"
+        response=$(curl -s -H "x-api-key: ${{ secrets.DOC_UPDATER_API_GATEWAY_KEY }}" -X POST "$URI" -d "$BODY")
         echo "response: $response"
       shell: bash
