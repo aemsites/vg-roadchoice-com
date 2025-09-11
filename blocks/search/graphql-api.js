@@ -212,24 +212,3 @@ export async function fetchCategories() {
 
   return data.data.rccategoriessubcategoriesFacets.facets;
 }
-
-// [
-//   {
-//     doc_count: 261,
-//     key: "Accessories",
-//     subcategories: [
-//       { doc_count: 86, key: 'Air Coils and Components' },
-//       { doc_count: 19, key: 'Antennas' },
-//       { doc_count: 1, key: 'Back Up Alarms' },
-//     ]
-//   },
-//   {
-//     doc_count: 191,
-//     key: "Brakes",
-//     subcategories: [
-//       { doc_count: 17, key: 'Air Disc Brake Calipers' },
-//       { doc_count: 11, key: 'Air Disc Brake Pads' },
-//       { doc_count: 9, key: 'Air Disc Brake Rotors' },
-//     ]
-//   }
-// ]
