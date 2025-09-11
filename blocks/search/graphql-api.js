@@ -184,3 +184,31 @@ export async function fetchFuzzySuggest({ q }) {
 
   return data.data[RC_PART_FUZZY_SEARCH];
 }
+
+export async function fetchCategories() {
+  const categoriesQuery = {
+    query: `
+      query RcCategoriesSubcategoriesFacets {
+        rccategoriessubcategoriesFacets {
+          facets {
+            doc_count
+            key
+            subcategories {
+              doc_count
+              key
+            }
+          }
+        }
+      }
+    `,
+    variables: {},
+  };
+
+  const { SEARCH_URL_DEV } = SEARCH_CONFIG;
+
+  const { data, error } = await fetchGraphQLData(categoriesQuery, SEARCH_URL_DEV);
+
+  if (error) return { facets: [], error };
+
+  return data.data.rccategoriessubcategoriesFacets.facets;
+}
