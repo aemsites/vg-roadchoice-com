@@ -184,3 +184,52 @@ export async function fetchFuzzySuggest({ q }) {
 
   return data.data[RC_PART_FUZZY_SEARCH];
 }
+
+export async function fetchCategories() {
+  const categoriesQuery = {
+    query: `
+      query RcCategoriesSubcategoriesFacets {
+        rccategoriessubcategoriesFacets {
+          facets {
+            doc_count
+            key
+            subcategories {
+              doc_count
+              key
+            }
+          }
+        }
+      }
+    `,
+    variables: {},
+  };
+
+  const { SEARCH_URL_DEV } = SEARCH_CONFIG;
+
+  const { data, error } = await fetchGraphQLData(categoriesQuery, SEARCH_URL_DEV);
+
+  if (error) return { facets: [], error };
+
+  return data.data.rccategoriessubcategoriesFacets.facets;
+}
+
+// [
+//   {
+//     doc_count: 261,
+//     key: "Accessories",
+//     subcategories: [
+//       { doc_count: 86, key: 'Air Coils and Components' },
+//       { doc_count: 19, key: 'Antennas' },
+//       { doc_count: 1, key: 'Back Up Alarms' },
+//     ]
+//   },
+//   {
+//     doc_count: 191,
+//     key: "Brakes",
+//     subcategories: [
+//       { doc_count: 17, key: 'Air Disc Brake Calipers' },
+//       { doc_count: 11, key: 'Air Disc Brake Pads' },
+//       { doc_count: 9, key: 'Air Disc Brake Rotors' },
+//     ]
+//   }
+// ]
