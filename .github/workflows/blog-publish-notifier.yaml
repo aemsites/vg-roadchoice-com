@@ -1,4 +1,4 @@
-name: Search Connector - Upsert
+name: RoadChoice Search Connector - Blog Upsert
 
 on:
   repository_dispatch:
@@ -19,13 +19,12 @@ jobs:
       (github.event.client_payload.status == 200 || github.event.client_payload.status == 204)
       && endsWith(github.event.client_payload.path, '.md')
       && (
-        startsWith(github.event.client_payload.path, '/magazine/')
-        || startsWith(github.event.client_payload.path, '/mack-news/')
+        startsWith(github.event.client_payload.path, '/blog/')
       )
     runs-on: ubuntu-latest
     env:
-      CONNECTOR_DOMAIN: ${{ vars.CONNECTOR_DOMAIN }}
-      API_KEY: ${{ secrets.API_KEY }}
+      EDS_CONNECTOR_DOMAIN: ${{ vars.EDS_CONNECTOR_DOMAIN }}
+      EDS_API_KEY: ${{ secrets.EDS_API_KEY }}
     outputs:
       http_code: ${{ steps.notify.outputs.http_code }}
       body: ${{ steps.notify.outputs.body }}
@@ -38,19 +37,11 @@ jobs:
           # Give time for publish pipeline to finish
           sleep 45s
 
-          RAW_PATH="${{ github.event.client_payload.path }}"
-
-          # Strip "index.md" or just ".md"
-          if [[ "$RAW_PATH" == *"index.md" ]]; then
-            PAGE_PATH="${RAW_PATH%"index.md"}"
-          else
-            PAGE_PATH="${RAW_PATH%.md}"
-          fi
+          PAGE_PATH="${{ github.event.client_payload.path }}"
 
           WEBSITE_NAME="${{ github.event.client_payload.site }}"
-          URI="${CONNECTOR_DOMAIN}/$WEBSITE_NAME"
+          URI="${EDS_CONNECTOR_DOMAIN}/$WEBSITE_NAME"
 
-          echo "Original path: $RAW_PATH"
           echo "Final upsert path: $PAGE_PATH"
           echo "Posting to: $URI"
 
@@ -58,7 +49,7 @@ jobs:
           BODY="$(echo "$BODY" | jq -c)"
 
           # Call API and capture both body and HTTP status code
-          response=$(curl -s -w "%{http_code}" -o response_body.txt -H "x-api-key: $API_KEY" -X POST "$URI" -d "$BODY")
+          response=$(curl -s -w "%{http_code}" -o response_body.txt -H "x-api-key: $EDS_API_KEY" -X POST "$URI" -d "$BODY")
           http_code="${response: -3}"
           body=$(cat response_body.txt)
 

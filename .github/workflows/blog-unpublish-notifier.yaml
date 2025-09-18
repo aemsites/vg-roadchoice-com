@@ -1,4 +1,4 @@
-name: Search Connector - Delete
+name: RoadChoice Search Connector - Blog Delete
 
 on:
   repository_dispatch:
@@ -20,13 +20,12 @@ jobs:
       (github.event.client_payload.status == 200 || github.event.client_payload.status == 204)
       && endsWith(github.event.client_payload.path, '.md')
       && (
-        startsWith(github.event.client_payload.path, '/magazine/')
-        || startsWith(github.event.client_payload.path, '/mack-news/')
+        startsWith(github.event.client_payload.path, '/blog/')
       )
     runs-on: ubuntu-latest
     env:
-      CONNECTOR_DOMAIN: ${{ vars.CONNECTOR_DOMAIN }}
-      API_KEY: ${{ secrets.API_KEY }}
+      EDS_CONNECTOR_DOMAIN: ${{ vars.EDS_CONNECTOR_DOMAIN }}
+      EDS_API_KEY: ${{ secrets.EDS_API_KEY }}
     outputs:
       page_path: ${{ steps.delete.outputs.page_path }}
       body: ${{ steps.delete.outputs.body }}
@@ -39,24 +38,16 @@ jobs:
           # Small delay to let upstream pipelines settle
           sleep 1s
 
-          RAW_PATH="${{ github.event.client_payload.path }}"
-
-          # Strip "index.md" or just ".md"
-          if [[ "$RAW_PATH" == *"index.md" ]]; then
-            PAGE_PATH="${RAW_PATH%"index.md"}"
-          else
-            PAGE_PATH="${RAW_PATH%.md}"
-          fi
+          PAGE_PATH="${{ github.event.client_payload.path }}"
 
           WEBSITE_NAME="${{ github.event.client_payload.site }}"
-          URI="${CONNECTOR_DOMAIN}/$WEBSITE_NAME?path=$PAGE_PATH"
+          URI="${EDS_CONNECTOR_DOMAIN}/$WEBSITE_NAME?path=$PAGE_PATH"
 
-          echo "Original path: $RAW_PATH"
           echo "Final delete path: $PAGE_PATH"
           echo "Calling DELETE: $URI"
 
           # Capture response body + HTTP status
-          response=$(curl -s -w "%{http_code}" -o response_body.txt -H "x-api-key: $API_KEY" -X DELETE "$URI")
+          response=$(curl -s -w "%{http_code}" -o response_body.txt -H "x-api-key: $EDS_API_KEY" -X DELETE "$URI")
           http_code="${response: -3}"
           body=$(cat response_body.txt)
 
