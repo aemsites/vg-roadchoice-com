@@ -38,11 +38,19 @@ jobs:
           # Small delay to let upstream pipelines settle
           sleep 1s
 
-          PAGE_PATH="${{ github.event.client_payload.path }}"
+          RAW_PATH="${{ github.event.client_payload.path }}"
+
+          # Strip "index.md" or just ".md"
+          if [[ "$RAW_PATH" == *"index.md" ]]; then
+            PAGE_PATH="${RAW_PATH%"index.md"}"
+          else
+            PAGE_PATH="${RAW_PATH%.md}"
+          fi
 
           WEBSITE_NAME="${{ github.event.client_payload.site }}"
           URI="${EDS_CONNECTOR_DOMAIN}/$WEBSITE_NAME?path=$PAGE_PATH"
 
+          echo "Original delete path: $RAW_PATH"
           echo "Final delete path: $PAGE_PATH"
           echo "Calling DELETE: $URI"
 
