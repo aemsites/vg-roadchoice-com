@@ -20,7 +20,7 @@ jobs:
       (github.event.client_payload.status == 200 || github.event.client_payload.status == 204)
       && endsWith(github.event.client_payload.path, '.md')
       && (
-        startsWith(github.event.client_payload.path, '/blog/')
+        contains(github.event.client_payload.path, '/blog/')
       )
     runs-on: ubuntu-latest
     env:
