@@ -37,11 +37,19 @@ jobs:
           # Give time for publish pipeline to finish
           sleep 45s
 
-          PAGE_PATH="${{ github.event.client_payload.path }}"
+          RAW_PATH="${{ github.event.client_payload.path }}"
+
+          # Strip "index.md" or just ".md"
+          if [[ "$RAW_PATH" == *"index.md" ]]; then
+            PAGE_PATH="${RAW_PATH%"index.md"}"
+          else
+            PAGE_PATH="${RAW_PATH%.md}"
+          fi
 
           WEBSITE_NAME="${{ github.event.client_payload.site }}"
           URI="${EDS_CONNECTOR_DOMAIN}/$WEBSITE_NAME"
 
+          echo "Original path: $RAW_PATH"
           echo "Final upsert path: $PAGE_PATH"
           echo "Posting to: $URI"
 
