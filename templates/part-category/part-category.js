@@ -5,7 +5,7 @@ import {
   getLocaleContextedUrl,
   getJsonFromUrl,
   setOrCreateMetadata,
-  getPlaceholders,
+  getTextLabel,
 } from '../../scripts/common.js';
 import { decorateLinks } from '../../scripts/scripts.js';
 
@@ -196,12 +196,12 @@ function setCanonicalUrl(category) {
  *
  * @param {string} category - The category slug from the URL.
  */
-async function updateMetadata(category) {
+function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
 
-  const title = await getPlaceholders('category_metadata_title');
-  const description = await getPlaceholders('category_metadata_title');
+  const title = getTextLabel('category_metadata_title');
+  const description = getTextLabel('category_metadata_title');
 
   console.log(title);
   console.log(description);
@@ -231,7 +231,7 @@ export default async function decorate(doc) {
 
   titleWrapper.appendChild(title);
 
-  const subtitleObject = await getSubtitleData(category);
+  const subtitleObject = getSubtitleData(category);
   if (subtitleObject?.text) {
     const { text, linkText, linkUrl } = subtitleObject;
     const subtitle = document.createRange().createContextualFragment(`
