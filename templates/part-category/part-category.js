@@ -200,8 +200,8 @@ async function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
 
-  const title = await getPlaceholders('category_metadata_title').replace('[[category]]', capitalizedCategory);
-  const description = await getPlaceholders('category_metadata_title').replace('[[category]]', capitalizedCategory);
+  const title = await getPlaceholders('category_metadata_title');
+  const description = await getPlaceholders('category_metadata_title');
 
   console.log(title);
   console.log(description);
