@@ -191,8 +191,8 @@ function setCanonicalUrl(category) {
   document.head.appendChild(canonical);
 }
 
-async function completeLabel(type, cat) {
-  let label = await getTextLabel(`category_metadata_${type}`);
+function completeLabel(type, cat) {
+  let label = getTextLabel(`category_metadata_${type}`);
   if (label) {
     label = label.replace('[[category]]', cat);
   }

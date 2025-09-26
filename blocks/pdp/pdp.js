@@ -461,9 +461,9 @@ function renderPartFit(partFitData) {
   partFitContainer.classList.remove('hide');
 }
 
-async function completeLabel(type, part) {
+function completeLabel(type, part) {
   const { 'Base Part Number': partNumber, 'Part Name': partName } = part;
-  let label = await getTextLabel(`pdp_metadata_${type}`);
+  let label = getTextLabel(`pdp_metadata_${type}`);
   if (label) {
     label = label.replace('[[part_number]]', partNumber);
     label = label.replace('[[part_name]]', partName);
