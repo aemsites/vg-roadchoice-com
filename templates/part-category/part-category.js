@@ -200,11 +200,8 @@ function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
 
-  const placeholderTitle = getPlaceholders('category_metadata_title');
-  const title = placeholderTitle.replace('[[category]]', capitalizedCategory);
-
-  const placeholderDescription = getPlaceholders('category_metadata_description');
-  const description = placeholderDescription.replace('[[category]]', capitalizedCategory);
+  const title = getPlaceholders('category_metadata_title').replace('[[category]]', capitalizedCategory);
+  const description = getPlaceholders('category_metadata_title').replace('[[category]]', capitalizedCategory);
 
   document.title = title;
   setOrCreateMetadata('og:title', title);
