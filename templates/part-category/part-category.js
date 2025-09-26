@@ -228,7 +228,7 @@ export default async function decorate(doc) {
 
   titleWrapper.appendChild(title);
 
-  const subtitleObject = getSubtitleData(category);
+  const subtitleObject = await getSubtitleData(category);
   if (subtitleObject?.text) {
     const { text, linkText, linkUrl } = subtitleObject;
     const subtitle = document.createRange().createContextualFragment(`
