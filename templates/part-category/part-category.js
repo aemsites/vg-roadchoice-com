@@ -1,4 +1,12 @@
-import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl, setOrCreateMetadata } from '../../scripts/common.js';
+import {
+  createElement,
+  getLongJSONData,
+  DEFAULT_LIMIT,
+  getLocaleContextedUrl,
+  getJsonFromUrl,
+  setOrCreateMetadata,
+  getPlaceholders,
+} from '../../scripts/common.js';
 import { decorateLinks } from '../../scripts/scripts.js';
 
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
@@ -191,8 +199,13 @@ function setCanonicalUrl(category) {
 function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
-  const title = `Road Choice - ${capitalizedCategory}`;
-  const description = `Explore parts in the ${capitalizedCategory} category.`;
+
+  const title = getPlaceholders('category_metadata_title');
+  title.replace('[[category]]', capitalizedCategory);
+
+  const description = getPlaceholders('category_metadata_description');
+  description.replace('[[category]]', capitalizedCategory);
+
   document.title = title;
   setOrCreateMetadata('og:title', title);
   setOrCreateMetadata('og:description', description);
