@@ -462,7 +462,7 @@ function renderPartFit(partFitData) {
 }
 
 async function updateMetadata(part) {
-  const { 'Base Part Number': partNumber, 'Part Number': partName } = part;
+  const { 'Base Part Number': partNumber, 'Part Name': partName } = part;
 
   let title = await getTextLabel('pdp_metadata_title');
   if (title) {
