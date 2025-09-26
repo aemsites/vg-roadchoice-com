@@ -203,16 +203,11 @@ async function updateMetadata(category) {
   const catTitleTemplate = await getTextLabel('category_metadata_title');
   const title = catTitleTemplate ? catTitleTemplate.replace('[[category]]', capitalizedCategory) : capitalizedCategory;
 
-  const catDescTemplate = await getTextLabel('category_metadata_title');
+  const catDescTemplate = await getTextLabel('category_metadata_description');
   const description = catDescTemplate ? catDescTemplate.replace('[[category]]', capitalizedCategory) : capitalizedCategory;
 
-  console.log(title);
-  console.log(description);
-  console.log(capitalizedCategory);
-  // const title = getPlaceholders('category_metadata_title').replace('[[category]]', capitalizedCategory);
-  // const description = getPlaceholders('category_metadata_title').replace('[[category]]', capitalizedCategory);
-
   document.title = title;
+  setOrCreateMetadata('description', description);
   setOrCreateMetadata('og:title', title);
   setOrCreateMetadata('og:description', description);
   setOrCreateMetadata('twitter:title', title);
