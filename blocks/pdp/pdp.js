@@ -462,22 +462,26 @@ function renderPartFit(partFitData) {
 }
 
 async function updateMetadata(part) {
-  console.log(part);
-  // const pdpTitleTemplate = await getTextLabel('pdp_metadata_title');
-  // const title = catTitleTemplate ? catTitleTemplate.replace('[[pdp]]', capitalizedCategory) : capitalizedCategory;
+  const { 'Base Part Number': partNumber, 'Part Number': partName } = part;
 
-  // const pdpDescTemplate = await getTextLabel('pdp_metadata_description');
-  // const description = catDescTemplate ? catDescTemplate.replace('[[category]]', capitalizedCategory) : capitalizedCategory;
+  let title = await getTextLabel('pdp_metadata_title');
+  if (title) {
+    title = title.replace('[[part_number]]', partNumber);
+    title = title.replace('[[part_name]]', partName);
+  }
 
-  // let result = test.replace("[[part_number]]", partNumberValue);
-  // result = result.replace("[[part_name]]", partNameValue);
+  let description = await getTextLabel('pdp_metadata_description');
+  if (description) {
+    description = description.replace('[[part_number]]', partNumber);
+    description = description.replace('[[part_name]]', partName);
+  }
 
-  document.title = `Road Choice - ${part['Base Part Number']}`;
-  setOrCreateMetadata('og:title', part['Base Part Number']);
-  setOrCreateMetadata('og:description', part['Part Name']);
+  document.title = title;
+  setOrCreateMetadata('og:title', title);
+  setOrCreateMetadata('og:description', description);
   setOrCreateMetadata('og:url', window.location.href);
-  setOrCreateMetadata('twitter:title', part['Base Part Number']);
-  setOrCreateMetadata('twitter:description', part['Part Name']);
+  setOrCreateMetadata('twitter:title', title);
+  setOrCreateMetadata('twitter:description', description);
 }
 
 function updateCanonicalUrl(category, sku) {
