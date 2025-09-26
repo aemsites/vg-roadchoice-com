@@ -196,12 +196,12 @@ function setCanonicalUrl(category) {
  *
  * @param {string} category - The category slug from the URL.
  */
-function updateMetadata(category) {
+async function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
 
-  const title = getTextLabel('category_metadata_title');
-  const description = getTextLabel('category_metadata_title');
+  const title = await getTextLabel('category_metadata_title');
+  const description = await getTextLabel('category_metadata_title');
 
   console.log(title);
   console.log(description);
@@ -223,7 +223,7 @@ export default async function decorate(doc) {
     return;
   }
   setCanonicalUrl(category);
-  await updateMetadata(category);
+  updateMetadata(category);
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
