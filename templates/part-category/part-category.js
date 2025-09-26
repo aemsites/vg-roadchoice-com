@@ -207,7 +207,6 @@ async function updateMetadata(category) {
   const description = catDescTemplate ? catDescTemplate.replace('[[category]]', capitalizedCategory) : capitalizedCategory;
 
   document.title = title;
-  setOrCreateMetadata('description', description);
   setOrCreateMetadata('og:title', title);
   setOrCreateMetadata('og:description', description);
   setOrCreateMetadata('twitter:title', title);

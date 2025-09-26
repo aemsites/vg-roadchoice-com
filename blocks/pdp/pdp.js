@@ -461,7 +461,17 @@ function renderPartFit(partFitData) {
   partFitContainer.classList.remove('hide');
 }
 
-function updateMetadata(part) {
+async function updateMetadata(part) {
+  console.log(part);
+  // const pdpTitleTemplate = await getTextLabel('pdp_metadata_title');
+  // const title = catTitleTemplate ? catTitleTemplate.replace('[[pdp]]', capitalizedCategory) : capitalizedCategory;
+
+  // const pdpDescTemplate = await getTextLabel('pdp_metadata_description');
+  // const description = catDescTemplate ? catDescTemplate.replace('[[category]]', capitalizedCategory) : capitalizedCategory;
+
+  // let result = test.replace("[[part_number]]", partNumberValue);
+  // result = result.replace("[[part_name]]", partNameValue);
+
   document.title = `Road Choice - ${part['Base Part Number']}`;
   setOrCreateMetadata('og:title', part['Base Part Number']);
   setOrCreateMetadata('og:description', part['Part Name']);
