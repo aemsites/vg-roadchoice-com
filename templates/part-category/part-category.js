@@ -223,7 +223,7 @@ export default async function decorate(doc) {
     return;
   }
   setCanonicalUrl(category);
-  updateMetadata(category);
+  await updateMetadata(category);
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
