@@ -204,7 +204,7 @@ async function completeLabel(type, cat) {
  *
  * @param {string} category - The category slug from the URL.
  */
-async function updateMetadata(category) {
+function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
   const title = completeLabel('title', capitalizedCategory);

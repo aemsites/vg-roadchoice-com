@@ -471,7 +471,7 @@ async function completeLabel(type, part) {
   return label || partName;
 }
 
-async function updateMetadata(part) {
+function updateMetadata(part) {
   const title = completeLabel('title', part);
   const description = completeLabel('description', part);
 
