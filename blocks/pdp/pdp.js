@@ -461,20 +461,19 @@ function renderPartFit(partFitData) {
   partFitContainer.classList.remove('hide');
 }
 
-async function updateMetadata(part) {
+async function completeLabel(type, part) {
   const { 'Base Part Number': partNumber, 'Part Name': partName } = part;
-
-  let title = await getTextLabel('pdp_metadata_title');
-  if (title) {
-    title = title.replace('[[part_number]]', partNumber);
-    title = title.replace('[[part_name]]', partName);
+  let label = await getTextLabel(`pdp_metadata_${type}`);
+  if (label) {
+    label = label.replace('[[part_number]]', partNumber);
+    label = label.replace('[[part_name]]', partName);
   }
+  return label || partName;
+}
 
-  let description = await getTextLabel('pdp_metadata_description');
-  if (description) {
-    description = description.replace('[[part_number]]', partNumber);
-    description = description.replace('[[part_name]]', partName);
-  }
+async function updateMetadata(part) {
+  const title = completeLabel('title', part);
+  const description = completeLabel('description', part);
 
   document.title = title;
   setOrCreateMetadata('og:title', title);

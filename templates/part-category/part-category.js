@@ -191,6 +191,14 @@ function setCanonicalUrl(category) {
   document.head.appendChild(canonical);
 }
 
+async function completeLabel(type, cat) {
+  let label = await getTextLabel(`category_metadata_${type}`);
+  if (label) {
+    label = label.replace('[[category]]', cat);
+  }
+  return label || cat;
+}
+
 /**
  * Sets page metadata for a category page, including <title>, Open Graph, and Twitter tags.
  *
@@ -199,12 +207,8 @@ function setCanonicalUrl(category) {
 async function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
-
-  const catTitleTemplate = await getTextLabel('category_metadata_title');
-  const title = catTitleTemplate ? catTitleTemplate.replace('[[category]]', capitalizedCategory) : capitalizedCategory;
-
-  const catDescTemplate = await getTextLabel('category_metadata_description');
-  const description = catDescTemplate ? catDescTemplate.replace('[[category]]', capitalizedCategory) : capitalizedCategory;
+  const title = completeLabel('title', capitalizedCategory);
+  const description = completeLabel('description', capitalizedCategory);
 
   document.title = title;
   setOrCreateMetadata('og:title', title);
