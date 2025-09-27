@@ -138,6 +138,22 @@
     {
       "Key": "DidyouMeanText",
       "Text": "Did you mean?"
+    },
+    {
+      "Key": "category_metadata_title",
+      "Text": "[[category]] Parts | Road Choice"
+    },
+    {
+      "Key": "category_metadata_description",
+      "Text": "Explore parts in the [[category]] category on Road Choice."
+    },
+    {
+      "Key": "pdp_metadata_title",
+      "Text": "[[part_number]] - [[part_name]]"
+    },
+    {
+      "Key": "pdp_metadata_description",
+      "Text": "Learn more about part [[part_number]] ([[part_name]]) on Road Choice."
     }
   ],
   ":type": "sheet"
