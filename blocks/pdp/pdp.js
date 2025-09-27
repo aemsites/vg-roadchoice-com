@@ -476,6 +476,7 @@ function updateMetadata(part) {
   const description = completeLabel('description', part);
 
   document.title = title;
+  setOrCreateMetadata('description', description);
   setOrCreateMetadata('og:title', title);
   setOrCreateMetadata('og:description', description);
   setOrCreateMetadata('og:url', window.location.href);

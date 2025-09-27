@@ -211,6 +211,7 @@ function updateMetadata(category) {
   const description = completeLabel('description', capitalizedCategory);
 
   document.title = title;
+  setOrCreateMetadata('description', description);
   setOrCreateMetadata('og:title', title);
   setOrCreateMetadata('og:description', description);
   setOrCreateMetadata('twitter:title', title);
