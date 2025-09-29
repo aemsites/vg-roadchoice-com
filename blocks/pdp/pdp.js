@@ -461,7 +461,7 @@ function renderPartFit(partFitData) {
   partFitContainer.classList.remove('hide');
 }
 
-function completeLabel(type, part) {
+function resolvePartLabel(type, part) {
   const { 'Base Part Number': partNumber, 'Part Name': partName } = part;
   let label = getTextLabel(`pdp_metadata_${type}`);
   if (label) {
@@ -472,8 +472,8 @@ function completeLabel(type, part) {
 }
 
 function updateMetadata(part) {
-  const title = completeLabel('title', part);
-  const description = completeLabel('description', part);
+  const title = resolvePartLabel('title', part);
+  const description = resolvePartLabel('description', part);
 
   document.title = title;
   setOrCreateMetadata('description', description);

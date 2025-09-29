@@ -191,7 +191,7 @@ function setCanonicalUrl(category) {
   document.head.appendChild(canonical);
 }
 
-function completeLabel(type, cat) {
+function resolvePartLabel(type, cat) {
   let label = getTextLabel(`category_metadata_${type}`);
   if (label) {
     label = label.replace('[[category]]', cat);
@@ -207,8 +207,8 @@ function completeLabel(type, cat) {
 function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
-  const title = completeLabel('title', capitalizedCategory);
-  const description = completeLabel('description', capitalizedCategory);
+  const title = resolvePartLabel('title', capitalizedCategory);
+  const description = resolvePartLabel('description', capitalizedCategory);
 
   document.title = title;
   setOrCreateMetadata('description', description);
