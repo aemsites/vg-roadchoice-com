@@ -106,7 +106,7 @@ export async function applyFuzzySearch(fuzzyTerm) {
 
     fuzzyWrapper.append(fuzzyText, list);
     const h1 = createElement('h1', { classes: [`${blockName}__fuzzysearch-title`] });
-    const titleHTML = getTextLabel('no_results_title').replace('[$]', `<span class="${blockName}__fuzzysearch-term">"${fuzzyTerm || ''}"</span>`);
+    const titleHTML = getTextLabel('no_results_title').replace('[$]', `<span class="${blockName}__fuzzysearch-term">${fuzzyTerm || ''}</span>`);
     h1.innerHTML = titleHTML;
     if (searchResultsSection) {
       searchResultsSection.innerHTML = '';
