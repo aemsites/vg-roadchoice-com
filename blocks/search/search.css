@@ -153,6 +153,7 @@
 
 .search__fuzzysearch-results-wrapper {
   display: flex;
+  justify-content: center;
   gap: 30px;
   padding-bottom: 30px;
 }
@@ -164,6 +165,20 @@
   color: var(--primary-red);
   font-weight: 700;
   cursor: pointer;
+}
+
+.search__fuzzysearch-title {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 38px;
+  color: var(--primary-red);
+}
+
+.search__fuzzysearch-term {
+  text-transform: none;
 }
 
 @media (min-width: 360px) {

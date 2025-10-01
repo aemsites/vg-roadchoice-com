@@ -105,7 +105,13 @@ export async function applyFuzzySearch(fuzzyTerm) {
     partBtn?.click();
 
     fuzzyWrapper.append(fuzzyText, list);
-    searchResultsSection?.prepend(fuzzyWrapper);
+    const h1 = createElement('h1', { classes: [`${blockName}__fuzzysearch-title`] });
+    const titleHTML = getTextLabel('no_results_title').replace('[$]', `<span class="${blockName}__fuzzysearch-term">"${fuzzyTerm || ''}"</span>`);
+    h1.innerHTML = titleHTML;
+    if (searchResultsSection) {
+      searchResultsSection.innerHTML = '';
+      searchResultsSection.append(h1, fuzzyWrapper);
+    }
   }
   return suggestions;
 }
