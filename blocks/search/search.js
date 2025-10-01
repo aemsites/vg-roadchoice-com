@@ -109,7 +109,7 @@ function addSearchByListeners(wrapper, form) {
 
     if (e.target.classList.contains(`${blockName}__cross-reference__btn`)) {
       document.querySelector(`.${blockName}__fuzzysearch-results-wrapper`)?.remove();
-      document.querySelector(`.${blockName}__fuzzysearch-title`)?.remove();
+      document.querySelector(`.${blockName}__no-results-title`)?.remove();
     }
   };
 }
