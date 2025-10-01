@@ -167,7 +167,7 @@
   cursor: pointer;
 }
 
-.search__fuzzysearch-title {
+.search__no-results-title {
   text-align: center;
   margin-top: 0;
   margin-bottom: 25px;
@@ -177,7 +177,7 @@
   color: var(--primary-red);
 }
 
-.search__fuzzysearch-term {
+.search__no-results-term {
   text-transform: none;
 }
 
