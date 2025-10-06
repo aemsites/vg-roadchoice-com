@@ -675,13 +675,14 @@ const formatValues = (values = []) => {
  * @param {string} propVal - The value to set for the meta tag's `content` attribute.
  */
 function setOrCreateMetadata(propName, propVal) {
-  const meta = document.head.querySelector(`meta[property="${propName}"]`);
+  const attributeValue = propName.startsWith('og:') ? 'property' : 'name';
+  const meta = document.head.querySelector(`meta[${attributeValue}="${propName}"]`);
   if (meta) {
     meta.setAttribute('content', propVal);
   } else {
     const newMeta = createElement('meta', {
       props: {
-        property: propName,
+        attributeValue: propName,
         content: propVal,
       },
     });
