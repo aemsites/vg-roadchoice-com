@@ -29,7 +29,7 @@ jobs:
         echo "response: $response"
       shell: bash
   notify-doc-data-updater:
-    if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && contains(github.event.client_payload.path, '/product-data/') && github.event.client_payload.path != '/product-data/road-choice-make-model-part-filter-options.json'
+    if: (github.event.client_payload.status == 200 || github.event.client_payload.status == 204) && contains(github.event.client_payload.path, '/product-data/') && !contains(github.event.client_payload.path, 'road-choice-make-model-part-filter-options.json')
     runs-on: ubuntu-latest
     steps:
     - name: Notify document_data_updater endpoint
