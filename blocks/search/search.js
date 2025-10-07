@@ -109,6 +109,7 @@ function addSearchByListeners(wrapper, form) {
 
     if (e.target.classList.contains(`${blockName}__cross-reference__btn`)) {
       document.querySelector(`.${blockName}__fuzzysearch-results-wrapper`)?.remove();
+      document.querySelector(`.${blockName}__no-results-title`)?.remove();
     }
   };
 }
@@ -320,11 +321,10 @@ function addFormListener(form) {
     const url = new URL(window.location.href);
     url.pathname = getLocaleContextedUrl('/search/');
     const fuzzyTerm = url.searchParams.get('fuzzyTerm');
-    const fuzzyness = url.searchParams.get('fuzzyness');
     const makeFilterValue = getMakeFilterValue(items);
     const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
 
-    if (!isCrossRefActive && !wrapper?.children?.length && !fuzzyness) {
+    if (!isCrossRefActive && !wrapper?.children?.length) {
       url.search = `?fuzzyTerm=${value}&st=parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
     } else {
       const searchType = isCrossRefActive

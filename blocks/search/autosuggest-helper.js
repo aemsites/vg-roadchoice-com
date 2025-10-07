@@ -105,7 +105,16 @@ export async function applyFuzzySearch(fuzzyTerm) {
     partBtn?.click();
 
     fuzzyWrapper.append(fuzzyText, list);
-    searchResultsSection?.prepend(fuzzyWrapper);
+    const noResultsTitleEl = createElement('h1', { classes: [`${blockName}__no-results-title`] });
+    const noResultsTitleHtml = getTextLabel('no_results_title').replace(
+      '[$]',
+      `<span class="${blockName}__no-results-term">${fuzzyTerm || ''}</span>`,
+    );
+    noResultsTitleEl.innerHTML = noResultsTitleHtml;
+
+    if (searchResultsSection) {
+      searchResultsSection.replaceChildren(noResultsTitleEl, fuzzyWrapper);
+    }
   }
   return suggestions;
 }

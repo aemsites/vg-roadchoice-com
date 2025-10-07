@@ -461,13 +461,27 @@ function renderPartFit(partFitData) {
   partFitContainer.classList.remove('hide');
 }
 
+function resolvePartLabel(type, part) {
+  const { 'Base Part Number': partNumber, 'Part Name': partName } = part;
+  let label = getTextLabel(`pdp_metadata_${type}`);
+  if (label) {
+    label = label.replace('[[part_number]]', partNumber);
+    label = label.replace('[[part_name]]', partName);
+  }
+  return label || partName;
+}
+
 function updateMetadata(part) {
-  document.title = `Road Choice - ${part['Base Part Number']}`;
-  setOrCreateMetadata('og:title', part['Base Part Number']);
-  setOrCreateMetadata('og:description', part['Part Name']);
+  const title = resolvePartLabel('title', part);
+  const description = resolvePartLabel('description', part);
+
+  document.title = title;
+  setOrCreateMetadata('description', description);
+  setOrCreateMetadata('og:title', title);
+  setOrCreateMetadata('og:description', description);
   setOrCreateMetadata('og:url', window.location.href);
-  setOrCreateMetadata('twitter:title', part['Base Part Number']);
-  setOrCreateMetadata('twitter:description', part['Part Name']);
+  setOrCreateMetadata('twitter:title', title);
+  setOrCreateMetadata('twitter:description', description);
 }
 
 function updateCanonicalUrl(category, sku) {

@@ -1,4 +1,12 @@
-import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, getJsonFromUrl, setOrCreateMetadata } from '../../scripts/common.js';
+import {
+  createElement,
+  getLongJSONData,
+  DEFAULT_LIMIT,
+  getLocaleContextedUrl,
+  getJsonFromUrl,
+  setOrCreateMetadata,
+  getTextLabel,
+} from '../../scripts/common.js';
 import { decorateLinks } from '../../scripts/scripts.js';
 
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
@@ -183,6 +191,14 @@ function setCanonicalUrl(category) {
   document.head.appendChild(canonical);
 }
 
+function resolvePartLabel(type, cat) {
+  let label = getTextLabel(`category_metadata_${type}`);
+  if (label) {
+    label = label.replace('[[category]]', cat);
+  }
+  return label || cat;
+}
+
 /**
  * Sets page metadata for a category page, including <title>, Open Graph, and Twitter tags.
  *
@@ -191,9 +207,11 @@ function setCanonicalUrl(category) {
 function updateMetadata(category) {
   const readableCategory = category.replace(/-/g, ' ');
   const capitalizedCategory = readableCategory.charAt(0).toUpperCase() + readableCategory.slice(1);
-  const title = `Road Choice - ${capitalizedCategory}`;
-  const description = `Explore parts in the ${capitalizedCategory} category.`;
+  const title = resolvePartLabel('title', capitalizedCategory);
+  const description = resolvePartLabel('description', capitalizedCategory);
+
   document.title = title;
+  setOrCreateMetadata('description', description);
   setOrCreateMetadata('og:title', title);
   setOrCreateMetadata('og:description', description);
   setOrCreateMetadata('twitter:title', title);
