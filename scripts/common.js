@@ -7,6 +7,14 @@ const DEFAULT_LIMIT = 100_000;
 
 let placeholders = null;
 
+/** Gets the language of the page from the HTML lang attribute or metadata tag.
+ * @returns {string|null} The language code, or null if not found.
+ */
+export const getPageLanguage = () => {
+  const locale = document.documentElement.lang || getMetadata('locale') || null;
+  return locale ? locale.split('-')[0].toUpperCase() : 'EN';
+};
+
 /**
  * Gets the language path from the current URL.
  * @returns {string} The language path, e.g., "/en/" or "/en-US/". Defaults to "/".
