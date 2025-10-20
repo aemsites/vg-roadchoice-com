@@ -153,15 +153,9 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     const model = urlParams.get('model');
     const searchType = urlParams.get('st');
     const category = urlParams.get('category');
-    const parsedOffset = parseInt(offsetParam, 10);
-    let targetOffset;
-    if (isNaN(parsedOffset)) {
-      targetOffset = 0;
-    } else if (isFirstSet && parsedOffset === 0) {
-      targetOffset = 0;
-    } else {
-      targetOffset = parsedOffset + 1;
-    }
+    const parsedOffset = Number.parseInt(offsetParam, 10);
+    const currentPage = Number.isFinite(parsedOffset) && parsedOffset >= 0 ? parsedOffset : 0;
+    const targetOffset = isFirstSet ? currentPage : currentPage + 1;
 
     const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
     const searchParams = { query, offset, make, model, searchType, category };
