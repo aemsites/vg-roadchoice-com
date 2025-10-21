@@ -15,9 +15,9 @@ let allArticles;
 
 const buildResults = (articles, page) => {
   articles.sort((a, b) => {
-    a.date = +a.date;
-    b.date = +b.date;
-    return b.date - a.date;
+    a['publish-date'] = +a['publish-date'];
+    b['publish-date'] = +b['publish-date'];
+    return b['publish-date'] - a['publish-date'];
   });
 
   const results = createElement('div', { classes: `${blockName}-articles` });
@@ -44,7 +44,7 @@ const buildResults = (articles, page) => {
     title.appendChild(titleLink);
 
     const date = createElement('p', { classes: 'date' });
-    date.textContent = formatDate(art.date);
+    date.textContent = formatDate(art['publish-date']);
 
     const description = createElement('p', { classes: 'description' });
     description.textContent = art.description;
@@ -326,9 +326,9 @@ export default async function decorate(block) {
   const json = await getJsonFromUrl(url);
   allArticles = json.data;
   allArticles.sort((a, b) => {
-    a.date = +a.date;
-    b.date = +b.date;
-    return b.date - a.date;
+    a['publish-date'] = +a['publish-date'];
+    b['publish-date'] = +b['publish-date'];
+    return b['publish-date'] - a['publish-date'];
   });
 
   const sidebar = buildSidebar(allArticles, titleContent);
