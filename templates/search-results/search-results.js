@@ -43,4 +43,7 @@ export default async function decorate(doc) {
 
   if (searchBar) main.prepend(searchBar);
   main.append(section);
+
+  // Delete obsolete containers left behind
+  ['.filters-container', '.results-list-container', '.pagination-container'].forEach((selector) => main.querySelector(selector)?.remove());
 }
