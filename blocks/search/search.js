@@ -153,7 +153,9 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
     const model = urlParams.get('model');
     const searchType = urlParams.get('st');
     const category = urlParams.get('category');
-    const targetOffset = isFirstSet && offsetParam === '0' ? 0 : parseInt(offsetParam) + 1;
+    const parsedOffset = Number.parseInt(offsetParam, 10);
+    const currentPage = Number.isFinite(parsedOffset) && parsedOffset >= 0 ? parsedOffset : 0;
+    const targetOffset = isFirstSet ? currentPage : currentPage + 1;
 
     const offset = MAX_PRODUCTS_PER_QUERY ? targetOffset * parseInt(MAX_PRODUCTS_PER_QUERY) : 0;
     const searchParams = { query, offset, make, model, searchType, category };
@@ -177,7 +179,8 @@ export const getAndApplySearchResults = async ({ isFirstSet }) => {
 
 const updateUrl = (targetOffset) => {
   const newUrl = new URL(window.location);
-  newUrl.searchParams.set('offset', targetOffset);
+  const safeOffset = isNaN(targetOffset) ? 0 : targetOffset;
+  newUrl.searchParams.set('offset', safeOffset);
   window.history.pushState({ path: newUrl.href }, '', newUrl.href);
 };
 
@@ -325,7 +328,7 @@ function addFormListener(form) {
     const modelFilterValue = getFieldValue(`${blockName}__model-filter__select`, items);
 
     if (!isCrossRefActive && !wrapper?.children?.length) {
-      url.search = `?fuzzyTerm=${value}&st=parts${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
+      url.search = `?fuzzyTerm=${value}&st=parts&offset=0${makeFilterValue ? `&make=${makeFilterValue}` : ''}${modelFilterValue ? `&model=${modelFilterValue}` : ''}`;
     } else {
       const searchType = isCrossRefActive
         ? 'cross'
