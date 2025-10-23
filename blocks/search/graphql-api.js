@@ -1,4 +1,4 @@
-import { SEARCH_CONFIG } from '../../scripts/common.js';
+import { SEARCH_CONFIG, getPageLanguage } from '../../scripts/common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
   try {
@@ -186,10 +186,12 @@ export async function fetchFuzzySuggest({ q }) {
 }
 
 export async function fetchCategories() {
+  const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
+
   const categoriesQuery = {
     query: `
-      query RcCategoriesSubcategoriesFacets {
-        rccategoriessubcategoriesFacets {
+      query RcCategoriesSubcategoriesFacets($tenant: RcTenantEnum, $language: RcLocaleEnum) {
+        rccategoriessubcategoriesFacets(tenant: $tenant, language: $language) {
           facets {
             doc_count
             key
@@ -201,10 +203,11 @@ export async function fetchCategories() {
         }
       }
     `,
-    variables: {},
+    variables: {
+      tenant: TENANT,
+      language: getPageLanguage() || 'EN',
+    },
   };
-
-  const { SEARCH_URL_DEV } = SEARCH_CONFIG;
 
   const { data, error } = await fetchGraphQLData(categoriesQuery, SEARCH_URL_DEV);
 
