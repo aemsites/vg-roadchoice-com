@@ -1,5 +1,7 @@
 import { createElement, getTextLabel, getJsonFromUrl, getLocaleContextedUrl } from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/aem.js';
+import { fetchArticles } from '../../scripts/graphql-api.js';
+import { extractLimitFromBlock } from '../../scripts/services/blog.service.js';
 
 const blockName = 'recommendations';
 const category = getMetadata('category');
@@ -27,31 +29,53 @@ export const clearRepeatedArticles = (articles) =>
     return null;
   });
 
+// const formatDate = (date) => {
+//   const convertedDate = new Date(parseInt(date, 10) * 1000);
+
+//   const day = convertedDate.getDate();
+//   const month = convertedDate.getMonth() + 1;
+//   const year = convertedDate.getFullYear();
+
+//   return `${month}/${day}/${year}`;
+// };
+
 const formatDate = (date) => {
+  // Convert the Unix timestamp (seconds) to milliseconds
   const convertedDate = new Date(parseInt(date, 10) * 1000);
 
-  const day = convertedDate.getDate();
-  const month = convertedDate.getMonth() + 1;
-  const year = convertedDate.getFullYear();
-
-  return `${month}/${day}/${year}`;
+  // Use toLocaleDateString with specific options
+  return convertedDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  });
+  // You could also use 'default' for the locale to use the user's system locale:
+  // return convertedDate.toLocaleDateString(undefined, {...});
 };
 
 export default async function decorate(block) {
-  const limit = Number(getLimit(block));
-  const route = getLocaleContextedUrl('/blog/query-index.json');
-  const { data: allArticles } = await getJsonFromUrl(route);
+  const queryParams = {
+    sort: 'LAST_MODIFIED_DESC',
+    limit: 10,
+    // limit: (extractLimitFromBlock(block) + 1),
+  };
 
-  const sortedArticles = allArticles.sort((a, b) => {
-    a.date = +a.date;
-    b.date = +b.date;
-    return b.date - a.date;
-  });
-  const filteredArticles = clearRepeatedArticles(sortedArticles);
-  const artByCategory = category ? filteredArticles.filter((e) => e.category.toLowerCase() === category.toLowerCase()) : filteredArticles;
-  const selectedArticles = artByCategory.slice(0, limit);
+  const { articles } = await fetchArticles(queryParams);
 
-  const noArticles = selectedArticles.length === 0;
+  //const { data: allArticles } = await getJsonFromUrl(route);
+
+  //const sortedArticles = allArticles.sort((a, b) => {
+  //  a.date = +a.date;
+  //  b.date = +b.date;
+  //  return b.date - a.date;
+  //});
+
+  //const filteredArticles = clearRepeatedArticles(sortedArticles);
+
+  //const artByCategory = category ? filteredArticles.filter((e) => e.category.toLowerCase() === category.toLowerCase()) : filteredArticles;
+  //const selectedArticles = artByCategory.slice(0, limit);
+
+  const noArticles = articles.length === 0;
 
   const recommendationsContent = createElement('div', { classes: `${blockName}-content` });
   const titleSection = createElement('div', { classes: ['title-section'] });
@@ -69,7 +93,9 @@ export default async function decorate(block) {
 
   const recommendationsList = createElement('ul', { classes: `${blockName}-list` });
 
-  selectedArticles.forEach((art) => {
+  articles.forEach((art) => {
+    console.log(art);
+    console.log(formatDate(art.publishDate));
     const article = createElement('li', { classes: ['article'] });
 
     const articleTitle = createElement('h2', { classes: ['article-title'] });
@@ -79,7 +105,7 @@ export default async function decorate(block) {
     articleTitle.appendChild(articleTitleLink);
 
     const articleDate = createElement('p', { classes: ['article-date'] });
-    articleDate.innerText = formatDate(art.date);
+    articleDate.innerText = formatDate(art.publishDate ? art.publishDate : art.lastModified);
 
     const articleText = createElement('p', { classes: ['article-text'] });
     articleText.innerText = art.description;

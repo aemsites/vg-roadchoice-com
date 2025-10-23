@@ -101,6 +101,10 @@
       {
         "name": "RC_PART_FUZZY_SEARCH",
         "value": "rcpartdidyoumean"
+      },
+      {
+        "name": "TENANT",
+        "value": "vg-roadchoice-com"
       }
     ]
   },
