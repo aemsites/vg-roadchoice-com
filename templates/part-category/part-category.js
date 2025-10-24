@@ -314,4 +314,6 @@ export default async function decorate(doc) {
   });
 
   observer.observe(breadcrumbBlock, { attributes: true, attributeFilter: ['data-block-status'] });
+
+  console.log(breadcrumbBlock);
 }
