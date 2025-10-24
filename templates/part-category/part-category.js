@@ -62,7 +62,8 @@ const getCategory = () => {
  */
 const getCategoryData = async (cat) => {
   const test = await subcategorySearch({ category: 'Tools', subcategory: 'Jacks' });
-  console.warn(test);
+  const metadataArray = test.map((item) => item.metadata);
+  console.warn(metadataArray);
 
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
