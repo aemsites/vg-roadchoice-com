@@ -21,7 +21,7 @@ function getFilters() {
 
 const renderBlock = async (block) => {
   const filters = getFilters();
-  console.log(filters);
+  console.log(filters); // these are the active filters from rc-[[SUBCAT]].json in sharepoint
   const filterTitle = createElement('h3', { classes: `${blockName}-title` });
   filterTitle.textContent = titleText;
   const filterForm = createElement('form', { classes: `${blockName}-form`, props: { id: `${blockName}-form` } });
