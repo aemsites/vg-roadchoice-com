@@ -69,7 +69,7 @@ const getCategoryData = async (cat) => {
     //   url: productDataUrl,
     //   limit: DEFAULT_LIMIT,
     // });
-    const rawData = await subcategorySearch({ category: 'Tools', subcategory: cat });
+    const rawData = await subcategorySearch({ category: 'Tools', subcategory: 'Jacks' });
     const products = rawData.map((item) => item.metadata);
 
     if (!Array.isArray(products) || products.length === 0) {
