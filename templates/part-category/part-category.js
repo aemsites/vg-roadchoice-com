@@ -117,13 +117,13 @@ const getFilterAttrib = async (cat) => {
       limit: DEFAULT_LIMIT,
     });
 
-    console.warn(filtersJson);
+    // console.warn(filtersJson); this is all +10000 filters
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
     const filterAttribs = filtersJson
       .filter((el) => el.Subcategory.toLowerCase().replace(/ /g, '-') === cat.toLowerCase() && el.Filter === '')
       .map((el) => el.Attributes);
-
+    console.log(filterAttribs);
     const event = new Event('FilterAttribsLoaded');
     sessionStorage.setItem('filter-attribs', JSON.stringify(filterAttribs));
     document.dispatchEvent(event);
