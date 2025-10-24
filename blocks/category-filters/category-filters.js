@@ -3,9 +3,9 @@ import { createElement, getTextLabel } from '../../scripts/common.js';
 const blockName = 'category-filters';
 let products = window.categoryData;
 let isDecorated = false;
-const titleText = getTextLabel('category_filters_title');
-const clearText = getTextLabel('category_filters_clear_button');
-const applyText = getTextLabel('category_filters_apply_button');
+const titleText = getTextLabel(`${blockName}_title`);
+const clearText = getTextLabel(`${blockName}_clear_button`);
+const applyText = getTextLabel(`${blockName}_apply_button`);
 
 function getFilters() {
   let filters = {};

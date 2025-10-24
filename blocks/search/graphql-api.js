@@ -309,6 +309,6 @@ export async function subcategorySearch({ category = '', subcategory = '' }) {
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
   if (error) return { items: [], error };
-
+  console.log(data);
   return data.data[RC_SUBCATEGORIES_SEARCH].items;
 }
