@@ -1,6 +1,8 @@
 import { SEARCH_CONFIG, getPageLanguage } from '../../scripts/common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
+  console.log(graphqlQuery);
+  console.log(endpoint);
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
