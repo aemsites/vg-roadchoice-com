@@ -61,18 +61,18 @@ const getCategory = () => {
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
-  const test = await subcategorySearch({ category: 'Tools', subcategory: 'Jacks' });
-  const metadataArray = test.map((item) => item.metadata);
-  console.warn(metadataArray);
-
   try {
-    const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
-    console.log('url', productDataUrl);
-    const products = await getLongJSONData({
-      url: productDataUrl,
-      limit: DEFAULT_LIMIT,
-    });
+    // const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
+    // console.log('url', productDataUrl);
+    // const products = await getLongJSONData({
+    //   url: productDataUrl,
+    //   limit: DEFAULT_LIMIT,
+    // });
+    const rawData = await subcategorySearch({ category: 'Tools', subcategory: 'Jacks' });
+    const products = rawData.map((item) => item.metadata);
+    console.warn(products);
     console.log('products', products);
+
     if (!Array.isArray(products) || products.length === 0) {
       console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
       json.data = [];
