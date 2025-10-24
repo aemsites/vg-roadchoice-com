@@ -21,6 +21,7 @@ function getFilters() {
 
 const renderBlock = async (block) => {
   const filters = getFilters();
+  console.log(filters);
   const filterTitle = createElement('h3', { classes: `${blockName}-title` });
   filterTitle.textContent = titleText;
   const filterForm = createElement('form', { classes: `${blockName}-form`, props: { id: `${blockName}-form` } });

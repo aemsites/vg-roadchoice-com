@@ -63,8 +63,8 @@ const getCategory = () => {
 const getCategoryData = async (cat) => {
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
-    console.log('url', productDataUrl);
-    console.log(cat);
+    console.log('url', productDataUrl); // -> this returns '/product-data/rc-jacks.json'
+    console.log(cat); // -> this returns 'jacks'
     // const products = await getLongJSONData({
     //   url: productDataUrl,
     //   limit: DEFAULT_LIMIT,
