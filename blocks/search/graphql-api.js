@@ -308,8 +308,8 @@ export async function subcategorySearch({ category = '', subcategory = '' }) {
     variables: {
       tenant: TENANT,
       language: getPageLanguage() || 'EN',
-      category,
-      subcategory,
+      categoryFilter: category,
+      subcategoryFilter: subcategory,
     },
   };
 
