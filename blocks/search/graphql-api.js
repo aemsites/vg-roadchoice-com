@@ -294,14 +294,7 @@ export async function subcategorySearch({ category = '', subcategory = '' }) {
               }
             }
             score
-          }
-          facets {
-            field_name
-            facets {
-              doc_count
-              key
-            }
-          }
+          } 
         }
       }
     `,
@@ -315,7 +308,7 @@ export async function subcategorySearch({ category = '', subcategory = '' }) {
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { items: [], facets: [], error };
+  if (error) return { items: [], error };
 
-  return data;
+  return data.data[RC_SUBCATEGORIES_SEARCH].items;
 }
