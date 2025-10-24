@@ -84,7 +84,8 @@ const getCategoryData = async (cat) => {
     json.limit = 20;
     json.total = products.length;
 
-    mainCategory = json.data[0]?.Category;
+    mainCategory = 'Jacks';
+    // mainCategory = json.data[0]?.Category;
 
     if (!mainCategory) {
       console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
