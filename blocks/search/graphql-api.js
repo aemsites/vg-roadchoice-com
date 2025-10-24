@@ -1,8 +1,7 @@
 import { SEARCH_CONFIG, getPageLanguage } from '../../scripts/common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
-  console.log(graphqlQuery);
-  console.log(endpoint);
+  console.log(graphqlQuery.variables);
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -309,6 +308,6 @@ export async function subcategorySearch({ category = '', subcategory = '' }) {
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
   if (error) return { items: [], error };
-  console.log(data);
+
   return data.data[RC_SUBCATEGORIES_SEARCH].items;
 }
