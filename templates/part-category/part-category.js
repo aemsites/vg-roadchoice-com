@@ -1,3 +1,4 @@
+import { subcategorySearch } from '../../blocks/search/graphql-api.js';
 import {
   createElement,
   getLongJSONData,
@@ -60,6 +61,8 @@ const getCategory = () => {
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
+  const test = await subcategorySearch('Tools', 'Jacks');
+  console.warn(test);
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
     console.log('url', productDataUrl);
@@ -112,7 +115,7 @@ const getFilterAttrib = async (cat) => {
       url: categoryMaster,
       limit: DEFAULT_LIMIT,
     });
-    console.log('filters', filtersJson);
+
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
     const filterAttribs = filtersJson

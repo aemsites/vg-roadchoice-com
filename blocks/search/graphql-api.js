@@ -252,3 +252,68 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
 
   return data.data[RC_PART_FUZZY_SEARCH];
 }
+
+/** Fetch fuzzy search suggestions from the GraphQL API based on the provided parameters.
+ * @param {Object} params - The fuzzy search parameters.
+ * @param {string} params.q - The search term for which to fetch suggestions.
+ * @param {string} params.language - The language code for localization.
+ * @returns {Object} An object containing the fuzzy search suggestions and any error encountered.
+ */
+export async function subcategorySearch({ category = '', subcategory = '' }) {
+  const { SEARCH_URL_DEV, RC_SUBCATEGORIES_SEARCH, TENANT } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${RC_SUBCATEGORIES_SEARCH}($categoryFilter: String!, $subcategoryFilter: String!, $facetFields: [String], $dynamicFilters: [RcDynamicFilter], $sortOptions: RcSortOptionsEnum, $limit: Int, $offset: Int, $tenant: RcTenantEnum, $language: RcLocaleEnum) {
+        ${RC_SUBCATEGORIES_SEARCH}(categoryFilter: $categoryFilter, subcategoryFilter: $subcategoryFilter, facetFields: $facetFields, dynamicFilters: $dynamicFilters, sortOptions: $sortOptions, limit: $limit, offset: $offset, tenant: $tenant, language: $language) {
+          count
+          currentPage
+          numberOfPages
+          items {
+            uuid
+            metadata {
+              base_part_number
+              mack_part_number
+              volvo_part_number
+              part_name
+              tenant
+              path
+              part_category
+              description
+              image_url
+              manufacturer {
+                oem_number
+                name
+              }
+              model {
+                make
+                name
+                description
+              }
+            }
+            score
+          }
+          facets {
+            field_name
+            facets {
+              doc_count
+              key
+            }
+          }
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      language: getPageLanguage() || 'EN',
+      category,
+      subcategory,
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { items: [], facets: [], error };
+
+  return data;
+}
