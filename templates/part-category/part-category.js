@@ -61,8 +61,9 @@ const getCategory = () => {
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
-  const test = await subcategorySearch('Tools', 'Jacks');
+  const test = await subcategorySearch({ category: 'Tools', subcategory: 'Jacks' });
   console.warn(test);
+
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
     console.log('url', productDataUrl);

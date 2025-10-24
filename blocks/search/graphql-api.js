@@ -261,7 +261,7 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
  * @param {string} params.language - The language code for localization.
  * @returns {Object} An object containing the fuzzy search suggestions and any error encountered.
  */
-export async function subcategorySearch({ category, subcategory }) {
+export async function subcategorySearch({ category = '', subcategory = '' }) {
   const { SEARCH_URL_DEV, RC_SUBCATEGORIES_SEARCH, TENANT } = SEARCH_CONFIG;
 
   const graphqlQuery = {
