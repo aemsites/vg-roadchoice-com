@@ -117,6 +117,7 @@ const getFilterAttrib = async (cat) => {
       limit: DEFAULT_LIMIT,
     });
 
+    console.warn(filtersJson);
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
     const filterAttribs = filtersJson
