@@ -117,7 +117,9 @@ const getFilterAttrib = async (cat) => {
       limit: DEFAULT_LIMIT,
     });
 
-    // console.warn(filtersJson); this is all +10000 filters
+    // this is all +10000 filters
+    console.warn(filtersJson);
+
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
     const filterAttribs = filtersJson
@@ -257,6 +259,7 @@ export default async function decorate(doc) {
 
   resetCategoryData();
   const categoryData = await getCategoryData(category);
+  console.log(categoryData);
   updateTitleWithSubcategory(title, category, categoryData);
   getFilterAttrib(category);
 
