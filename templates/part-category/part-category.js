@@ -53,12 +53,12 @@ const getCategory = () => {
 };
 
 /**
- * Finds the main category key corresponding to a given subcategory name.
+ * Finds the main category key and subcategory key for a given subcategory name.
  * * @param {Array<Object>} dataArray The array of category objects.
  * @param {string} subcategoryName The subcategory key string to search for (e.g., "Antennas").
- * @returns {string | null} The key of the main category (e.g., "Accessories"), or null if not found.
+ * @returns {Object | null} An object with keys 'cat' and 'subcat', or null if not found.
  */
-const findMainCategoryKey = (dataArray, subcategoryName) => {
+const getCategoryObject = (dataArray, subcategoryName) => {
   const searchKey = subcategoryName.toLowerCase();
   const foundObject = dataArray.find((categoryObj) => {
     if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
@@ -67,8 +67,14 @@ const findMainCategoryKey = (dataArray, subcategoryName) => {
     return false;
   });
 
-  // 3. Return the key of the found object or null if no match was found
-  return foundObject ? foundObject.key : null;
+  if (foundObject) {
+    return {
+      cat: foundObject.key,
+      subcat: foundObject.value,
+    };
+  }
+
+  return null;
 };
 
 /**
@@ -81,7 +87,7 @@ const findMainCategoryKey = (dataArray, subcategoryName) => {
  */
 const getCategoryData = async (cat) => {
   const rawCategoryList = await fetchCategories();
-  mainCategory = findMainCategoryKey(rawCategoryList, cat);
+  const categoryObject = getCategoryObject(rawCategoryList, cat);
   console.log(mainCategory);
 
   try {
@@ -92,7 +98,7 @@ const getCategoryData = async (cat) => {
     //   url: productDataUrl,
     //   limit: DEFAULT_LIMIT,
     // });
-    const rawData = await subcategorySearch({ category: mainCategory, subcategory: cat });
+    const rawData = await subcategorySearch(categoryObject);
     const products = rawData.map((item) => item.metadata);
 
     if (!Array.isArray(products) || products.length === 0) {
@@ -108,6 +114,7 @@ const getCategoryData = async (cat) => {
     json.total = products.length;
 
     // mainCategory = json.data[0]?.part_category;
+    mainCategory = categoryObject.cat;
 
     if (!mainCategory) {
       console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
