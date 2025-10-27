@@ -78,8 +78,8 @@ const getCategoryObject = (dataArray, subcategoryName) => {
 
   if (foundObject && matchingSubcategory) {
     return {
-      cat: foundObject.key,
-      subcat: matchingSubcategory.key,
+      category: foundObject.key,
+      subcategory: matchingSubcategory.key,
     };
   }
 
@@ -96,7 +96,7 @@ const getCategoryObject = (dataArray, subcategoryName) => {
  */
 const getCategoryData = async (cat) => {
   const rawCategoryList = await fetchCategories();
-  const categoryObject = await getCategoryObject(rawCategoryList, cat);
+  const categoryObject = getCategoryObject(rawCategoryList, cat);
   console.log(categoryObject);
 
   try {
