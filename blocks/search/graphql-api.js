@@ -291,7 +291,7 @@ export async function fetchCategories() {
  * @param {string} params.language - The language code for localization.
  * @returns {Object} An object containing the fuzzy search suggestions and any error encountered.
  */
-export async function subcategorySearch({ category = '', subcategory = '' }) {
+export async function subcategorySearch({ category = '', subcategory = '', facetFields = [], dynamicFilters = [] }) {
   const { SEARCH_URL_DEV, RC_SUBCATEGORIES_SEARCH, TENANT } = SEARCH_CONFIG;
 
   const graphqlQuery = {
@@ -333,6 +333,8 @@ export async function subcategorySearch({ category = '', subcategory = '' }) {
       language: getPageLanguage() || 'EN',
       categoryFilter: category,
       subcategoryFilter: subcategory,
+      facetFields,
+      dynamicFilters,
     },
   };
 
@@ -340,5 +342,10 @@ export async function subcategorySearch({ category = '', subcategory = '' }) {
 
   if (error) return { items: [], error };
 
-  return data.data[RC_SUBCATEGORIES_SEARCH].items;
+  const result = {
+    products: data.data[RC_SUBCATEGORIES_SEARCH].items,
+    filters: data.data[RC_SUBCATEGORIES_SEARCH].facets,
+  };
+
+  return result;
 }

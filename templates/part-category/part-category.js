@@ -95,12 +95,15 @@ const getCategoryObject = (dataArray, subcategoryName) => {
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
+  const filters = ['Lift Height (in)', 'Pair', 'Tons Supported', 'Type', 'Weight (lb)', 'WID Number'];
   const rawCategoryList = await fetchCategories();
-  const categoryObject = getCategoryObject(rawCategoryList, cat);
+  const categoryObject = getCategoryObject(rawCategoryList, cat, filters);
 
   try {
-    const rawData = await subcategorySearch(categoryObject);
-    const products = rawData.map((item) => item.metadata);
+    const { rawItems, rawFacets } = await subcategorySearch(categoryObject);
+    const products = rawItems.map((item) => item.metadata);
+
+    console.log(rawFacets);
 
     if (!Array.isArray(products) || products.length === 0) {
       console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
