@@ -53,24 +53,33 @@ const getCategory = () => {
 };
 
 /**
- * Finds the main category key and subcategory key for a given subcategory name.
+ * Finds the main category key and the exactly matched subcategory key.
  * * @param {Array<Object>} dataArray The array of category objects.
- * @param {string} subcategoryName The subcategory key string to search for (e.g., "Antennas").
- * @returns {Object | null} An object with keys 'cat' and 'subcat', or null if not found.
+ * @param {string} subcategoryName The subcategory key string to search for (e.g., "antennas").
+ * @returns {Object | null} An object with keys 'cat' and 'subcat' (the exact case from the data), or null if not found.
  */
 const getCategoryObject = (dataArray, subcategoryName) => {
   const searchKey = subcategoryName.toLowerCase();
+  let matchingSubcategory = null;
+
   const foundObject = dataArray.find((categoryObj) => {
     if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
-      return categoryObj.subcategories.some((subCat) => subCat.key.toLowerCase() === searchKey);
+      const isMatch = categoryObj.subcategories.some((subCat) => {
+        if (subCat.key.toLowerCase() === searchKey) {
+          matchingSubcategory = subCat;
+          return true;
+        }
+        return false;
+      });
+      return isMatch;
     }
     return false;
   });
 
-  if (foundObject) {
+  if (foundObject && matchingSubcategory) {
     return {
-      category: foundObject.key,
-      subcategory: foundObject.value,
+      cat: foundObject.key,
+      subcat: matchingSubcategory.key,
     };
   }
 
