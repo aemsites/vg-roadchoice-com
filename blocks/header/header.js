@@ -218,6 +218,8 @@ export default async function decorate(block) {
     }
 
     const navSections = nav.querySelector('.nav-sections');
+    buildCategorySection(navSections, parsedCategories);
+
     if (navSections) {
       const navLevels = 3;
       let selector = ':scope';
