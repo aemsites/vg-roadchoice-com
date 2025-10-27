@@ -87,7 +87,7 @@ const getCategoryObject = (dataArray, subcategoryName) => {
  */
 const getCategoryData = async (cat) => {
   const rawCategoryList = await fetchCategories();
-  const categoryObject = getCategoryObject(rawCategoryList, cat);
+  const categoryObject = await getCategoryObject(rawCategoryList, cat);
   console.log(categoryObject);
 
   try {
