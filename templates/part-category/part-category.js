@@ -69,8 +69,8 @@ const getCategoryObject = (dataArray, subcategoryName) => {
 
   if (foundObject) {
     return {
-      cat: foundObject.key,
-      subcat: foundObject.value,
+      category: foundObject.key,
+      subcategory: foundObject.value,
     };
   }
 
@@ -88,7 +88,7 @@ const getCategoryObject = (dataArray, subcategoryName) => {
 const getCategoryData = async (cat) => {
   const rawCategoryList = await fetchCategories();
   const categoryObject = getCategoryObject(rawCategoryList, cat);
-  console.log(mainCategory);
+  console.log(categoryObject);
 
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
