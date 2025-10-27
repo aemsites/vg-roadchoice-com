@@ -1,4 +1,4 @@
-import { subcategorySearch } from '../../blocks/search/graphql-api.js';
+import { subcategorySearch, fetchCategories } from '../../blocks/search/graphql-api.js';
 import {
   createElement,
   getLongJSONData,
@@ -61,6 +61,8 @@ const getCategory = () => {
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
+  const rawCategoryList = await fetchCategories();
+  console.log(rawCategoryList);
   try {
     const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
     console.log('url', productDataUrl); // -> this returns '/product-data/rc-jacks.json'
