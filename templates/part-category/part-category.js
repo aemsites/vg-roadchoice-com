@@ -97,7 +97,10 @@ const getCategoryObject = (dataArray, subcategoryName) => {
 const getCategoryData = async (cat) => {
   const filters = ['Lift Height (in)', 'Pair', 'Tons Supported', 'Type', 'Weight (lb)', 'WID Number'];
   const rawCategoryList = await fetchCategories();
-  const categoryObject = getCategoryObject(rawCategoryList, cat, filters, []);
+
+  const categoryObject = getCategoryObject(rawCategoryList, cat);
+  categoryObject.facetFields = filters;
+  categoryObject.dynamicFilters = [];
 
   try {
     const { rawItems, rawFacets } = await subcategorySearch(categoryObject);
@@ -150,15 +153,11 @@ const getFilterAttrib = async (cat) => {
       limit: DEFAULT_LIMIT,
     });
 
-    // this is all +10000 filters
-    console.warn(filtersJson);
-
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
     const filterAttribs = filtersJson
       .filter((el) => el.Subcategory.toLowerCase().replace(/ /g, '-') === cat.toLowerCase() && el.Filter === '')
       .map((el) => el.Attributes);
-    console.log(filterAttribs); // this is the list of active filters to display
     const event = new Event('FilterAttribsLoaded');
     sessionStorage.setItem('filter-attribs', JSON.stringify(filterAttribs));
     document.dispatchEvent(event);
@@ -321,7 +320,6 @@ export default async function decorate(doc) {
           props: { href: getLocaleContextedUrl(`/part-category/${mainSlug}`) },
         });
         mainLink.textContent = mainCategory;
-        console.log('category', mainSlug);
 
         const mainItem = createElement('li', {
           classes: ['breadcrumb-item', `breadcrumb-item-${index}`],
@@ -337,7 +335,6 @@ export default async function decorate(doc) {
         props: { href: getLocaleContextedUrl(`/part-category/${category}`) },
       });
       finalLink.textContent = title.textContent;
-      console.log('subcategory', category);
       const finalItem = createElement('li', {
         classes: ['breadcrumb-item', `breadcrumb-item-${index}`],
       });
@@ -349,6 +346,4 @@ export default async function decorate(doc) {
   });
 
   observer.observe(breadcrumbBlock, { attributes: true, attributeFilter: ['data-block-status'] });
-
-  console.log(breadcrumbBlock);
 }

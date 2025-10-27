@@ -338,6 +338,8 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
     },
   };
 
+  console.log(graphqlQuery.variables);
+
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
   if (error) return { items: [], error };
@@ -346,6 +348,8 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
     products: data.data[RC_SUBCATEGORIES_SEARCH].items,
     filters: data.data[RC_SUBCATEGORIES_SEARCH].facets,
   };
+
+  console.log(result);
 
   return result;
 }
