@@ -132,7 +132,7 @@ const getCategoryData = async (cat) => {
     return products;
   } catch (err) {
     console.error('%c[CategoryData] Error fetching category data', 'color:red;background-color:aliceblue', err);
-    window.location.href = get404PageUrl();
+    // window.location.href = get404PageUrl();
   }
 };
 
