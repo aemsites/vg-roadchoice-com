@@ -97,7 +97,7 @@ const getCategoryObject = (dataArray, subcategoryName) => {
 const getCategoryData = async (cat) => {
   const filters = ['Lift Height (in)', 'Pair', 'Tons Supported', 'Type', 'Weight (lb)', 'WID Number'];
   const rawCategoryList = await fetchCategories();
-  const categoryObject = getCategoryObject(rawCategoryList, cat, filters);
+  const categoryObject = getCategoryObject(rawCategoryList, cat, filters, []);
 
   try {
     const { rawItems, rawFacets } = await subcategorySearch(categoryObject);
