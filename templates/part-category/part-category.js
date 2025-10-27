@@ -97,16 +97,8 @@ const getCategoryObject = (dataArray, subcategoryName) => {
 const getCategoryData = async (cat) => {
   const rawCategoryList = await fetchCategories();
   const categoryObject = getCategoryObject(rawCategoryList, cat);
-  console.log(categoryObject);
 
   try {
-    const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
-    console.log('url', productDataUrl); // -> this returns '/product-data/rc-jacks.json'
-    console.log(cat); // -> this returns 'jacks'
-    // const products = await getLongJSONData({
-    //   url: productDataUrl,
-    //   limit: DEFAULT_LIMIT,
-    // });
     const rawData = await subcategorySearch(categoryObject);
     const products = rawData.map((item) => item.metadata);
 
@@ -122,8 +114,7 @@ const getCategoryData = async (cat) => {
     json.limit = 20;
     json.total = products.length;
 
-    // mainCategory = json.data[0]?.part_category;
-    mainCategory = categoryObject.cat;
+    mainCategory = categoryObject.category;
 
     if (!mainCategory) {
       console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
@@ -298,7 +289,6 @@ export default async function decorate(doc) {
 
   resetCategoryData();
   const categoryData = await getCategoryData(category);
-  console.log(categoryData);
   updateTitleWithSubcategory(title, category, categoryData);
   getFilterAttrib(category);
 
