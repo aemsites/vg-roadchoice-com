@@ -1,10 +1,12 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { createElement } from '../../scripts/common.js';
+import { fetchCategories } from '../search/graphql-api.js';
 
 // media query match that indicates mobile/tablet width
 const MQ = window.matchMedia('(min-width: 992px)');
 const isDesktop = MQ.matches;
 let categoriesClone;
+const docRange = document.createRange();
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -138,12 +140,54 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
+const rawCategoryList = await fetchCategories();
+const parsedCategories = rawCategoryList.reduce((accumulator, currentItem) => {
+  const categoryKey = currentItem.key;
+  const subcategoryKeys = currentItem.subcategories.map((sub) => sub.key);
+  accumulator[categoryKey] = subcategoryKeys;
+  return accumulator;
+}, {});
+
+function buildListsEls(allCategoryData) {
+  let htmlString = '';
+
+  for (const category in allCategoryData) {
+    if (Object.hasOwnProperty.call(allCategoryData, category)) {
+      htmlString += '<li>';
+
+      const categoryLink = `/part-category/${category.toLowerCase().replace(/\s+/g, '-')}`;
+      htmlString += `<a href="${categoryLink}">${category.toUpperCase()}</a>`;
+
+      htmlString += '<ul>';
+
+      allCategoryData[category].forEach((subCategory) => {
+        const subCategoryLink = `/part-category/${subCategory.toLowerCase().replace(/\s+/g, '-')}`;
+        htmlString += `<li><a href="${subCategoryLink}">${subCategory}</a></li>`;
+      });
+
+      htmlString += '</ul>';
+      htmlString += '</li>';
+    }
+  }
+  return htmlString;
+}
+
+const buildCategorySection = (section, categories) => {
+  const listPlacement = section.querySelector('ul li:first-of-type');
+  const subCategoryList = docRange.createContextualFragment(`
+      <ul class="level-2" >
+        ${buildListsEls(categories)}
+      </ul>
+      `);
+
+  listPlacement.appendChild(subCategoryList);
+};
+
 /**
  * decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  const docRange = document.createRange();
   // fetch nav content
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';

@@ -254,6 +254,37 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
   return data.data[RC_PART_FUZZY_SEARCH];
 }
 
+export async function fetchCategories() {
+  const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
+
+  const categoriesQuery = {
+    query: `
+      query RcCategoriesSubcategoriesFacets($tenant: RcTenantEnum, $language: RcLocaleEnum) {
+        rccategoriessubcategoriesFacets(tenant: $tenant, language: $language) {
+          facets {
+            doc_count
+            key
+            subcategories {
+              doc_count
+              key
+            }
+          }
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      language: getPageLanguage() || 'EN',
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(categoriesQuery, SEARCH_URL_DEV);
+
+  if (error) return { facets: [], error };
+
+  return data.data.rccategoriessubcategoriesFacets.facets;
+}
+
 /** Fetch fuzzy search suggestions from the GraphQL API based on the provided parameters.
  * @param {Object} params - The fuzzy search parameters.
  * @param {string} params.q - The search term for which to fetch suggestions.
