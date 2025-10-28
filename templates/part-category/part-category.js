@@ -103,11 +103,10 @@ const getCategoryData = async (cat) => {
   categoryObject.dynamicFilters = [];
 
   try {
-    const { rawItems, rawFacets } = await subcategorySearch(categoryObject);
+    const rawData = await subcategorySearch(categoryObject);
+    console.warn(rawData);
+    let rawItems;
     const products = rawItems.map((item) => item.metadata);
-
-    console.warn(rawItems);
-    console.log(rawFacets);
 
     if (!Array.isArray(products) || products.length === 0) {
       console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
