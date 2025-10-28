@@ -104,9 +104,8 @@ const getCategoryData = async (cat) => {
 
   try {
     const rawData = await subcategorySearch(categoryObject);
-    console.warn(rawData);
-    let rawItems;
-    const products = rawItems.map((item) => item.metadata);
+    const { items, filters } = rawData;
+    const products = items.map((item) => item.metadata);
 
     if (!Array.isArray(products) || products.length === 0) {
       console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);

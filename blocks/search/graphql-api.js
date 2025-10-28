@@ -345,7 +345,7 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
   if (error) return { items: [], error };
 
   const result = {
-    products: data.data[RC_SUBCATEGORIES_SEARCH].items,
+    items: data.data[RC_SUBCATEGORIES_SEARCH].items,
     filters: data.data[RC_SUBCATEGORIES_SEARCH].facets,
   };
 
