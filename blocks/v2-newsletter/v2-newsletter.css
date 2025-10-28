@@ -1,0 +1,110 @@
+.v2-newsletter__container {
+  --v2-newsletter-padding: 24px;
+  --v2-newsletter-gap: 24px;
+
+  background-color: var(--primary-light-gray);
+  display: flex;
+  flex-direction: column;
+  gap: var(--v2-newsletter-gap);
+  padding: var(--v2-newsletter-padding);
+}
+
+.v2-newsletter__text {
+  color: #141414;
+  text-align: center;
+}
+
+.v2-newsletter__title {
+  font-family: var(--heading-ff-regular);
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 30px;
+  margin-bottom: 0;
+  margin-top: 0;
+  text-transform: none;
+}
+
+.v2-newsletter__form-container form {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--v2-newsletter-gap);
+}
+
+.v2-newsletter__form-container .v2-forms__floating-label-group {
+  margin: 26px 0 0;
+  width: 100%;
+}
+
+.v2-newsletter__form-container input[type='email'] {
+  margin: 0;
+}
+
+.v2-forms__floating-label-group input[type='email'] {
+  background-color: var(--primary-white);
+  border: 1px solid #A7A8A9;
+  border-radius: 4px;
+  color: #141414;
+  display: block;
+  font-size: 16px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  line-height: 20.8px;
+  padding: 16px;
+  width: 100%;
+}
+
+.v2-forms__container .button {
+  --bg-shadow: rgb(0 0 0 / 20%);
+
+  box-shadow:
+    0 0.6px 3px 0 var(--bg-shadow),
+    0 8px 16px 0 var(--bg-shadow);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1.25px;
+  line-height: 14px;
+  padding: 21px;
+}
+
+.v2-newsletter__form-container p {
+  margin: 0;
+  text-align: center;
+}
+
+@media screen and (min-width: 744px) {
+  .v2-newsletter__container {
+    --v2-newsletter-padding: 32px;
+    --v2-newsletter-gap: 32px;
+  }
+
+  .v2-newsletter__form-container .v2-forms__floating-label-group {
+    margin-top: 0;
+  }
+
+  .v2-newsletter__form-container form {
+    flex-direction: row;
+    gap: 16px;
+    margin: auto;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .v2-newsletter__container {
+    --v2-newsletter-padding: 32px 48px;
+    --v2-newsletter-gap: 64px;
+
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .v2-newsletter__text {
+    max-width: 554px;
+    text-align: left;
+  }
+
+  .v2-newsletter__form-container input[type='email'] {
+    min-width: 334px;
+  }
+}

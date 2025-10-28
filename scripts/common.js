@@ -659,6 +659,13 @@ function getLocaleContextedUrl(urlPathToConvert) {
 }
 
 /**
+ * Function that checks for the locale field in metadata an returns it.
+ * It defaults to 'en-us'
+ * @returns {string} The locale string
+ */
+const getLocale = () => getMetadata('locale') || 'en-us';
+
+/**
  * Formats an array of objects into a single object with key-value pairs.
  * Each object in the array should have 'name' and 'value' properties.
  * @param {Array} values - The array of objects to format.
@@ -728,6 +735,7 @@ export { COOKIE_CONFIGS, DEALER_LOCATOR, SEARCH_CONFIG, DEFAULT_LIMIT };
 
 export {
   getLocaleContextedUrl,
+  getLocale,
   checkLinkProps,
   loadWorker,
   getLongJSONData,
