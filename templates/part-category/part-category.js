@@ -106,6 +106,7 @@ const getCategoryData = async (cat) => {
     const { rawItems, rawFacets } = await subcategorySearch(categoryObject);
     const products = rawItems.map((item) => item.metadata);
 
+    console.warn(rawItems);
     console.log(rawFacets);
 
     if (!Array.isArray(products) || products.length === 0) {
