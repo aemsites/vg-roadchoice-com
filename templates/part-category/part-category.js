@@ -95,14 +95,17 @@ const getCategoryObject = (dataArray, subcategoryName) => {
  * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
-const getCategoryData = async (cat) => {
+export const getCategoryData = async (cat) => {
   const rawCategoryList = await fetchCategories();
 
   const categoryObject = getCategoryObject(rawCategoryList, cat, filterAttribs);
 
   try {
     const rawData = await subcategorySearch(categoryObject);
-    const { items } = rawData;
+    const { items, facets } = rawData;
+
+    sessionStorage.setItem('filter-attribs', JSON.stringify(facets));
+
     const products = items.map((item) => item.metadata);
 
     if (!Array.isArray(products) || products.length === 0) {
