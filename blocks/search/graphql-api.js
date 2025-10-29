@@ -1,7 +1,6 @@
 import { SEARCH_CONFIG, getPageLanguage } from '../../scripts/common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
-  console.log(graphqlQuery.variables);
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -285,12 +284,6 @@ export async function fetchCategories() {
   return data.data.rccategoriessubcategoriesFacets.facets;
 }
 
-/** Fetch fuzzy search suggestions from the GraphQL API based on the provided parameters.
- * @param {Object} params - The fuzzy search parameters.
- * @param {string} params.q - The search term for which to fetch suggestions.
- * @param {string} params.language - The language code for localization.
- * @returns {Object} An object containing the fuzzy search suggestions and any error encountered.
- */
 export async function subcategorySearch({ category = '', subcategory = '', facetFields = [], dynamicFilters = [] }) {
   const { SEARCH_URL_DEV, RC_SUBCATEGORIES_SEARCH, TENANT } = SEARCH_CONFIG;
 

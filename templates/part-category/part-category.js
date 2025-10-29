@@ -98,7 +98,7 @@ const getCategoryData = async (cat) => {
   const filters = ['Lift Height (in)', 'Pair', 'Tons Supported', 'Type', 'Weight (lb)', 'WID Number'];
   const rawCategoryList = await fetchCategories();
 
-  const categoryObject = getCategoryObject(rawCategoryList, cat);
+  const categoryObject = getCategoryObject(rawCategoryList, cat, filters, []);
   categoryObject.facetFields = filters;
   categoryObject.dynamicFilters = [];
 
@@ -106,8 +106,6 @@ const getCategoryData = async (cat) => {
     const rawData = await subcategorySearch(categoryObject);
     const { items } = rawData;
     const products = items.map((item) => item.metadata);
-
-    console.log(products);
 
     if (!Array.isArray(products) || products.length === 0) {
       console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
