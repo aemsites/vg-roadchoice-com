@@ -163,6 +163,7 @@ const renderBlock = async (block) => {
 };
 
 const isRenderedCheck = (block) => {
+  console.log(block);
   if (getFilters() && products && !isDecorated) {
     isDecorated = true;
     renderBlock(block);
