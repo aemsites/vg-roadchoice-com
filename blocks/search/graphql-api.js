@@ -324,7 +324,14 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
               }
             }
             score
-          } 
+          }
+          facets {
+            field_name
+            facets {
+              doc_count
+              key
+            }
+          }
         }
       }
     `,
