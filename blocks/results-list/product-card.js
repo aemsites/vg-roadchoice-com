@@ -5,7 +5,6 @@ const blockName = 'product-card';
 const partNumberText = getTextLabel('part_number');
 
 const getProperties = (prod, st) => {
-  console.log(prod);
   const cardContent = {};
   const maxChars = 48;
   const { path, part_name, image_url, imgUrl, Description } = prod;

@@ -14,6 +14,7 @@ const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-
 const amount = 12;
 let category;
 let mainCategory;
+let filterAttribs;
 const json = {
   data: [],
   limit: 0,
@@ -95,12 +96,9 @@ const getCategoryObject = (dataArray, subcategoryName) => {
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
 const getCategoryData = async (cat) => {
-  const filters = ['Lift Height (in)', 'Pair', 'Tons Supported', 'Type', 'Weight (lb)', 'WID Number'];
   const rawCategoryList = await fetchCategories();
 
-  const categoryObject = getCategoryObject(rawCategoryList, cat, filters, []);
-  categoryObject.facetFields = filters;
-  categoryObject.dynamicFilters = [];
+  const categoryObject = getCategoryObject(rawCategoryList, cat, filterAttribs);
 
   try {
     const rawData = await subcategorySearch(categoryObject);
@@ -154,7 +152,7 @@ const getFilterAttrib = async (cat) => {
 
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
-    const filterAttribs = filtersJson
+    filterAttribs = filtersJson
       .filter((el) => el.Subcategory.toLowerCase().replace(/ /g, '-') === cat.toLowerCase() && el.Filter === '')
       .map((el) => el.Attributes);
     const event = new Event('FilterAttribsLoaded');
@@ -288,10 +286,11 @@ export default async function decorate(doc) {
   section.classList.add('part-category');
   section.prepend(titleWrapper);
 
-  resetCategoryData();
+  getFilterAttrib(category);
+
   const categoryData = await getCategoryData(category);
   updateTitleWithSubcategory(title, category, categoryData);
-  getFilterAttrib(category);
+  resetCategoryData();
 
   // Update breadcrumb dynamically once the block is loaded
   const observer = new MutationObserver((mutations) => {

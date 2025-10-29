@@ -14,7 +14,7 @@ const productsWorker = getProductsWorker();
 productsWorker.onmessage = ({ data }) => {
   if (products && data.imgData && !hasImagesData) {
     hasImagesData = true;
-    imgData = data.imgData[0];
+    imgData = data.imgData;
     const event = new CustomEvent('ImagesLoaded', { detail: data.imgData });
     document.dispatchEvent(event);
   }
