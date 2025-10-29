@@ -1,4 +1,5 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
+import { getCategoryData } from '../../templates/part-category/part-category.js';
 
 const blockName = 'category-filters';
 let products = window.categoryData;
@@ -20,8 +21,11 @@ function getFilters() {
 }
 
 const renderBlock = async (block) => {
-  const filters = getFilters();
-  console.warn(filters);
+  const data = await getCategoryData();
+  console.warn(data);
+
+  const { facets: filters } = data;
+  console.log(filters);
 
   const filterTitle = createElement('h3', { classes: `${blockName}-title` });
   filterTitle.textContent = titleText;

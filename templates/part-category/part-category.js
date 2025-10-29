@@ -12,7 +12,7 @@ import { decorateLinks } from '../../scripts/scripts.js';
 
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
 const amount = 12;
-let category;
+const category = getCategory();
 let mainCategory;
 let filterAttribs;
 const json = {
@@ -95,10 +95,10 @@ const getCategoryObject = (dataArray, subcategoryName) => {
  * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
-export const getCategoryData = async (cat) => {
+export const getCategoryData = async () => {
   const rawCategoryList = await fetchCategories();
 
-  const categoryObject = getCategoryObject(rawCategoryList, cat, filterAttribs);
+  const categoryObject = getCategoryObject(rawCategoryList, category, filterAttribs);
 
   try {
     const rawData = await subcategorySearch(categoryObject);
@@ -109,7 +109,7 @@ export const getCategoryData = async (cat) => {
     const products = items.map((item) => item.metadata);
 
     if (!Array.isArray(products) || products.length === 0) {
-      console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
+      console.warn(`[CategoryData] No product data found or empty array returned for category: "${category}"`);
       json.data = [];
       json.limit = 0;
       json.total = 0;
@@ -123,7 +123,7 @@ export const getCategoryData = async (cat) => {
     mainCategory = categoryObject.category;
 
     if (!mainCategory) {
-      console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
+      console.warn(`[CategoryData] mainCategory is missing for: "${category}"`);
     }
 
     window.categoryData = json.data;
@@ -258,7 +258,6 @@ function updateMetadata(category) {
 }
 
 export default async function decorate(doc) {
-  category = getCategory();
   if (!category) {
     console.log('No category provided — assuming this is the category template');
     return;
@@ -293,6 +292,7 @@ export default async function decorate(doc) {
 
   const categoryData = await getCategoryData(category);
   updateTitleWithSubcategory(title, category, categoryData);
+
   resetCategoryData();
 
   // Update breadcrumb dynamically once the block is loaded
