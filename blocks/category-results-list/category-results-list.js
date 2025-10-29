@@ -33,6 +33,7 @@ const getImagesData = ({ productList, loadingElement, detail }) => {
       prod.hasImage = true;
       prod.imgUrl = filterLoop[0]['Image URL'];
     }
+    console.log(prod);
     const productItem = productCard(prod, searchType);
     if (idx >= amount) productItem.classList.add('hidden');
     productList.appendChild(productItem);
