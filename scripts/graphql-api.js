@@ -254,12 +254,7 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
   return data.data[RC_PART_FUZZY_SEARCH];
 }
 
-export async function fetchArticlesAndFacets({
-  sort = 'PUBLISH_DATE_DESC',
-  limit = 100,
-  // category = null,
-  offset = 0,
-}) {
+export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit = 100, category = null, offset = 0 }) {
   const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
   const queryName = 'rcrecommend';
 
@@ -301,7 +296,7 @@ export async function fetchArticlesAndFacets({
       offset,
       sort,
       language: getPageLanguage() || 'EN',
-      // category,
+      category,
     },
   };
 
