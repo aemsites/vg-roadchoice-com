@@ -46,6 +46,13 @@ function getTextLabel(key) {
 }
 
 /**
+ * Function that checks for the locale field in metadata an returns it.
+ * It defaults to 'en-us'
+ * @returns {string} The locale string
+ */
+export const getLocale = () => getMetadata('locale') || 'en-us';
+
+/**
  * Create an element with the given id and classes.
  * @param {string} tagName the tag
  * @param {Object} options the element options

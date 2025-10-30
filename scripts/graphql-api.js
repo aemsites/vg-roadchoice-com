@@ -254,94 +254,7 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
   return data.data[RC_PART_FUZZY_SEARCH];
 }
 
-/**
- * Fetch search results from the GraphQL API based on the provided parameters.
- * @param {Object} params - The search parameters.
- * @param {string} params.query - The search query string.
- * @param {number} params.offset - The offset for pagination.
- * @param {string} [params.make] - The make filter (optional).
- * @param {string} [params.model] - The model filter (optional).
- * @param {string} params.searchType - The type of search ('cross' or 'parts').
- * @param {string} [params.category] - The category filter (optional).
- * @param {boolean} [params.applyFuzziness] - Whether to apply fuzziness (optional).
- * @param {string} params.language - The language code for localization.
- * @returns {Object} An object containing the search results and categories.
- */
-// export async function fetchArticlesAndFacets({
-//       limit = null
-//       category = null,
-//       sort: 'PUBLISH_DATE_DESC',
-//       language: getPageLanguage() || 'EN',
-//       facets: 'TAGS',
-// }) {
-//   const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
-//   const queryName = 'rcrecommend'
-
-//   const graphqlQuery = {
-//     query: `
-//       query Query($tenant: String!, $language: RcLocaleEnum!, $facets: [RcBlogsFieldEnum], $sort: RcBlogsSortOptionsEnum, $category: String) {
-//         ${queryName}(tenant: $tenant, language: $language, facets: $facets, sort: $sort, category: $category) {
-//           facets {
-//             field
-//             items {
-//               value
-//               count
-//             }
-//           }
-//           items {
-//             metadata {
-//               title
-//               description
-//               url
-//               lastModified
-//               language
-//               category
-//               tags
-//               publishDate
-//               image
-//             }
-//           }
-//           count
-//         }
-//       }
-//     `,
-//     variables: {
-//       tenant: TENANT,
-//       sort: 'PUBLISH_DATE_DESC',
-//       language: getPageLanguage() || 'EN',
-//       facets: 'TAGS',
-//     },
-//   };
-
-//   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
-
-//   if (error) return { results: [], error };
-
-//   const { facets, items } = data.data[queryName];
-
-//   const articles = items.map((item) => item.metadata);
-//   const categories = facets[0].items.reduce((accumulator, currentItem) => {
-//     accumulator[currentItem.value] = currentItem.count;
-//     return accumulator;
-// }, {});
-
-//   return { articles, categories };
-// }
-
-/**
- * Fetch search results from the GraphQL API based on the provided parameters.
- * @param {Object} params - The search parameters.
- * @param {string} params.query - The search query string.
- * @param {number} params.offset - The offset for pagination.
- * @param {string} [params.make] - The make filter (optional).
- * @param {string} [params.model] - The model filter (optional).
- * @param {string} params.searchType - The type of search ('cross' or 'parts').
- * @param {string} [params.category] - The category filter (optional).
- * @param {boolean} [params.applyFuzziness] - Whether to apply fuzziness (optional).
- * @param {string} params.language - The language code for localization.
- * @returns {Object} An object containing the search results and categories.
- */
-export async function fetchArticles({
+export async function fetchArticlesAndFacets({
   sort = 'PUBLISH_DATE_DESC',
   limit = 100,
   // category = null,
@@ -352,25 +265,34 @@ export async function fetchArticles({
 
   const graphqlQuery = {
     query: `
-      query ${queryName}($tenant: String!, $language: RcLocaleEnum!, $limit: Int, $offset: Int) {
-          rcrecommend(tenant: $tenant, language: $language, limit: $limit, offset: $offset) {
-              count
-              items {
-                  uuid
-                  metadata {
-                      title
-                      description
-                      url
-                      lastModified
-                      language
-                      category
-                      tags
-                      publishDate
-                      image
-                  }
-                  score
-              }
+      query ${queryName}($language: RcLocaleEnum!, $category: String, $sort: RcBlogsSortOptionsEnum, $facets: [RcBlogsFieldEnum], $tag: String, $tenant: RcTenantEnum!, $offset: Int, $limit: Int) {
+        ${queryName}(language: $language, category: $category, sort: $sort, facets: $facets, tag: $tag, tenant: $tenant, offset: $offset, limit: $limit) {
+          count
+          items {
+            uuid
+            metadata {
+              title
+              description
+              url
+              lastModified
+              language
+              category
+              tags
+              publishDate
+              image
+            }
+            score
           }
+          facets {
+            field
+            items {
+              count
+              value
+            }
+          }
+          currentPage
+          numberOfPages
+        }
       }
     `,
     variables: {
@@ -382,14 +304,14 @@ export async function fetchArticles({
       // category,
     },
   };
-  // console.log(graphqlQuery.variables);
+
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
   if (error) return { results: [], error };
 
+  console.log(data);
   const { items } = data.data[queryName];
 
   const articles = items.map((item) => item.metadata);
-  console.log(articles);
   return { articles };
 }

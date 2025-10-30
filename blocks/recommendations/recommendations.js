@@ -1,10 +1,10 @@
-import { createElement, getTextLabel, getJsonFromUrl, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getTextLabel, getLocale } from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/aem.js';
-import { fetchArticles } from '../../scripts/graphql-api.js';
-import { extractLimitFromBlock } from '../../scripts/services/blog.service.js';
+import { fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
+import { extractLimitFromBlock, clearCurrentArticle } from '../../scripts/services/blog.service.js';
 
 const blockName = 'recommendations';
-const category = getMetadata('category');
+const category = getMetadata('category') || null;
 const title = getTextLabel('recommendations_title');
 const linkText = getTextLabel('read_more');
 
@@ -29,51 +29,26 @@ export const clearRepeatedArticles = (articles) =>
     return null;
   });
 
-// const formatDate = (date) => {
-//   const convertedDate = new Date(parseInt(date, 10) * 1000);
-
-//   const day = convertedDate.getDate();
-//   const month = convertedDate.getMonth() + 1;
-//   const year = convertedDate.getFullYear();
-
-//   return `${month}/${day}/${year}`;
-// };
-
 const formatDate = (date) => {
-  // Convert the Unix timestamp (seconds) to milliseconds
   const convertedDate = new Date(parseInt(date, 10) * 1000);
 
-  // Use toLocaleDateString with specific options
-  return convertedDate.toLocaleDateString('en-US', {
+  return convertedDate.toLocaleDateString(getLocale(), {
     year: 'numeric',
     month: 'numeric',
     day: 'numeric',
   });
-  // You could also use 'default' for the locale to use the user's system locale:
-  // return convertedDate.toLocaleDateString(undefined, {...});
 };
 
 export default async function decorate(block) {
   const queryParams = {
     sort: 'LAST_MODIFIED_DESC',
-    limit: 10,
-    // limit: (extractLimitFromBlock(block) + 1),
+    limit: extractLimitFromBlock(block) + 1,
+    category,
   };
 
-  const { articles } = await fetchArticles(queryParams);
+  const { articles } = await fetchArticlesAndFacets(queryParams);
 
-  //const { data: allArticles } = await getJsonFromUrl(route);
-
-  //const sortedArticles = allArticles.sort((a, b) => {
-  //  a.date = +a.date;
-  //  b.date = +b.date;
-  //  return b.date - a.date;
-  //});
-
-  //const filteredArticles = clearRepeatedArticles(sortedArticles);
-
-  //const artByCategory = category ? filteredArticles.filter((e) => e.category.toLowerCase() === category.toLowerCase()) : filteredArticles;
-  //const selectedArticles = artByCategory.slice(0, limit);
+  const filteredArticles = clearCurrentArticle(articles);
 
   const noArticles = articles.length === 0;
 
@@ -93,7 +68,7 @@ export default async function decorate(block) {
 
   const recommendationsList = createElement('ul', { classes: `${blockName}-list` });
 
-  articles.forEach((art) => {
+  filteredArticles.forEach((art) => {
     console.log(art);
     console.log(formatDate(art.publishDate));
     const article = createElement('li', { classes: ['article'] });
