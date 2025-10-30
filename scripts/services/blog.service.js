@@ -61,6 +61,6 @@ const getLastURLFolder = (url) =>
 export const clearCurrentArticle = (articles) =>
   articles.filter((article) => {
     const currentArticlePath = getLastURLFolder(window.location.href);
-    const lastElementInUrl = getLastURLFolder(article.metadata.url);
+    const lastElementInUrl = getLastURLFolder(article.url);
     return lastElementInUrl !== currentArticlePath ? article : null;
   });
