@@ -1,6 +1,6 @@
 import { createElement, getTextLabel, getLocale } from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/aem.js';
-import { fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
+import { fetchArticlesAndFacets } from '../search/graphql-api.js';
 import { extractLimitFromBlock, clearCurrentArticle } from '../../scripts/services/blog.service.js';
 
 const blockName = 'recommendations';
