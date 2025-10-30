@@ -223,7 +223,7 @@ function updateMetadata(category) {
 }
 
 export default async function decorate(doc) {
-  const subcategory = getCategory();
+  const subcategory = await getCategory();
 
   if (!subcategory) {
     console.log('No category provided — assuming this is the category template');

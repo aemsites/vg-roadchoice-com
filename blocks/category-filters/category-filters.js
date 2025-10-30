@@ -12,7 +12,8 @@ function getFilters() {
   let filters = {};
 
   try {
-    filters = JSON.parse(sessionStorage.getItem('filter-attribs'));
+    filters = window.categoryData;
+    console.log(filters);
   } catch (error) {
     throw new Error('Error getting filters from sessionStorage: ', error);
   }
@@ -21,11 +22,8 @@ function getFilters() {
 }
 
 const renderBlock = async (block) => {
-  const filters = window.categoryData.filters;
-  // const data = await getItemsAndFacets();
-  // console.log(window.categoryData.filters);
-
-  // const { facets: filters } = data;
+  // const filters = window.categoryData.filters;
+  const filters = getFilters();
   console.log(filters);
 
   const filterTitle = createElement('h3', { classes: `${blockName}-title` });
@@ -172,6 +170,8 @@ const isRenderedCheck = (block) => {
 
 export default async function decorate(block) {
   isRenderedCheck(block);
+  renderBlock(block);
+  console.log(isRenderedCheck(block));
   if (isDecorated) return;
   ['FilterAttribsLoaded', 'CategoryDataLoaded'].forEach((eventName) => {
     document.addEventListener(eventName, () => {
