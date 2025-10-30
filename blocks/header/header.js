@@ -1,5 +1,5 @@
 import { getMetadata } from '../../scripts/aem.js';
-import { createElement } from '../../scripts/common.js';
+import { createElement, slugify } from '../../scripts/common.js';
 import { fetchCategories } from '../search/graphql-api.js';
 
 // media query match that indicates mobile/tablet width
@@ -148,39 +148,38 @@ const parsedCategories = rawCategoryList.reduce((accumulator, currentItem) => {
   return accumulator;
 }, {});
 
-function buildListsEls(allCategoryData) {
-  let htmlString = '';
+const buildLists = (allCategoryData) => {
+  const categoryEntries = Object.entries(allCategoryData);
+  const listItems = categoryEntries
+    .map(([category, subcategories]) => {
+      // Gather all subcat <li> els in one string
+      const subcatEls = subcategories
+        .map(
+          (subcat) => `
+      <li>
+        <a class="subcategory" href="/part-category/${slugify(subcat)}">${subcat}</a></li>
+      </li>`,
+        )
+        .join('');
+      // Return category <li> with subcat string inside
+      return `
+      <li>
+        <a class="category" href="/part-category/${slugify(category)}">${category}</a>
+        <ul>
+          ${subcatEls}
+        </ul>
+      </li>`;
+    })
+    .join('');
 
-  for (const category in allCategoryData) {
-    if (Object.hasOwnProperty.call(allCategoryData, category)) {
-      htmlString += '<li>';
-
-      const categoryLink = `/part-category/${category.toLowerCase().replace(/\s+/g, '-')}`;
-      htmlString += `<a href="${categoryLink}">${category.toUpperCase()}</a>`;
-
-      htmlString += '<ul>';
-
-      allCategoryData[category].forEach((subCategory) => {
-        const subCategoryLink = `/part-category/${subCategory.toLowerCase().replace(/\s+/g, '-')}`;
-        htmlString += `<li><a href="${subCategoryLink}">${subCategory}</a></li>`;
-      });
-
-      htmlString += '</ul>';
-      htmlString += '</li>';
-    }
-  }
-  return htmlString;
-}
+  return `<ul class="level-2">${listItems}</ul>`;
+};
 
 const buildCategorySection = (section, categories) => {
-  const listPlacement = section.querySelector('ul li:first-of-type');
-  const subCategoryList = docRange.createContextualFragment(`
-      <ul class="level-2" >
-        ${buildListsEls(categories)}
-      </ul>
-      `);
+  const firstlistElement = section.querySelector('ul li:first-of-type');
+  const subCategoryList = docRange.createContextualFragment(buildLists(categories));
 
-  listPlacement.appendChild(subCategoryList);
+  firstlistElement?.appendChild(subCategoryList);
 };
 
 /**
@@ -188,7 +187,6 @@ const buildCategorySection = (section, categories) => {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  const docRange = document.createRange();
   // fetch nav content
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
