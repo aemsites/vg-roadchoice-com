@@ -338,18 +338,14 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
     },
   };
 
-  console.log(graphqlQuery.variables);
-
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
-  console.log(data.data);
+
   if (error) return { items: [], error };
 
   const result = {
     items: data.data[RC_SUBCATEGORIES_SEARCH].items,
     facets: data.data[RC_SUBCATEGORIES_SEARCH].facets,
   };
-
-  console.log(result);
 
   return result;
 }

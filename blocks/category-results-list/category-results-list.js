@@ -70,6 +70,7 @@ const isRenderedCheck = (block) => {
 };
 
 export default async function decorate(block) {
+  console.log(block);
   document.addEventListener('FilteredProducts', (e) => {
     products = [...e.detail.filteredProducts];
     const bottomBtn = block.querySelector('.bottom-more-button');

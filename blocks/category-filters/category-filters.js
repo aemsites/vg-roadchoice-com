@@ -21,10 +21,11 @@ function getFilters() {
 }
 
 const renderBlock = async (block) => {
-  const data = await getItemsAndFacets();
-  console.log(data);
+  const filters = window.categoryData.filters;
+  // const data = await getItemsAndFacets();
+  // console.log(window.categoryData.filters);
 
-  const { facets: filters } = data;
+  // const { facets: filters } = data;
   console.log(filters);
 
   const filterTitle = createElement('h3', { classes: `${blockName}-title` });
@@ -163,7 +164,6 @@ const renderBlock = async (block) => {
 };
 
 const isRenderedCheck = (block) => {
-  console.log(block);
   if (getFilters() && products && !isDecorated) {
     isDecorated = true;
     renderBlock(block);

@@ -14,15 +14,22 @@
  *
  * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
+// export const getCategory = () => {
+//   const parts = window.location.pathname.split('/').filter(Boolean);
+//   const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
+
+//   if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
+//     return null;
+//   }
+
+//   return segment;
+// };
+
 export const getCategory = () => {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
+  const url = new URL(window.location.href);
+  const urlParams = new URLSearchParams(url.search);
 
-  if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
-    return null;
-  }
-
-  return segment;
+  return urlParams.get('category') || null;
 };
 
 /**
