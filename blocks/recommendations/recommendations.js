@@ -39,6 +39,14 @@ const formatDate = (date) => {
   });
 };
 
+const sortArticlesByDate = (articles) => {
+  articles.sort((a, b) => {
+    const dateA = a.publishDate ? a.publishDate : a.lastModified;
+    const dateB = b.publishDate ? b.publishDate : b.lastModified;
+    return dateB - dateA;
+  });
+};
+
 export default async function decorate(block) {
   const queryParams = {
     sort: 'LAST_MODIFIED_DESC',
@@ -47,11 +55,7 @@ export default async function decorate(block) {
   };
 
   const { articles } = await fetchArticlesAndFacets(queryParams);
-
   const filteredArticles = clearCurrentArticle(articles);
-
-  const noArticles = articles.length === 0;
-
   const recommendationsContent = createElement('div', { classes: `${blockName}-content` });
   const titleSection = createElement('div', { classes: ['title-section'] });
 
@@ -68,9 +72,9 @@ export default async function decorate(block) {
 
   const recommendationsList = createElement('ul', { classes: `${blockName}-list` });
 
+  sortArticlesByDate(filteredArticles);
+
   filteredArticles.forEach((art) => {
-    console.log(art);
-    console.log(formatDate(art.publishDate));
     const article = createElement('li', { classes: ['article'] });
 
     const articleTitle = createElement('h2', { classes: ['article-title'] });
@@ -97,5 +101,7 @@ export default async function decorate(block) {
   recommendationsContent.append(titleSection, recommendationsList);
 
   block.textContent = '';
-  if (!noArticles) block.appendChild(recommendationsContent);
+  if (articles.length > 0 && filteredArticles.length > 0) {
+    block.appendChild(recommendationsContent);
+  }
 }
