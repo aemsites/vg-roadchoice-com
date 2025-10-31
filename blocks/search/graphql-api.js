@@ -1,6 +1,7 @@
 import { SEARCH_CONFIG, getPageLanguage } from '../../scripts/common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
+  console.log(graphqlQuery.variables);
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -251,4 +252,103 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
   if (error) return { facets: [], error };
 
   return data.data[RC_PART_FUZZY_SEARCH];
+}
+
+export async function fetchCategories() {
+  const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
+
+  const categoriesQuery = {
+    query: `
+      query RcCategoriesSubcategoriesFacets($tenant: RcTenantEnum, $language: RcLocaleEnum) {
+        rccategoriessubcategoriesFacets(tenant: $tenant, language: $language) {
+          facets {
+            doc_count
+            key
+            subcategories {
+              doc_count
+              key
+            }
+          }
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      language: getPageLanguage() || 'EN',
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(categoriesQuery, SEARCH_URL_DEV);
+
+  if (error) return { facets: [], error };
+
+  return data.data.rccategoriessubcategoriesFacets.facets;
+}
+
+export async function subcategorySearch({ category = '', subcategory = '', facetFields = [], dynamicFilters = [], limit = 100, offset = 0 }) {
+  const { SEARCH_URL_DEV, RC_SUBCATEGORIES_SEARCH, TENANT } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${RC_SUBCATEGORIES_SEARCH}($categoryFilter: String!, $subcategoryFilter: String!, $facetFields: [String], $dynamicFilters: [RcDynamicFilter], $sortOptions: RcSortOptionsEnum, $limit: Int, $offset: Int, $tenant: RcTenantEnum, $language: RcLocaleEnum) {
+        ${RC_SUBCATEGORIES_SEARCH}(categoryFilter: $categoryFilter, subcategoryFilter: $subcategoryFilter, facetFields: $facetFields, dynamicFilters: $dynamicFilters, sortOptions: $sortOptions, limit: $limit, offset: $offset, tenant: $tenant, language: $language) {
+          count
+          currentPage
+          numberOfPages
+          items {
+            uuid
+            metadata {
+              base_part_number
+              mack_part_number
+              volvo_part_number
+              part_name
+              tenant
+              path
+              part_category
+              description
+              image_url
+              manufacturer {
+                oem_number
+                name
+              }
+              model {
+                make
+                name
+                description
+              }
+            }
+            score
+          }
+          facets {
+            field_name
+            facets {
+              doc_count
+              key
+            }
+          }
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      language: getPageLanguage() || 'EN',
+      categoryFilter: category,
+      subcategoryFilter: subcategory,
+      facetFields,
+      dynamicFilters,
+      limit,
+      offset,
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+  console.log(data);
+  if (error) return { items: [], facets: [], error };
+
+  const result = {
+    items: data.data[RC_SUBCATEGORIES_SEARCH].items,
+    facets: data.data[RC_SUBCATEGORIES_SEARCH].facets,
+  };
+  console.log(result);
+  return result;
 }

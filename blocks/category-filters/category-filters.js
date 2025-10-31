@@ -21,6 +21,8 @@ function getFilters() {
 
 const renderBlock = async (block) => {
   const filters = getFilters();
+  const filterKeys = Object.keys(filters).sort();
+
   const filterTitle = createElement('h3', { classes: `${blockName}-title` });
   filterTitle.textContent = titleText;
   const filterForm = createElement('form', { classes: `${blockName}-form`, props: { id: `${blockName}-form` } });
@@ -47,29 +49,27 @@ const renderBlock = async (block) => {
   applyFilterBtn.textContent = applyText;
   const filterList = createElement('ul', { classes: `${blockName}-list` });
 
-  // filter the data to add extra filters to every attribute
-  filters.forEach((attribute) => {
+  // filter the data to add extra filters to every key
+  filterKeys.forEach((key) => {
     const filterItem = createElement('li', { classes: `${blockName}-item` });
     const titleWrapper = createElement('div', { classes: `${blockName}-title-wrapper` });
     const filterAttrib = createElement('h6', { classes: `${blockName}-item-title` });
-    filterAttrib.textContent = attribute;
+    filterAttrib.textContent = key;
     const plusBtn = createElement('span', { classes: ['plus-btn', 'fa', 'fa-plus'] });
     const filterOptionsWrapper = createElement('ul', {
       classes: [`${blockName}-options-wrapper`, 'hidden'],
     });
-    const set = new Set();
-    products.forEach((product) => {
-      if (product[attribute] !== '') set.add(product[attribute]);
-    });
-    if (set.size <= 0) return;
-    [...set].sort().forEach((el) => {
+
+    // Add checkbox for every attribute
+    const attributes = [...filters[key]];
+    attributes.forEach((el) => {
       const filterOption = createElement('li', { classes: `${blockName}-option` });
-      const inputId = `${attribute ? attribute.replace(' ', '_') : null}<&>${el ? el.replace(' ', '_') : null}`;
+      const inputId = `${key ? key.replace(' ', '_') : null}<&>${el ? el.replace(' ', '_') : null}`;
       const filterInput = createElement('input', {
         classes: `${blockName}-input`,
         props: {
           type: 'checkbox',
-          'data-filter-title': attribute,
+          'data-filter-title': key,
           value: el,
           id: inputId,
         },
@@ -84,6 +84,7 @@ const renderBlock = async (block) => {
       filterOption.append(filterInput, filterLabel);
       filterOptionsWrapper.appendChild(filterOption);
     });
+
     titleWrapper.append(filterAttrib, plusBtn);
     filterItem.append(titleWrapper, filterOptionsWrapper);
     filterList.appendChild(filterItem);
@@ -116,6 +117,7 @@ const renderBlock = async (block) => {
     const isApply = id === 'apply-filter-btn';
     if (isApply) {
       const checkedInputs = [...filterList.querySelectorAll(`.${blockName}-input:checked`)];
+      console.log(checkedInputs);
       const filteredAttrib = [];
       filterForm.querySelector('.clear-filter-btn').disabled = false;
       // [{ title, values: [value1, value2, ...] }]

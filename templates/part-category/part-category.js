@@ -1,13 +1,6 @@
-import {
-  createElement,
-  getLongJSONData,
-  DEFAULT_LIMIT,
-  getLocaleContextedUrl,
-  getJsonFromUrl,
-  setOrCreateMetadata,
-  getTextLabel,
-} from '../../scripts/common.js';
-import { decorateLinks } from '../../scripts/scripts.js';
+import { fetchCategories, subcategorySearch } from '../../blocks/search/graphql-api.js';
+import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, setOrCreateMetadata, getTextLabel } from '../../scripts/common.js';
+import { getCategoryObject, transformFacets, getCategory } from '../../scripts/services/part-category.service.js';
 
 const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
 const amount = 12;
@@ -24,33 +17,6 @@ function get404PageUrl() {
   return getLocaleContextedUrl('/404.html');
 }
 
-/* Cases that throw an error if the category is wrong or missing that goes to 404 page:
- * 1. "/part-category/" => 404 if is index path
- * 2. "/part-category/?" => 404 if is index path width query string or wrong query parameter
- * 3. "/part-category/?category" => 404 if is an empty category without "=" sign
- * 4. "/part-category/?category=" => 404 if is an empty category with "=" sign
- * 5. "/part-category/?category=asdf" => 404 if is a wrong category
- */
-
-/**
- * Extracts the category name from the URL path.
- *
- * Returns `null` if the path points to a clean-URL template page (e.g., a category landing page),
- * typically represented by `/part-category/`, `/en-ca/part-category/`, etc.
- *
- * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
- */
-const getCategory = () => {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
-
-  if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
-    return null;
-  }
-
-  return segment;
-};
-
 /**
  * Loads product data for the given category and updates internal state and sessionStorage.
  * If the data file does not exist or contains no products, the state is reset and an empty array is returned.
@@ -59,14 +25,26 @@ const getCategory = () => {
  * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
-const getCategoryData = async (cat) => {
+const getCategoryData = async (categoryObj) => {
   try {
-    const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
+    const cat = categoryObj.subcategory.toLowerCase();
 
-    const products = await getLongJSONData({
-      url: productDataUrl,
-      limit: DEFAULT_LIMIT,
-    });
+    const queryParams = {
+      category: categoryObj.category,
+      subcategory: categoryObj.subcategory,
+      facetFields: JSON.parse(sessionStorage.getItem('filter-attribs')),
+      dynamicFilters: [],
+    };
+
+    const productsAndFacets = await subcategorySearch(queryParams);
+    const { items, facets } = productsAndFacets;
+
+    const products = items.map((item) => item.metadata);
+    const filters = transformFacets(facets);
+
+    const filterEvent = new Event('FilterAttribsLoaded');
+    sessionStorage.setItem('filter-attribs', JSON.stringify(filters));
+    document.dispatchEvent(filterEvent);
 
     if (!Array.isArray(products) || products.length === 0) {
       console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
@@ -80,7 +58,7 @@ const getCategoryData = async (cat) => {
     json.limit = 20;
     json.total = products.length;
 
-    mainCategory = json.data[0]?.Category;
+    mainCategory = categoryObj.category;
 
     if (!mainCategory) {
       console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
@@ -95,7 +73,7 @@ const getCategoryData = async (cat) => {
     return products;
   } catch (err) {
     console.error('%c[CategoryData] Error fetching category data', 'color:red;background-color:aliceblue', err);
-    window.location.href = get404PageUrl();
+    // window.location.href = get404PageUrl();
   }
 };
 
@@ -148,30 +126,6 @@ const updateTitleWithSubcategory = (title, category, categoryData) => {
     console.log(
       subcategory === null ? 'No product data found, using fallback category' : 'No subcategory found in product data, using fallback category',
     );
-  }
-};
-
-/**
- * Fetches and formats the subcategory data to build the subtitle.
- * @returns {Object} The subcategory data as single object.
- * @throws {Error} If the subcategory data is not found.
- */
-const getSubtitleData = async (cat) => {
-  try {
-    const url = getLocaleContextedUrl('/part-category/subcategory-text.json');
-    const response = await getJsonFromUrl(url);
-    const { data } = response;
-    const result = data?.find((obj) => obj.subcategory === cat);
-    if (result) {
-      for (const key in result) {
-        if (result[key] === '') {
-          result[key] = null;
-        }
-      }
-    }
-    return result;
-  } catch (err) {
-    console.log('%cError fetching subcategories', err);
   }
 };
 
@@ -233,27 +187,19 @@ export default async function decorate(doc) {
 
   titleWrapper.appendChild(title);
 
-  const subtitleObject = await getSubtitleData(category);
-  if (subtitleObject?.text) {
-    const { text, linkText, linkUrl } = subtitleObject;
-    const subtitle = document.createRange().createContextualFragment(`
-      <p class='part-category-subtitle'>
-        ${text}
-        ${linkText?.length > 0 ? `<a href='${linkUrl}'>${linkText}</a>` : ''}
-      </p>
-    `);
-    titleWrapper.appendChild(subtitle);
-    decorateLinks(titleWrapper);
-  }
-
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
   section.classList.add('part-category');
   section.prepend(titleWrapper);
 
+  const allCategories = await fetchCategories();
+  const categoryObject = getCategoryObject(allCategories, category);
+  mainCategory = categoryObject.category;
+
   resetCategoryData();
-  const categoryData = await getCategoryData(category);
-  updateTitleWithSubcategory(title, category, categoryData);
-  getFilterAttrib(category);
+  await getFilterAttrib(category);
+  const categoryData = await getCategoryData(categoryObject);
+
+  updateTitleWithSubcategory(title, category, categoryObject.subcategory);
 
   // Update breadcrumb dynamically once the block is loaded
   const observer = new MutationObserver((mutations) => {

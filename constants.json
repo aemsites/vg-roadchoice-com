@@ -101,6 +101,14 @@
       {
         "name": "RC_PART_FUZZY_SEARCH",
         "value": "rcpartdidyoumean"
+      },
+      {
+        "name": "RC_SUBCATEGORIES_SEARCH",
+        "value": "rccategoriessubcategoriesSearch"
+      },
+      {
+        "name": "TENANT",
+        "value": "VG_ROADCHOICE_COM"
       }
     ]
   },
