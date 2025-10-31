@@ -1,5 +1,5 @@
 import { getMetadata } from '../../scripts/aem.js';
-import { createElement, slugify } from '../../scripts/common.js';
+import { createElement, getLanguagePath, slugify } from '../../scripts/common.js';
 import { fetchCategories } from '../search/graphql-api.js';
 
 // media query match that indicates mobile/tablet width
@@ -150,6 +150,7 @@ const parsedCategories = rawCategoryList.reduce((accumulator, currentItem) => {
 
 const buildLists = (allCategoryData) => {
   const categoryEntries = Object.entries(allCategoryData);
+  const locale = getLanguagePath();
   const listItems = categoryEntries
     .map(([category, subcategories]) => {
       // Gather all subcat <li> els in one string
@@ -157,14 +158,14 @@ const buildLists = (allCategoryData) => {
         .map(
           (subcat) => `
       <li>
-        <a class="subcategory" href="/part-category/${slugify(subcat)}">${subcat}</a></li>
+        <a class="subcategory" href="${locale}/part-category/${slugify(subcat)}">${subcat}</a></li>
       </li>`,
         )
         .join('');
       // Return category <li> with subcat string inside
       return `
       <li>
-        <a class="category" href="/part-category/${slugify(category)}">${category}</a>
+        <a class="category" href="${locale}/part-category/${slugify(category)}">${category}</a>
         <ul>
           ${subcatEls}
         </ul>
