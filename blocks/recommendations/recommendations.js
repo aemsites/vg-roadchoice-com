@@ -39,14 +39,6 @@ const formatDate = (date) => {
   });
 };
 
-const sortArticlesByDate = (articles) => {
-  articles.sort((a, b) => {
-    const dateA = a.publishDate ? a.publishDate : a.lastModified;
-    const dateB = b.publishDate ? b.publishDate : b.lastModified;
-    return dateB - dateA;
-  });
-};
-
 export default async function decorate(block) {
   const queryParams = {
     sort: 'LAST_MODIFIED_DESC',
@@ -72,11 +64,8 @@ export default async function decorate(block) {
 
   const recommendationsList = createElement('ul', { classes: `${blockName}-list` });
 
-  sortArticlesByDate(filteredArticles);
-
   filteredArticles.forEach((art) => {
     const article = createElement('li', { classes: ['article'] });
-
     const articleTitle = createElement('h2', { classes: ['article-title'] });
     const articleTitleLink = createElement('a', { classes: ['article-title-link'], props: { href: art.url } });
     articleTitleLink.innerText = art.title;
