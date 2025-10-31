@@ -53,14 +53,22 @@ const getLastURLFolder = (url) =>
  * // Output: [{ metadata: { url: 'https://example.com/article1' } }, { metadata: { url: 'https://example.com/article2' } }]
  *
  * @description
- * This function filters out the current article from the list of articles based on the URL.
+ * This function filters out the current article from the list of articles based on the URL or title.
  * It compares the last folder of the current URL with the last folder of each article's URL.
- * If they match, the article is excluded from the filtered list.
- * The function returns a new array containing only the articles that do not match the current article's URL.
+ * If the article has no URL, it falls back to comparing the article title with the current page's h1 title.
+ * If either comparison matches, the article is excluded from the filtered list.
+ * The function returns a new array containing only the articles that do not match the current article.
  */
-export const clearCurrentArticle = (articles) =>
-  articles.filter((article) => {
-    const currentArticlePath = getLastURLFolder(window.location.href);
-    const lastElementInUrl = getLastURLFolder(article.url);
+export const clearCurrentArticle = (articles) => {
+  const currentArticlePath = getLastURLFolder(window.location.href);
+  const currentArticleTitle = document.querySelector('h1')?.textContent || '';
+  return articles.filter((article) => {
+    const articleURL = article?.url || '';
+    if (!articleURL) {
+      const articleTitle = article?.title || '';
+      return articleTitle !== currentArticleTitle ? article : null;
+    }
+    const lastElementInUrl = articleURL ? getLastURLFolder(articleURL) : null;
     return lastElementInUrl !== currentArticlePath ? article : null;
   });
+};
