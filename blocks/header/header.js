@@ -158,14 +158,14 @@ const buildLists = (allCategoryData) => {
         .map(
           (subcat) => `
       <li>
-        <a class="subcategory" href="${locale}/part-category/${slugify(subcat)}">${subcat}</a></li>
+        <a class="subcategory" href="${locale}part-category/${slugify(subcat)}">${subcat}</a></li>
       </li>`,
         )
         .join('');
       // Return category <li> with subcat string inside
       return `
       <li>
-        <a class="category" href="${locale}/part-category/${slugify(category)}">${category}</a>
+        <a class="category" href="${locale}part-category/${slugify(category)}">${category}</a>
         <ul>
           ${subcatEls}
         </ul>
