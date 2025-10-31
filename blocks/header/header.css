@@ -48,7 +48,7 @@ header nav .nav-drop.show > a {
   row-gap: 1rem;
 }
 
-header .level-2 > li {
+.categories .level-2 > li {
   width: calc((100vw - 14rem) * 0.2);
 }
 
@@ -471,7 +471,7 @@ header .nav-tools .categories a {
     --categories-height: 1450px;
   }
 
-  header .level-2 > li {
+  .categories .level-2 > li {
     width: calc((100vw - 24rem) * 0.2);
   }
 }
