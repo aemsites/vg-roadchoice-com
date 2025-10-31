@@ -78,7 +78,7 @@ export default async function decorate(block) {
     const article = createElement('li', { classes: ['article'] });
 
     const articleTitle = createElement('h2', { classes: ['article-title'] });
-    const articleTitleLink = createElement('a', { classes: ['article-title-link'], props: { href: art.path } });
+    const articleTitleLink = createElement('a', { classes: ['article-title-link'], props: { href: art.url } });
     articleTitleLink.innerText = art.title;
 
     articleTitle.appendChild(articleTitleLink);
@@ -90,7 +90,7 @@ export default async function decorate(block) {
     articleText.innerText = art.description;
 
     const strongLink = createElement('strong');
-    const articleLink = createElement('a', { classes: ['article-link'], props: { href: art.path } });
+    const articleLink = createElement('a', { classes: ['article-link'], props: { href: art.url } });
     articleLink.innerText = linkText;
     strongLink.appendChild(articleLink);
 
