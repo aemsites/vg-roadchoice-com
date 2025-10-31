@@ -41,7 +41,7 @@ const formatDate = (date) => {
 
 export default async function decorate(block) {
   const queryParams = {
-    sort: 'LAST_MODIFIED_DESC',
+    sort: 'PUBLISH_DATE_DESC',
     limit: extractLimitFromBlock(block) + 1,
     category,
   };
