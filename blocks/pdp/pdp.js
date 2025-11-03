@@ -174,8 +174,10 @@ function filterByCategory(data, category, categoryKey = 'category') {
     console.warn(blogCategory);
     console.log(category);
     console.log(data);
+    console.log(data[categoryKey]);
   }
-  return data.filter((item) => item[categoryKey].replace(/[^\w]/g, '').toLowerCase() === category.replace(/[^\w]/g, '').toLowerCase());
+  const result = data.filter((item) => item[categoryKey].replace(/[^\w]/g, '').toLowerCase() === category.replace(/[^\w]/g, '').toLowerCase());
+  return result;
 }
 
 function groupByLanguage(data) {
