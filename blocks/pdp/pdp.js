@@ -171,10 +171,10 @@ function setPartData(part, block) {
 function filterByCategory(data, category, categoryKey = 'category') {
   if (categoryKey.toLowerCase() === 'subcategory') {
     blogCategory = category;
+    console.warn(blogCategory);
+    console.log(category);
+    console.log(data);
   }
-  console.warn(blogCategory);
-  console.log(category);
-  console.log(data);
   return data.filter((item) => item[categoryKey].replace(/[^\w]/g, '').toLowerCase() === category.replace(/[^\w]/g, '').toLowerCase());
 }
 
