@@ -197,7 +197,7 @@ export default async function decorate(doc) {
 
   resetCategoryData();
   await getFilterAttrib(category);
-  const categoryData = await getCategoryData(categoryObject);
+  await getCategoryData(categoryObject);
 
   updateTitleWithSubcategory(title, category, categoryObject.subcategory);
 

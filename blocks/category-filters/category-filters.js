@@ -1,4 +1,5 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
+import { getCategory } from '../../scripts/services/part-category.service.js';
 
 const blockName = 'category-filters';
 let products = window.categoryData;
@@ -115,6 +116,7 @@ const renderBlock = async (block) => {
       submitter: { id },
     } = e;
     const isApply = id === 'apply-filter-btn';
+
     if (isApply) {
       const checkedInputs = [...filterList.querySelectorAll(`.${blockName}-input:checked`)];
       console.log(checkedInputs);
@@ -131,6 +133,14 @@ const renderBlock = async (block) => {
           filteredAttrib.push({ title, values: [value] });
         }
       });
+      console.log(filteredAttrib);
+
+      const filteredQueryParams = {
+        category: getCategory(),
+      };
+
+      console.log(filteredQueryParams);
+
       const filteredProducts = new Set();
       products.forEach((product) => {
         const isFiltered = filteredAttrib.every((attrib) => attrib.values.includes(product[attrib.title]));
