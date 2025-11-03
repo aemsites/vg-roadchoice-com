@@ -292,7 +292,7 @@ async function fetchBlogs(category) {
       limit: 3,
     };
     const { articles } = await fetchArticlesAndFacets(queryParams);
-    return [...articles];
+    return [articles];
   } catch (error) {
     console.error(error);
     return null;
