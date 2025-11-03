@@ -8,6 +8,7 @@ import {
   setOrCreateMetadata,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
+import { fetchArticlesAndFacets } from '../search/graphql-api.js';
 
 const blockName = 'pdp';
 const docTypes = {
@@ -285,9 +286,13 @@ function renderSDS(sdsList) {
 
 async function fetchBlogs(category) {
   try {
-    const json = await getJsonData(getLocaleContextedUrl('/blog/query-index.json'));
-    if (!json) return null;
-    return filterByCategory(json?.data, category);
+    const queryParams = {
+      sort: 'PUBLISH_DATE_DESC',
+      category,
+      limit: 3,
+    };
+    const { articles } = await fetchArticlesAndFacets(queryParams);
+    return [...articles];
   } catch (error) {
     console.error(error);
     return null;
@@ -305,25 +310,21 @@ function renderBlogs(blogList) {
   `);
   sectionWrapper.append(fragment);
 
-  blogList
-    .filter((blog) => Number.isInteger(parseInt(blog.date, 10)))
-    .sort((blog1, blog2) => blog1.date - blog2.date)
-    .slice(-3)
-    .forEach((sds) => {
-      const blogFragment = docRange.createContextualFragment(`
+  blogList.forEach((sds) => {
+    const blogFragment = docRange.createContextualFragment(`
         <li class="${blockName}-blogs-list-item">
-          <a class="${blockName}-blogs-anchor" target="_blank" href="${sds.path}">
+          <a class="${blockName}-blogs-anchor" target="_blank" href="${sds.url}">
             <h6 class="${blockName}-blogs-title">${sds.title}</h6>
           </a>
           <p class="${blockName}-blogs-date">
-            ${new Date(parseInt(sds.date, 10) * 1000).toLocaleDateString()}
+            ${new Date(parseInt(sds.publishDate, 10) * 1000).toLocaleDateString()}
           </p>
           <p class="${blockName}-blogs-description">${sds.description}</p>
-          <a class="${blockName}-blogs-cta" target="_blank" href="${sds.path}">Read More</a>
+          <a class="${blockName}-blogs-cta" target="_blank" href="${sds.url}">Read More</a>
         </li>
       `);
-      sectionWrapper.querySelector(`.${blockName}-blogs-list`).append(blogFragment);
-    });
+    sectionWrapper.querySelector(`.${blockName}-blogs-list`).append(blogFragment);
+  });
   blogsContainer.classList.remove('hide');
 }
 
