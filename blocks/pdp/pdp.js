@@ -545,6 +545,8 @@ function renderBreadcrumbs(part) {
 
 export default async function decorate(block) {
   const pathSegments = getPathParams();
+  console.log(pathSegments);
+  // const subcategory = getCate
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
 
