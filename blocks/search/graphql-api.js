@@ -303,8 +303,9 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
 
   if (error) return { results: [], error };
 
-  const { items } = data.data[queryName];
+  const { items, facets } = data.data[queryName];
 
   const articles = items.map((item) => item.metadata);
-  return { articles };
+
+  return { articles, facets };
 }
