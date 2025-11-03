@@ -185,6 +185,7 @@ async function fetchCategoryKeys(category) {
       url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
       limit: DEFAULT_LIMIT,
     });
+    console.log(json);
     if (!json || json.length === 0) return [];
     return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
