@@ -1,4 +1,4 @@
-import { getTextLabel, getJsonFromUrl, createElement } from '../../scripts/common.js';
+import { getTextLabel, createElement } from '../../scripts/common.js';
 import { readBlockConfig } from '../../scripts/aem.js';
 import { fetchArticlesAndFacets } from '../search/graphql-api.js';
 
