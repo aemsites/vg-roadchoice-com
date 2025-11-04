@@ -46,6 +46,7 @@
   border-radius: 4px;
   color: #141414;
   display: block;
+  font-family: var(--body-ff);
   font-size: 16px;
   font-weight: 300;
   letter-spacing: 0.5px;
@@ -60,6 +61,7 @@
   box-shadow:
     0 0.6px 3px 0 var(--bg-shadow),
     0 8px 16px 0 var(--bg-shadow);
+  font-family: var(--body-ff);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 1.25px;
