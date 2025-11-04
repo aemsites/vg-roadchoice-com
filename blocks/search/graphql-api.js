@@ -278,7 +278,7 @@ export async function fetchCategories() {
   };
 
   const { data, error } = await fetchGraphQLData(categoriesQuery, SEARCH_URL_DEV);
-  console.log(data);
+
   if (error) return { facets: [], error };
 
   return data.data[RC_CATEGORY_FACETS].facets;
@@ -336,7 +336,6 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
   const { items, facets } = data.data[RC_BLOG_RECOMMEND];
 
   const articles = items.map((item) => item.metadata);
-  console.log(articles);
-  console.log(graphqlQuery.variables);
+
   return { articles, facets };
 }
