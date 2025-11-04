@@ -287,7 +287,7 @@ function renderSDS(sdsList) {
 async function getBlogCategory(category) {
   try {
     const json = await fetchCategoryKeysJson();
-
+    console.log(json);
     if (!json || json.length === 0) return null;
 
     return getCategoryObject(json, category);
