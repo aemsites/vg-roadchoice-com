@@ -298,6 +298,7 @@ async function fetchBlogs(category = null) {
     };
     const { articles } = await fetchArticlesAndFacets(queryParams);
     const articleArray = [...articles];
+    console.log(articleArray);
     return articleArray;
   } catch (error) {
     console.error(error);
@@ -306,6 +307,7 @@ async function fetchBlogs(category = null) {
 }
 
 function renderBlogs(blogList) {
+  console.log(blogList);
   if (!blogList) return;
   const blogsContainer = document.querySelector(`.${blockName}-blogs`);
   const sectionWrapper = blogsContainer.querySelector('.default-content-wrapper');
