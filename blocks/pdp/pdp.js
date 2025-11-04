@@ -573,7 +573,7 @@ export default async function decorate(block) {
     renderImages(block, images);
   });
 
-  blogCategory = fetchPartFit(pathSegments).then(renderPartFit);
+  fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
   fetchBlogs(blogCategory).then(renderBlogs);
