@@ -714,28 +714,33 @@ function setOrCreateMetadata(propName, propVal) {
 export const getCategoryObject = (dataArray, subcategoryName) => {
   const searchKey = subcategoryName.toLowerCase().replaceAll('-', ' ');
   console.log(searchKey);
-  let matchingSubcategory = null;
+
+  let foundCategory = null;
+  let foundSubcategoryKey = null;
 
   const foundObject = dataArray.find((categoryObj) => {
-    if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
-      const isMatch = categoryObj.subcategories.some((subCat) => {
-        if (subCat.key.toLowerCase() === searchKey) {
-          matchingSubcategory = subCat;
-          return true;
-        }
-        return false;
-      });
-      return isMatch;
+    const subcategories = categoryObj.subcategories || [];
+
+    const matchingSubcategory = subcategories.find((subCat) => {
+      return subCat.key && subCat.key.toLowerCase() === searchKey;
+    });
+
+    if (matchingSubcategory) {
+      foundCategory = categoryObj.key;
+      foundSubcategoryKey = matchingSubcategory.key;
+      return true;
     }
+
     return false;
   });
-  console.warn(foundObject);
-  if (foundObject && matchingSubcategory) {
+
+  if (foundObject) {
     return {
-      category: foundObject.key,
-      subcategory: matchingSubcategory.key,
+      category: foundCategory,
+      subcategory: foundSubcategoryKey,
     };
   }
+
   return null;
 };
 
