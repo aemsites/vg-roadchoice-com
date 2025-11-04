@@ -709,7 +709,7 @@ function setOrCreateMetadata(propName, propVal) {
  * Finds the main category key and the exactly matched subcategory key.
  * * @param {Array<Object>} dataArray The array of category objects.
  * @param {string} subcategoryName The subcategory key string to search for (e.g., "antennas").
- * @returns {Object | null} An object with keys 'cat' and 'subcat' (the exact case from the data), or null if not found.
+ * @returns {Object | null} An object with keys 'category' and 'subcategory' (the exact case from the data), or null if not found.
  */
 export const getCategoryObject = (dataArray, subcategoryName) => {
   const searchKey = subcategoryName.toLowerCase();
