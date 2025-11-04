@@ -300,7 +300,8 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
   };
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
-
+  console.log(data);
+  console.log(graphqlQuery.variables);
   if (error) return { results: [], error };
 
   const { items, facets } = data.data[queryName];
