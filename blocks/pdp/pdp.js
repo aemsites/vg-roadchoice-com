@@ -286,6 +286,11 @@ function renderSDS(sdsList) {
   sdsContainer.classList.remove('hide');
 }
 
+/**
+ * Fetches a limited array of blog articles for a specific category.
+ * @param {string} category - The resolved category key to filter the blog articles by.
+ * @returns {Promise<Array>} A promise that resolves to an array of articles
+ */
 async function fetchBlogs(category) {
   try {
     const queryParams = {
