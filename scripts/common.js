@@ -737,6 +737,21 @@ export const getCategoryObject = (dataArray, subcategoryName) => {
   return null;
 };
 
+// export async function fetchCategoryKeys(category) {
+//   try {
+//     const json = await getLongJSONData({
+//       url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
+//       limit: DEFAULT_LIMIT,
+//     });
+//     if (!json || json.length === 0) return [];
+
+//     return json;
+//   } catch (error) {
+//     console.error(error);
+//     return [];
+//   }
+// }
+
 function isPerformanceAllowed() {
   return checkOneTrustGroup(COOKIE_CONFIGS.PERFORMANCE_COOKIE);
 }

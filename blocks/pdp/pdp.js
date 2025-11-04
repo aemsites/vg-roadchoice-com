@@ -191,7 +191,10 @@ async function fetchCategoryKeys(category) {
 
     blogCategory = await getCategoryObject(json, category);
 
-    return filterByCategory(json, category, 'Subcategory');
+    const result = filterByCategory(json, category, 'Subcategory');
+    console.log(result);
+
+    return result;
   } catch (error) {
     console.error(error);
     return [];
@@ -569,7 +572,7 @@ export default async function decorate(block) {
     renderImages(block, images);
   });
 
-  fetchPartFit(pathSegments).then(renderPartFit);
+  blogCategory = fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
   fetchBlogs(blogCategory).then(renderBlogs);
