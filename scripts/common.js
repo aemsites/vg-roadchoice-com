@@ -712,7 +712,8 @@ function setOrCreateMetadata(propName, propVal) {
  * @returns {Object | null} An object with keys 'category' and 'subcategory' (the exact case from the data), or null if not found.
  */
 export const getCategoryObject = (dataArray, subcategoryName) => {
-  const searchKey = subcategoryName.toLowerCase();
+  const searchKey = subcategoryName.toLowerCase().replaceAll('-', ' ');
+  console.log(searchKey);
   let matchingSubcategory = null;
 
   const foundObject = dataArray.find((categoryObj) => {
@@ -728,6 +729,7 @@ export const getCategoryObject = (dataArray, subcategoryName) => {
     }
     return false;
   });
+  console.warn(foundObject);
   if (foundObject && matchingSubcategory) {
     return {
       category: foundObject.key,
