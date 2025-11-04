@@ -545,6 +545,7 @@ function renderBreadcrumbs(part) {
 async function getBlogCategory(category) {
   const categoriesJson = await fetchCategoryKeysJson();
   console.log(categoriesJson);
+  console.log(category);
   const categoryObject = getCategoryObject(categoriesJson, category);
 
   console.log(categoryObject);
