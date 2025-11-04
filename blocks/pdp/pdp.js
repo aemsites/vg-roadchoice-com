@@ -190,7 +190,7 @@ async function fetchCategoryKeys(category) {
     });
     if (!json || json.length === 0) return [];
 
-    blogCategory = await getCategoryObject(json, category);
+    blogCategory = getCategoryObject(json, category);
 
     const result = filterByCategory(json, category, 'Subcategory');
     console.log(result);
