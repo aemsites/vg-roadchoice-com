@@ -76,6 +76,12 @@ export const clearCurrentArticle = (articles) => {
   });
 };
 
+/**
+ * @param {string} rawCategory - The raw string slug used to identify the subcategory
+ * (e.g., "fan-clutches" or "fan clutches" which should be searched as "Fan Clutches" in the API).
+ * @returns {Promise<Object | null>} A promise that resolves to an object containing the resolved
+ * category keys, in the format: { category: string, subcategory: string } or null
+ */
 export async function getBlogCategory(rawCategory) {
   try {
     const rawCategoryList = await fetchCategories();
