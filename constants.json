@@ -42,7 +42,7 @@
       }
     ]
   },
-  "dealerLocator": {
+  "tools": {
     "total": 3,
     "offset": 0,
     "limit": 3,
@@ -52,8 +52,8 @@
         "value": "https://dealerlocator.roadchoice.com/DealerJSON.ashx"
       },
       {
-        "name": "API_KEY",
-        "value": "AIzaSyAP8IewqHuU8SMz_6tNiIUlbU_l0GFOd1w"
+        "name": "GOOGLE_API_KEY",
+        "value": "AIzaSyDA2kl6xcb8bn_9aAVm2MN5BRYpxPrvQ58"
       },
       {
         "name": "BACKUP_URL",
@@ -111,7 +111,7 @@
   ":version": 3,
   ":names": [
     "cookieValues",
-    "dealerLocator",
+    "tools",
     "searchConfig"
   ],
   ":type": "multi-sheet"

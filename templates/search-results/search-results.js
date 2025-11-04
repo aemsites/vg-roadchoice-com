@@ -43,4 +43,9 @@ export default async function decorate(doc) {
 
   if (searchBar) main.prepend(searchBar);
   main.append(section);
+
+  // These containers are beign left behind and generating unnecessary padding. Since we are appending the other 3
+  // blocks (filters, results-list and pagination) at WRAPPER level these should be removed.
+  // TODO: refactor this block so that this step is not necessary.
+  ['.filters-container', '.results-list-container', '.pagination-container'].forEach((selector) => main.querySelector(selector)?.remove());
 }
