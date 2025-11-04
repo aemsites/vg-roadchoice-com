@@ -551,6 +551,7 @@ export default async function decorate(block) {
   const pathSegments = getPathParams();
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
+  console.log(pathSegments.category);
 
   getPDPData(pathSegments).then((part) => {
     if (part) {
