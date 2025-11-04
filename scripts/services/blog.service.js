@@ -1,5 +1,5 @@
-import { fetchCategories } from '../../blocks/search/graphql-api';
-import { getCategoryObject } from '../common';
+import { fetchCategories } from '../../blocks/search/graphql-api.js';
+import { getCategoryObject } from '../common.js';
 
 /**
  * Extract the classes of a block and in case there is a 'limit-X' set, extract it as a number
