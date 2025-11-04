@@ -6,6 +6,7 @@ import {
   DEFAULT_LIMIT,
   getLocaleContextedUrl,
   setOrCreateMetadata,
+  getCategoryObject,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 import { fetchArticlesAndFacets } from '../search/graphql-api.js';
@@ -169,15 +170,7 @@ function setPartData(part, block) {
 }
 
 function filterByCategory(data, category, categoryKey = 'category') {
-  if (categoryKey.toLowerCase() === 'subcategory') {
-    blogCategory = category;
-    console.warn(blogCategory);
-    console.log(category);
-    console.log(data);
-    console.log(data[categoryKey]);
-  }
-  const result = data.filter((item) => item[categoryKey].replace(/[^\w]/g, '').toLowerCase() === category.replace(/[^\w]/g, '').toLowerCase());
-  return result;
+  return data.filter((item) => item[categoryKey].replace(/[^\w]/g, '').toLowerCase() === category.replace(/[^\w]/g, '').toLowerCase());
 }
 
 function groupByLanguage(data) {
@@ -194,8 +187,10 @@ async function fetchCategoryKeys(category) {
       url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
       limit: DEFAULT_LIMIT,
     });
-    console.log(json);
     if (!json || json.length === 0) return [];
+
+    blogCategory = getCategoryObject(json, category);
+
     return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
     console.error(error);
@@ -294,14 +289,13 @@ function renderSDS(sdsList) {
   sdsContainer.classList.remove('hide');
 }
 
-async function fetchBlogs(category) {
+async function fetchBlogs(category = null) {
   try {
     const queryParams = {
       sort: 'PUBLISH_DATE_DESC',
       category,
       limit: 3,
     };
-    console.log(queryParams);
     const { articles } = await fetchArticlesAndFacets(queryParams);
     const articleArray = [...articles];
     return articleArray;
@@ -555,8 +549,6 @@ function renderBreadcrumbs(part) {
 
 export default async function decorate(block) {
   const pathSegments = getPathParams();
-  console.log(pathSegments);
-  // const subcategory = getCate
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
 
@@ -579,7 +571,7 @@ export default async function decorate(block) {
   fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
-  fetchBlogs(pathSegments.category).then(renderBlogs);
+  fetchBlogs(blogCategory).then(renderBlogs);
 
   document.querySelector('main').addEventListener('click', (e) => {
     if (e.target.matches('.section.accordion h5')) {

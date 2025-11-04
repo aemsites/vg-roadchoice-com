@@ -705,6 +705,39 @@ function setOrCreateMetadata(propName, propVal) {
   }
 }
 
+/**
+ * Finds the main category key and the exactly matched subcategory key.
+ * * @param {Array<Object>} dataArray The array of category objects.
+ * @param {string} subcategoryName The subcategory key string to search for (e.g., "antennas").
+ * @returns {Object | null} An object with keys 'cat' and 'subcat' (the exact case from the data), or null if not found.
+ */
+export const getCategoryObject = (dataArray, subcategoryName) => {
+  const searchKey = subcategoryName.toLowerCase();
+  let matchingSubcategory = null;
+
+  const foundObject = dataArray.find((categoryObj) => {
+    if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
+      const isMatch = categoryObj.subcategories.some((subCat) => {
+        if (subCat.key.toLowerCase() === searchKey) {
+          matchingSubcategory = subCat;
+          return true;
+        }
+        return false;
+      });
+      return isMatch;
+    }
+    return false;
+  });
+
+  if (foundObject && matchingSubcategory) {
+    return {
+      category: foundObject.key,
+      subcategory: matchingSubcategory.key,
+    };
+  }
+  return null;
+};
+
 function isPerformanceAllowed() {
   return checkOneTrustGroup(COOKIE_CONFIGS.PERFORMANCE_COOKIE);
 }
