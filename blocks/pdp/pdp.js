@@ -284,7 +284,24 @@ function renderSDS(sdsList) {
   sdsContainer.classList.remove('hide');
 }
 
-async function fetchBlogs(category) {
+async function getBlogCategory(category) {
+  try {
+    const json = await fetchCategoryKeysJson();
+
+    if (!json || json.length === 0) return null;
+    const categoryObject = getCategoryObject(json, category);
+
+    console.log(categoryObject);
+    return categoryObject;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+async function fetchBlogs(cat) {
+  const category = await getBlogCategory(cat);
+
   try {
     const queryParams = {
       sort: 'PUBLISH_DATE_DESC',
@@ -542,27 +559,12 @@ function renderBreadcrumbs(part) {
   breadcrumbSection.append(breadcrumbs);
 }
 
-async function getBlogCategory(category) {
-  try {
-    const json = await fetchCategoryKeysJson();
-
-    if (!json || json.length === 0) return null;
-    const categoryObject = getCategoryObject(json, category);
-
-    console.log(categoryObject);
-    return categoryObject;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
 export default async function decorate(block) {
   const pathSegments = getPathParams();
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
-  const blogCategory = await getBlogCategory(pathSegments.category);
-  console.log(blogCategory);
+  // const blogCategory = await getBlogCategory(pathSegments.category);
+  // console.log(blogCategory);
 
   getPDPData(pathSegments).then((part) => {
     if (part) {
@@ -583,8 +585,7 @@ export default async function decorate(block) {
   fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
-  fetchBlogs('Batteries').then(renderBlogs);
-  // fetchBlogs(pathSegments.category).then(renderBlogs);
+  fetchBlogs(pathSegments.category).then(renderBlogs);
 
   document.querySelector('main').addEventListener('click', (e) => {
     if (e.target.matches('.section.accordion h5')) {
