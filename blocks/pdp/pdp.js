@@ -10,7 +10,7 @@ import {
   fetchCategoryKeysJson,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
-import { fetchArticlesAndFacets } from '../search/graphql-api.js';
+import { fetchArticlesAndFacets, fetchCategories } from '../search/graphql-api.js';
 
 const blockName = 'pdp';
 const docTypes = {
@@ -286,11 +286,11 @@ function renderSDS(sdsList) {
 
 async function getBlogCategory(category) {
   try {
-    const json = await fetchCategoryKeysJson();
-    console.log(json);
-    if (!json || json.length === 0) return null;
+    const rawCategoryList = await fetchCategories();
+    console.log(rawCategoryList);
+    if (!rawCategoryList || rawCategoryList.length === 0) return null;
 
-    return getCategoryObject(json, category);
+    return getCategoryObject(rawCategoryList, category);
   } catch (error) {
     console.log(error);
     return null;
