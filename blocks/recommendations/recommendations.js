@@ -73,7 +73,7 @@ export default async function decorate(block) {
     articleTitle.appendChild(articleTitleLink);
 
     const articleDate = createElement('p', { classes: ['article-date'] });
-    articleDate.innerText = formatDate(art.publishDate ? art.publishDate : art.lastModified);
+    articleDate.innerText = formatDate(art.publishDate);
 
     const articleText = createElement('p', { classes: ['article-text'] });
     articleText.innerText = art.description;
