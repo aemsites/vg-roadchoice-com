@@ -314,8 +314,7 @@ const buildSidebar = (articles, titleContent) => {
 };
 
 export default async function decorate(block) {
-  const blockConfig = readBlockConfig(block);
-  const [titleContent, amount] = Object.values(blockConfig);
+  const { title, 'amount-of-articles': amount } = readBlockConfig(block);
   articlesPerPage = +amount;
 
   const queryParams = {
@@ -325,7 +324,7 @@ export default async function decorate(block) {
   const { articles } = await fetchArticlesAndFacets(queryParams);
   allArticles = [...articles];
 
-  const sidebar = buildSidebar(allArticles, titleContent);
+  const sidebar = buildSidebar(allArticles, title);
   const results = buildResults(allArticles, 0);
 
   block.textContent = '';
