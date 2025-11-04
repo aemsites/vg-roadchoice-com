@@ -90,7 +90,7 @@ export default async function decorate(block) {
   recommendationsContent.append(titleSection, recommendationsList);
 
   block.textContent = '';
-  if (articles.length > 0 && filteredArticles.length > 0) {
+  if (articles.length && filteredArticles.length) {
     block.appendChild(recommendationsContent);
   }
 }
