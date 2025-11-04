@@ -1,8 +1,9 @@
 import { loadScript } from '../../scripts/aem.js';
-import { DEALER_LOCATOR } from '../../scripts/common.js';
+import { TOOLS_CONFIGS } from '../../scripts/common.js';
 
 // DEALER LOCATOR config coming from constants file.
-const { ENDPOINT_URL = false, API_KEY = false, BACKUP_URL = false } = DEALER_LOCATOR;
+const missingKeyMessage = 'MissingKey';
+const { ENDPOINT_URL = false, GOOGLE_API_KEY: apiKey = missingKeyMessage, BACKUP_URL = false } = TOOLS_CONFIGS;
 
 function escapeHTML(input) {
   return input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -28,33 +29,42 @@ export default async function decorate(block) {
   });
   if (!ENDPOINT_URL) {
     console.error(
-      'The block is missing the %cENDPOINT_URL%c in the constants config for %cDEALER_LOCATOR',
+      'The block is missing the %cENDPOINT_URL%c in the constants config for %cTOOLS_CONFIGS',
       'color: red;',
       'color: initial;',
       'color: red;',
     );
   }
   observer.observe(block, { attributes: true, attributeFilter: ['data-block-status'] });
-  window.locatorConfig = {
-    consolidateFilters: true,
-    selectedBrand: 'roadchoice',
-    dataSource: datasource || '',
-    backupUrl: BACKUP_URL || '',
-    apiKey: API_KEY || '',
-    amenities: [
-      'Appointments Accepted',
-      'Bilingual Service',
-      'Driver Lounge',
-      'Free Pickup and Delivery',
-      'Hotel Shuttle',
-      'Internet Service',
-      'Laundry',
-      'Showers',
-      'Telephones',
-      'Trailer Parking',
-      'Video Games',
-    ],
-  };
+  if (!apiKey || apiKey === missingKeyMessage) {
+    console.error(
+      'The block is wrongly set up or is missing the %cGOOGLE_API_KEY%c in the %cTOOLS_CONFIGS',
+      'color: red;',
+      'color: initial;',
+      'color: red;',
+    );
+  } else {
+    window.locatorConfig = {
+      consolidateFilters: true,
+      selectedBrand: 'roadchoice',
+      dataSource: datasource || '',
+      backupUrl: BACKUP_URL || '',
+      apiKey,
+      amenities: [
+        'Appointments Accepted',
+        'Bilingual Service',
+        'Driver Lounge',
+        'Free Pickup and Delivery',
+        'Hotel Shuttle',
+        'Internet Service',
+        'Laundry',
+        'Showers',
+        'Telephones',
+        'Trailer Parking',
+        'Video Games',
+      ],
+    };
+  }
 
   loadScript('/blocks/dealer-locator/vendor/jquery.min.js', { type: 'text/javascript', charset: 'UTF-8' }).then(() => {
     // these scripts depend on jquery:
