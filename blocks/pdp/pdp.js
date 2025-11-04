@@ -293,9 +293,10 @@ async function fetchBlogs(category) {
       category,
       limit: 3,
     };
-    console.log(queryParams);
+
     const { articles } = await fetchArticlesAndFacets(queryParams);
     const articleArray = [...articles];
+
     return articleArray;
   } catch (error) {
     console.error(error);
@@ -571,9 +572,7 @@ export default async function decorate(block) {
   fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
-  if (blogCategory.length) {
-    fetchBlogs(blogCategory).then(renderBlogs);
-  }
+  fetchBlogs(blogCategory).then(renderBlogs);
 
   document.querySelector('main').addEventListener('click', (e) => {
     if (e.target.matches('.section.accordion h5')) {
