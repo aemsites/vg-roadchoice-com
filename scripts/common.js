@@ -733,7 +733,7 @@ export const getCategoryObject = (dataArray, subcategoryName) => {
 
     return false;
   });
-
+  console.log(foundObject);
   if (foundObject) {
     return {
       category: foundCategory,
