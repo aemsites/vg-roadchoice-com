@@ -48,6 +48,14 @@ header nav .nav-drop.show > a {
   row-gap: 1rem;
 }
 
+.categories .level-2 > li {
+  width: calc((100vw - 14rem) * 0.2);
+}
+
+header .level-2 a.category {
+  text-transform: uppercase;
+}
+
 header span.fa-arrow-left {
   grid-area: left;
 }
@@ -461,5 +469,9 @@ header .nav-tools .categories a {
     --categories-padding: 6rem 6rem 20rem;
     --categories-gap: 8rem 3rem;
     --categories-height: 1450px;
+  }
+
+  .categories .level-2 > li {
+    width: calc((100vw - 24rem) * 0.2);
   }
 }
