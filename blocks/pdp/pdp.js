@@ -583,7 +583,8 @@ export default async function decorate(block) {
   fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
-  fetchBlogs(pathSegments.category).then(renderBlogs);
+  fetchBlogs('Batteries').then(renderBlogs);
+  // fetchBlogs(pathSegments.category).then(renderBlogs);
 
   document.querySelector('main').addEventListener('click', (e) => {
     if (e.target.matches('.section.accordion h5')) {
