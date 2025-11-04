@@ -284,7 +284,7 @@ export async function fetchCategories() {
   return data.data[RC_CATEGORY_FACETS].facets;
 }
 
-export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit = 3, category = null, offset = 0 }) {
+export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit = 100, category = null, offset = 0 }) {
   const { SEARCH_URL_DEV, RC_BLOG_RECOMMEND, TENANT } = SEARCH_CONFIG;
 
   const graphqlQuery = {
