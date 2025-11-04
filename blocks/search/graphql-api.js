@@ -254,13 +254,12 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
 }
 
 export async function fetchCategories() {
-  const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
-  const queryName = 'rccategoriessubcategoriesfacets';
-  
+  const { SEARCH_URL_DEV, RC_CATEGORY_FACETS, TENANT } = SEARCH_CONFIG;
+
   const categoriesQuery = {
     query: `
-      query ${queryName}($tenant: RcTenantEnum, $language: RcLocaleEnum) {
-        ${queryName}(tenant: $tenant, language: $language) {
+      query ${RC_CATEGORY_FACETS}($tenant: RcTenantEnum, $language: RcLocaleEnum) {
+        ${RC_CATEGORY_FACETS}(tenant: $tenant, language: $language) {
           facets {
             doc_count
             key
@@ -279,20 +278,19 @@ export async function fetchCategories() {
   };
 
   const { data, error } = await fetchGraphQLData(categoriesQuery, SEARCH_URL_DEV);
-
+  console.log(data);
   if (error) return { facets: [], error };
 
-  return data.data.queryName.facets;
+  return data.data[RC_CATEGORY_FACETS].facets;
 }
 
-export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit = 100, category = null, offset = 0 }) {
-  const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
-  const queryName = 'rcrecommend';
+export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit = 3, category = null, offset = 0 }) {
+  const { SEARCH_URL_DEV, RC_BLOG_RECOMMEND, TENANT } = SEARCH_CONFIG;
 
   const graphqlQuery = {
     query: `
-      query ${queryName}($language: RcLocaleEnum!, $category: String, $sort: RcBlogsSortOptionsEnum, $facets: [RcBlogsFieldEnum], $tag: String, $tenant: RcTenantEnum!, $offset: Int, $limit: Int) {
-        ${queryName}(language: $language, category: $category, sort: $sort, facets: $facets, tag: $tag, tenant: $tenant, offset: $offset, limit: $limit) {
+      query ${RC_BLOG_RECOMMEND}($language: RcLocaleEnum!, $category: String, $sort: RcBlogsSortOptionsEnum, $facets: [RcBlogsFieldEnum], $tag: String, $tenant: RcTenantEnum!, $offset: Int, $limit: Int) {
+        ${RC_BLOG_RECOMMEND}(language: $language, category: $category, sort: $sort, facets: $facets, tag: $tag, tenant: $tenant, offset: $offset, limit: $limit) {
           count
           items {
             uuid
@@ -335,9 +333,10 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
 
   if (error) return { results: [], error };
 
-  const { items, facets } = data.data[queryName];
+  const { items, facets } = data.data[RC_BLOG_RECOMMEND];
 
   const articles = items.map((item) => item.metadata);
-
+  console.log(articles);
+  console.log(graphqlQuery.variables);
   return { articles, facets };
 }

@@ -320,6 +320,7 @@ export default async function decorate(block) {
 
   const queryParams = {
     sort: 'PUBLISH_DATE_DESC',
+    limit: 100,
   };
 
   const { articles } = await fetchArticlesAndFacets(queryParams);

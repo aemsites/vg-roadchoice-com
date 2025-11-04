@@ -42,7 +42,7 @@ const formatDate = (date) => {
 export default async function decorate(block) {
   const queryParams = {
     sort: 'PUBLISH_DATE_DESC',
-    limit: extractLimitFromBlock(block) + 1,
+    limit: extractLimitFromBlock(block) + (isBlogArticle ? 1 : 0),
     category,
   };
 
