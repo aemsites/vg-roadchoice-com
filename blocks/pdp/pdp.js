@@ -189,7 +189,7 @@ async function fetchCategoryKeys(category) {
     });
     if (!json || json.length === 0) return [];
 
-    blogCategory = getCategoryObject(json, category);
+    blogCategory = await getCategoryObject(json, category);
 
     return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
