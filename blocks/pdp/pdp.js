@@ -289,10 +289,8 @@ async function getBlogCategory(category) {
     const json = await fetchCategoryKeysJson();
 
     if (!json || json.length === 0) return null;
-    const categoryObject = getCategoryObject(json, category);
 
-    console.log(categoryObject);
-    return categoryObject;
+    return getCategoryObject(json, category);
   } catch (error) {
     console.log(error);
     return null;
