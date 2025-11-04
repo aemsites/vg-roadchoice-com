@@ -1,6 +1,7 @@
 import { SEARCH_CONFIG, getPageLanguage } from '../../scripts/common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
+  console.log(graphqlQuery.variables);
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -336,6 +337,6 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
   const { items, facets } = data.data[RC_BLOG_RECOMMEND];
 
   const articles = items.map((item) => item.metadata);
-
+  console.log(articles);
   return { articles, facets };
 }
