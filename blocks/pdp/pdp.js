@@ -295,9 +295,8 @@ async function fetchBlogs(category) {
     };
 
     const { articles } = await fetchArticlesAndFacets(queryParams);
-    const articleArray = [...articles];
 
-    return articleArray;
+    return articles || null;
   } catch (error) {
     console.error(error);
     return null;
