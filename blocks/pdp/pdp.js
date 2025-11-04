@@ -182,6 +182,7 @@ function groupByLanguage(data) {
 }
 
 async function fetchCategoryKeys(category) {
+  console.log(category);
   try {
     const json = await getLongJSONData({
       url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
