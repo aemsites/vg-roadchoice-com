@@ -6,11 +6,10 @@ import {
   DEFAULT_LIMIT,
   getLocaleContextedUrl,
   setOrCreateMetadata,
-  getCategoryObject,
-  fetchCategoryKeysJson,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
-import { fetchArticlesAndFacets, fetchCategories } from '../search/graphql-api.js';
+import { fetchArticlesAndFacets } from '../search/graphql-api.js';
+import { getBlogCategory } from '../../scripts/services/blog.service.js';
 
 const blockName = 'pdp';
 const docTypes = {
@@ -19,7 +18,6 @@ const docTypes = {
 };
 const docRange = document.createRange();
 const SUPPORTED_LOCALES_WITH_PREFIX = ['en-ca', 'fr-ca'];
-// let blogCategory;
 
 function getJsonData(route) {
   const requestUrl = new URL(window.location.origin + route);
@@ -184,7 +182,11 @@ function groupByLanguage(data) {
 
 async function fetchCategoryKeys(category) {
   try {
-    const json = await fetchCategoryKeysJson();
+    const json = await getLongJSONData({
+      url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
+      limit: DEFAULT_LIMIT,
+    });
+    if (!json || json.length === 0) return [];
 
     return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
@@ -284,28 +286,14 @@ function renderSDS(sdsList) {
   sdsContainer.classList.remove('hide');
 }
 
-async function getBlogCategory(category) {
-  try {
-    const rawCategoryList = await fetchCategories();
-
-    if (!rawCategoryList || rawCategoryList.length === 0) return null;
-
-    return getCategoryObject(rawCategoryList, category);
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
-async function fetchBlogs(cat) {
-  const categoryObject = await getBlogCategory(cat);
-
+async function fetchBlogs(category) {
   try {
     const queryParams = {
       sort: 'PUBLISH_DATE_DESC',
-      category: categoryObject.subcategory,
+      category,
       limit: 3,
     };
+    console.log(queryParams);
     const { articles } = await fetchArticlesAndFacets(queryParams);
     const articleArray = [...articles];
     return articleArray;
@@ -559,10 +547,10 @@ function renderBreadcrumbs(part) {
 
 export default async function decorate(block) {
   const pathSegments = getPathParams();
+  const blogCategory = getBlogCategory(pathSegments.category);
+
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
-  // const blogCategory = await getBlogCategory(pathSegments.category);
-  // console.log(blogCategory);
 
   getPDPData(pathSegments).then((part) => {
     if (part) {
@@ -583,7 +571,7 @@ export default async function decorate(block) {
   fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
-  fetchBlogs(pathSegments.category).then(renderBlogs);
+  fetchBlogs(blogCategory).then(renderBlogs);
 
   document.querySelector('main').addEventListener('click', (e) => {
     if (e.target.matches('.section.accordion h5')) {

@@ -1,3 +1,6 @@
+import { fetchCategories } from '../../blocks/search/graphql-api';
+import { getCategoryObject } from '../common';
+
 /**
  * Extract the classes of a block and in case there is a 'limit-X' set, extract it as a number
  * @param {block} block - The block element
@@ -72,3 +75,16 @@ export const clearCurrentArticle = (articles) => {
     return lastElementInUrl !== currentArticlePath ? article : null;
   });
 };
+
+export async function getBlogCategory(rawCategory) {
+  try {
+    const rawCategoryList = await fetchCategories();
+
+    if (!rawCategoryList || rawCategoryList.length === 0) return null;
+
+    return getCategoryObject(rawCategoryList, rawCategory);
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}

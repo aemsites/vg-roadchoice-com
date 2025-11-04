@@ -713,55 +713,29 @@ function setOrCreateMetadata(propName, propVal) {
  */
 export const getCategoryObject = (dataArray, subcategoryName) => {
   const searchKey = subcategoryName.toLowerCase().replaceAll('-', ' ');
-  console.log(searchKey);
-
-  let foundCategory = null;
-  let foundSubcategoryKey = null;
+  let matchingSubcategory = null;
 
   const foundObject = dataArray.find((categoryObj) => {
-    const subcategories = categoryObj.subcategories || [];
-
-    const matchingSubcategory = subcategories.find((subCat) => {
-      return subCat.key && subCat.key.toLowerCase() === searchKey;
-    });
-
-    if (matchingSubcategory) {
-      foundCategory = categoryObj.key;
-      foundSubcategoryKey = matchingSubcategory.key;
-      return true;
+    if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
+      return categoryObj.subcategories.some((subCat) => {
+        if (subCat.key.toLowerCase() === searchKey) {
+          matchingSubcategory = subCat;
+          return true;
+        }
+        return false;
+      });
     }
-
     return false;
   });
-  console.log(foundObject);
-  if (foundObject) {
+
+  if (foundObject && matchingSubcategory) {
     return {
-      category: foundCategory,
-      subcategory: foundSubcategoryKey,
+      category: foundObject.key,
+      subcategory: matchingSubcategory.key,
     };
   }
-
   return null;
 };
-
-/**
- * Fetches the complete master file containing all category and subcategory keys.
- * @returns {Promise<Array>} A Promise that resolves to an array of categories and subcategories or []
- */
-export async function fetchCategoryKeysJson() {
-  try {
-    const json = await getLongJSONData({
-      url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
-      limit: DEFAULT_LIMIT,
-    });
-    if (!json || json.length === 0) return [];
-
-    return json;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-}
 
 function isPerformanceAllowed() {
   return checkOneTrustGroup(COOKIE_CONFIGS.PERFORMANCE_COOKIE);
