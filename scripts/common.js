@@ -714,7 +714,7 @@ function setOrCreateMetadata(propName, propVal) {
 export const getCategoryObject = (dataArray, subcategoryName) => {
   const searchKey = subcategoryName.toLowerCase().replaceAll('-', ' ');
   let matchingSubcategory = null;
-
+  console.log(searchKey);
   const foundObject = dataArray.find((categoryObj) => {
     if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
       return categoryObj.subcategories.some((subCat) => {

@@ -543,14 +543,21 @@ function renderBreadcrumbs(part) {
 }
 
 async function getBlogCategory(category) {
-  const categoriesJson = await fetchCategoryKeysJson();
-  console.log(categoriesJson);
-  console.log(category);
-  const categoryObject = getCategoryObject(categoriesJson, category);
+  try {
+    const json = await fetchCategoryKeysJson();
 
-  console.log(categoryObject);
+    if (!json || json.length === 0) return null;
+    console.log(json);
+    console.log(category);
+    const categoryObject = getCategoryObject(json, category);
 
-  return categoryObject;
+    console.log(categoryObject);
+
+    return categoryObject;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 export default async function decorate(block) {
