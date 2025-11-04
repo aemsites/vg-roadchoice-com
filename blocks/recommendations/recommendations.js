@@ -1,7 +1,7 @@
 import { createElement, getTextLabel, getLocale } from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/aem.js';
 import { fetchArticlesAndFacets } from '../search/graphql-api.js';
-import { extractLimitFromBlock, clearCurrentArticle } from '../../scripts/services/blog.service.js';
+import { getLimitFromBlock, clearCurrentArticle } from '../../scripts/services/blog.service.js';
 
 const blockName = 'recommendations';
 const category = getMetadata('category') || null;
@@ -42,7 +42,7 @@ const formatDate = (date) => {
 export default async function decorate(block) {
   const queryParams = {
     sort: 'PUBLISH_DATE_DESC',
-    limit: extractLimitFromBlock(block) + (isBlogArticle ? 1 : 0),
+    limit: getLimitFromBlock(block) + (isBlogArticle ? 1 : 0),
     category,
   };
 

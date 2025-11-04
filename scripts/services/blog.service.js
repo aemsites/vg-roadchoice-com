@@ -3,7 +3,7 @@
  * @param {block} block - The block element
  * @returns {number} - A number representing the limit
  */
-export const extractLimitFromBlock = (block) => {
+export const getLimitFromBlock = (block) => {
   let limit = null;
   const blockClass = [...block.classList].find((className) => className.startsWith('limit-'));
   if (blockClass) {
@@ -14,22 +14,22 @@ export const extractLimitFromBlock = (block) => {
 };
 
 /**
- * Extracts the last folder from a URL.
+ * Extracts the last path segment from a URL.
  *
- * @param {string} url - The URL from which to extract the last folder.
- * @returns {string} The last folder in the URL.
+ * @param {string} url - The URL from which to extract the last segment.
+ * @returns {string} The last segment in the URL.
  *
  * @example
  * // Example usage:
  * const url = 'https://example.com/folder1/folder2';
- * const lastFolder = getLastURLFolder(url);
- * console.log(lastFolder); // Output: 'folder2'
+ * const lastPathSegment = getLastURLSegment(url);
+ * console.log(lastPathSegment); // Output: 'folder2'
  *
  * @description
  * This function splits the URL by '/' and filters out any empty segments.
- * It then returns the last non-empty segment, which represents the last folder in the URL.
+ * It then returns the last non-empty segment, which represents the last segment in the URL.
  * */
-const getLastURLFolder = (url) =>
+const getLastURLSegment = (url) =>
   url
     .split('/')
     .filter((item) => item.trim() !== '')
@@ -54,13 +54,13 @@ const getLastURLFolder = (url) =>
  *
  * @description
  * This function filters out the current article from the list of articles based on the URL or title.
- * It compares the last folder of the current URL with the last folder of each article's URL.
+ * It compares the last segment of the current URL with the last segment of each article's URL.
  * If the article has no URL, it falls back to comparing the article title with the current page's h1 title.
  * If either comparison matches, the article is excluded from the filtered list.
  * The function returns a new array containing only the articles that do not match the current article.
  */
 export const clearCurrentArticle = (articles) => {
-  const currentArticlePath = getLastURLFolder(window.location.href);
+  const currentArticlePath = getLastURLSegment(window.location.href);
   const currentArticleTitle = document.querySelector('h1')?.textContent || '';
   return articles.filter((article) => {
     const articleURL = article?.url || '';
@@ -68,7 +68,7 @@ export const clearCurrentArticle = (articles) => {
       const articleTitle = article?.title || '';
       return articleTitle !== currentArticleTitle ? article : null;
     }
-    const lastElementInUrl = articleURL ? getLastURLFolder(articleURL) : null;
+    const lastElementInUrl = articleURL ? getLastURLSegment(articleURL) : null;
     return lastElementInUrl !== currentArticlePath ? article : null;
   });
 };
