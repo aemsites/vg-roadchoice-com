@@ -284,7 +284,7 @@ function renderSDS(sdsList) {
   sdsContainer.classList.remove('hide');
 }
 
-async function fetchBlogs(category = null) {
+async function fetchBlogs(category) {
   try {
     const queryParams = {
       sort: 'PUBLISH_DATE_DESC',
