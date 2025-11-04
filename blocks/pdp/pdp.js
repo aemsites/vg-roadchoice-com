@@ -7,6 +7,7 @@ import {
   getLocaleContextedUrl,
   setOrCreateMetadata,
   getCategoryObject,
+  fetchCategoryKeysJson,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 import { fetchArticlesAndFacets } from '../search/graphql-api.js';
@@ -18,7 +19,7 @@ const docTypes = {
 };
 const docRange = document.createRange();
 const SUPPORTED_LOCALES_WITH_PREFIX = ['en-ca', 'fr-ca'];
-let blogCategory;
+// let blogCategory;
 
 function getJsonData(route) {
   const requestUrl = new URL(window.location.origin + route);
@@ -182,20 +183,10 @@ function groupByLanguage(data) {
 }
 
 async function fetchCategoryKeys(category) {
-  console.log(category);
   try {
-    const json = await getLongJSONData({
-      url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
-      limit: DEFAULT_LIMIT,
-    });
-    if (!json || json.length === 0) return [];
+    const json = await fetchCategoryKeysJson();
 
-    blogCategory = getCategoryObject(json, category);
-
-    const result = filterByCategory(json, category, 'Subcategory');
-    console.log(result);
-
-    return result;
+    return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
     console.error(error);
     return [];
@@ -551,11 +542,22 @@ function renderBreadcrumbs(part) {
   breadcrumbSection.append(breadcrumbs);
 }
 
+async function getBlogCategory(category) {
+  const categoriesJson = await fetchCategoryKeysJson();
+  const categoryObject = getCategoryObject(categoriesJson, category);
+
+  console.log(categoryObject);
+
+  return categoryObject.subcategory;
+}
+
 export default async function decorate(block) {
   const pathSegments = getPathParams();
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
+  const blogCategory = getBlogCategory(pathSegments.category);
   console.log(pathSegments.category);
+  console.log(blogCategory);
 
   getPDPData(pathSegments).then((part) => {
     if (part) {
