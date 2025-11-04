@@ -287,7 +287,7 @@ function renderSDS(sdsList) {
 async function getBlogCategory(category) {
   try {
     const rawCategoryList = await fetchCategories();
-    console.log(rawCategoryList);
+
     if (!rawCategoryList || rawCategoryList.length === 0) return null;
 
     return getCategoryObject(rawCategoryList, category);
@@ -298,12 +298,12 @@ async function getBlogCategory(category) {
 }
 
 async function fetchBlogs(cat) {
-  const category = await getBlogCategory(cat);
+  const categoryObject = await getBlogCategory(cat);
 
   try {
     const queryParams = {
       sort: 'PUBLISH_DATE_DESC',
-      category,
+      category: categoryObject.subcategory,
       limit: 3,
     };
     const { articles } = await fetchArticlesAndFacets(queryParams);
