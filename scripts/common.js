@@ -717,13 +717,14 @@ export const getCategoryObject = (dataArray, subcategoryName) => {
 
   const foundObject = dataArray.find((categoryObj) => {
     if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
-      return categoryObj.subcategories.some((subCat) => {
+      const isMatch = categoryObj.subcategories.some((subCat) => {
         if (subCat.key.toLowerCase() === searchKey) {
           matchingSubcategory = subCat;
           return true;
         }
         return false;
       });
+      return isMatch;
     }
     return false;
   });
