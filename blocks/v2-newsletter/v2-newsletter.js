@@ -3,9 +3,9 @@ import { getTextLabel, createElement } from '../../scripts/common.js';
 
 const blockName = 'v2-newsletter';
 
-async function handleSubmissionResult({ titleText, messageText, isSuccess }) {
-  const form = document.querySelector('form[data-submitting=true]');
-  const title = document.querySelector(`.${blockName}__title`);
+async function handleSubmissionResult(block, { titleText, messageText, isSuccess }) {
+  const form = block.querySelector('form[data-submitting=true]');
+  const title = block.querySelector(`.${blockName}__title`);
   const message = document.createRange().createContextualFragment(`<p>${messageText}</p>`);
 
   if (isSuccess) {
@@ -16,22 +16,6 @@ async function handleSubmissionResult({ titleText, messageText, isSuccess }) {
   form.setAttribute('data-submitting', 'false');
   form.replaceWith(message);
 }
-
-window.logResult = function logResult(json) {
-  if (json.result === 'success') {
-    handleSubmissionResult({
-      titleText: getTextLabel('v2_newsletter:success_title'),
-      messageText: getTextLabel('v2_newsletter:success_text'),
-      isSuccess: true,
-    });
-  } else if (json.result === 'error') {
-    handleSubmissionResult({
-      titleText: getTextLabel('v2_newsletter:error_title'),
-      messageText: getTextLabel('v2_newsletter:error_text'),
-      isSuccess: false,
-    });
-  }
-};
 
 export default async function decorate(block) {
   const formLink = block.firstElementChild.innerText.trim();
@@ -63,4 +47,20 @@ export default async function decorate(block) {
   block.replaceWith(container);
 
   await loadBlock(formContainer.firstElementChild);
+
+  window.logResult = function logResult(json) {
+    if (json.result === 'success') {
+      handleSubmissionResult(container, {
+        titleText: getTextLabel('v2_newsletter:success_title'),
+        messageText: getTextLabel('v2_newsletter:success_text'),
+        isSuccess: true,
+      });
+    } else if (json.result === 'error') {
+      handleSubmissionResult(container, {
+        titleText: getTextLabel('v2_newsletter:error_title'),
+        messageText: getTextLabel('v2_newsletter:error_text'),
+        isSuccess: false,
+      });
+    }
+  };
 }
