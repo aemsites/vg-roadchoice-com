@@ -708,30 +708,26 @@ function setOrCreateMetadata(propName, propVal) {
 /**
  * Finds the main category key and the exactly matched subcategory key.
  * * @param {Array<Object>} dataArray The array of category objects.
- * @param {string} subcategoryName The subcategory key string to search for (e.g., "antennas").
- * @returns {Object | null} An object with keys 'category' and 'subcategory' (the exact case from the data), or null if not found.
+ * @param {string} subcategoryName The subcategory key string to search for (e.g., "Antennas").
+ * @returns {Object | null} An object with keys 'category' and 'subcategory', or null if not found.
  */
 export const getCategoryObject = (dataArray, subcategoryName) => {
-  const searchKey = subcategoryName.toLowerCase().replaceAll('-', ' ');
-  let matchingSubcategory = null;
-
   const foundObject = dataArray.find((categoryObj) => {
-    if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
-      return categoryObj.subcategories.some((subCat) => {
-        if (subCat.key.toLowerCase() === searchKey) {
-          matchingSubcategory = subCat;
-          return true;
-        }
-        return false;
-      });
+    const categoryKey = Object.keys(categoryObj)[0];
+    const subcategories = categoryObj[categoryKey];
+
+    if (subcategories.includes(subcategoryName)) {
+      return true;
     }
     return false;
   });
 
-  if (foundObject && matchingSubcategory) {
+  if (foundObject) {
+    const categoryKey = Object.keys(foundObject)[0];
+
     return {
-      category: foundObject.key,
-      subcategory: matchingSubcategory.key,
+      category: categoryKey,
+      subcategory: subcategoryName,
     };
   }
   return null;
