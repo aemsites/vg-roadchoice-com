@@ -9,6 +9,7 @@ import {
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 import { fetchArticlesAndFacets } from '../search/graphql-api.js';
+import { getBlogCategory } from '../../scripts/services/blog.service.js';
 
 const blockName = 'pdp';
 const docTypes = {
@@ -564,7 +565,7 @@ export default async function decorate(block) {
       fetchCategoryKeys(pathSegments.category).then((categoryKeys) => {
         renderColDetails(part, block, categoryKeys);
       });
-      blogCategory = part.category || null;
+      blogCategory = part.Subcategory || null;
     }
   });
 
