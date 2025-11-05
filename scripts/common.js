@@ -709,7 +709,7 @@ function setOrCreateMetadata(propName, propVal) {
  * Finds the main category key and the exactly matched subcategory key.
  * * @param {Array<Object>} dataArray The array of category objects.
  * @param {string} subcategoryName The subcategory key string to search for (e.g., "Antennas").
- * @returns {Object | null} An object with keys 'category' and 'subcategory', or null if not found.
+ * @returns {{category: string, subcategory: string} | null} An object, or null if not found.
  */
 export const getCategoryObject = (dataArray, subcategoryName) => {
   const foundObject = dataArray.find((categoryObj) => {
