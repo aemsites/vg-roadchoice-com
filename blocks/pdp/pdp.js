@@ -552,7 +552,7 @@ function renderBreadcrumbs(part) {
 
 export default async function decorate(block) {
   const pathSegments = getPathParams();
-  let blogCategory;
+  const blogCategory = await getBlogCategory(pathSegments.category);
 
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
@@ -565,7 +565,6 @@ export default async function decorate(block) {
       fetchCategoryKeys(pathSegments.category).then((categoryKeys) => {
         renderColDetails(part, block, categoryKeys);
       });
-      blogCategory = part.Subcategory || null;
     }
   });
 
@@ -577,7 +576,7 @@ export default async function decorate(block) {
   fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
-  fetchBlogs(blogCategory).then(renderBlogs);
+  fetchBlogs(blogCategory.subcategory).then(renderBlogs);
 
   document.querySelector('main').addEventListener('click', (e) => {
     if (e.target.matches('.section.accordion h5')) {
