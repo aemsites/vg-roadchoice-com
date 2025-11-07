@@ -54,7 +54,7 @@ const renderBlock = async (block) => {
   const filterList = createElement('ul', { classes: `${blockName}-list` });
 
   // filter the data to add extra filters to every key
-  filterKeys.forEach((key, idx) => {
+  filterKeys.forEach((key) => {
     const filterItem = createElement('li', { classes: `${blockName}-item` });
     const titleWrapper = createElement('div', { classes: `${blockName}-title-wrapper` });
     const filterAttrib = createElement('h6', { classes: `${blockName}-item-title` });
