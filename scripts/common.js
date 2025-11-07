@@ -698,6 +698,15 @@ function setOrCreateMetadata(propName, propVal) {
   }
 }
 
+/**
+ * Checks if the current window location host matches any known development or testing domains.
+ * * @returns {boolean} True if the current host is a development/staging environment, false otherwise.
+ */
+export const isDevHost = () => {
+  const devHosts = ['localhost', '127.0.0.1', 'aem.page', 'aem.live'];
+  return devHosts.some((url) => window.location.host.includes(url));
+};
+
 function isPerformanceAllowed() {
   return checkOneTrustGroup(COOKIE_CONFIGS.PERFORMANCE_COOKIE);
 }
