@@ -19,20 +19,20 @@ import { isDevHost } from '../common.js';
  * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
 export const getCategory = () => {
-  // if (isDevHost()) {
-  //   const url = new URL(window.location.href);
-  //   const urlParams = new URLSearchParams(url.search);
+  if (isDevHost()) {
+    const url = new URL(window.location.href);
+    const urlParams = new URLSearchParams(url.search);
 
-  //   return urlParams.get('category') || null;
-  // } else {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
+    return urlParams.get('category') || null;
+  } else {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
 
-  if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
-    return null;
+    if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
+      return null;
+    }
+    return segment;
   }
-  return segment;
-  // }
 };
 
 /**
