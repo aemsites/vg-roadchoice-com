@@ -32,9 +32,7 @@ const getFilterAttrib = async (subcategory) => {
 
     if (!filtersJson) throw new Error('Failed to fetch filter data');
 
-    const filterAttribs = filtersJson
-      .filter((el) => el.Subcategory.toLowerCase().replace(/ /g, '-') === subcategory.toLowerCase() && el.Filter === '')
-      .map((el) => el.Attributes);
+    const filterAttribs = filtersJson.filter((el) => el.Subcategory === subcategory && el.Filter === '').map((el) => el.Attributes);
 
     return filterAttribs;
   } catch (err) {
