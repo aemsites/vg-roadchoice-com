@@ -110,7 +110,7 @@ const resetCategoryData = () => {
   sessionStorage.removeItem('category-data');
   sessionStorage.removeItem('filter-attribs');
   sessionStorage.removeItem('amount');
-  sessionStorage.removeItem('categoryObject');
+  sessionStorage.removeItem('category-object');
 };
 
 /**
