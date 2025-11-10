@@ -1,5 +1,3 @@
-import { isDevHost } from '../common.js';
-
 /* Cases that throw an error if the category is wrong or missing that goes to 404 page:
  * 1. "/part-category/" => 404 if is index path
  * 2. "/part-category/?" => 404 if is index path width query string or wrong query parameter
@@ -19,7 +17,7 @@ import { isDevHost } from '../common.js';
  * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
 export const getCategory = () => {
-  if (isDevHost()) {
+  if (window.location.host.includes('localhost')) {
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(url.search);
 
