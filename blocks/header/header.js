@@ -1,10 +1,12 @@
 import { getMetadata } from '../../scripts/aem.js';
-import { createElement } from '../../scripts/common.js';
+import { createElement, getLanguagePath, slugify } from '../../scripts/common.js';
+import { fetchCategories } from '../search/graphql-api.js';
 
 // media query match that indicates mobile/tablet width
 const MQ = window.matchMedia('(min-width: 992px)');
 const isDesktop = MQ.matches;
 let categoriesClone;
+const docRange = document.createRange();
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -138,12 +140,54 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
+const rawCategoryList = await fetchCategories();
+const parsedCategories = rawCategoryList.reduce((accumulator, currentItem) => {
+  const categoryKey = currentItem.key;
+  const subcategoryKeys = currentItem.subcategories.map((sub) => sub.key);
+  accumulator[categoryKey] = subcategoryKeys;
+  return accumulator;
+}, {});
+
+const buildLists = (allCategoryData) => {
+  const categoryEntries = Object.entries(allCategoryData);
+  const locale = getLanguagePath();
+  const listItems = categoryEntries
+    .map(([category, subcategories]) => {
+      // Gather all subcat <li> els in one string
+      const subcatEls = subcategories
+        .map(
+          (subcat) => `
+      <li>
+        <a class="subcategory" href="${locale}part-category/${slugify(subcat)}">${subcat}</a></li>
+      </li>`,
+        )
+        .join('');
+      // Return category <li> with subcat string inside
+      return `
+      <li>
+        <a class="category" href="${locale}part-category/${slugify(category)}">${category}</a>
+        <ul>
+          ${subcatEls}
+        </ul>
+      </li>`;
+    })
+    .join('');
+
+  return `<ul class="level-2">${listItems}</ul>`;
+};
+
+const buildCategorySection = (section, categories) => {
+  const firstlistElement = section.querySelector('ul li:first-of-type');
+  const subCategoryList = docRange.createContextualFragment(buildLists(categories));
+
+  firstlistElement?.appendChild(subCategoryList);
+};
+
 /**
  * decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  const docRange = document.createRange();
   // fetch nav content
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
@@ -174,6 +218,8 @@ export default async function decorate(block) {
     }
 
     const navSections = nav.querySelector('.nav-sections');
+    buildCategorySection(navSections, parsedCategories);
+
     if (navSections) {
       const navLevels = 3;
       let selector = ':scope';

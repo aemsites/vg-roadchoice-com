@@ -69,7 +69,7 @@
 }
 
 .cards.resources .cards-item {
-  align-items: space-between;
+  justify-content: space-between;
   background-color: var(--primary-red);
   width: 100%;
   padding: 0 15px 5px;
