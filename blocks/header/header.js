@@ -140,14 +140,6 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
-const rawCategoryList = await fetchCategories();
-const parsedCategories = rawCategoryList.reduce((accumulator, currentItem) => {
-  const categoryKey = currentItem.key;
-  const subcategoryKeys = currentItem.subcategories.map((sub) => sub.key);
-  accumulator[categoryKey] = subcategoryKeys;
-  return accumulator;
-}, {});
-
 const buildLists = (allCategoryData) => {
   const categoryEntries = Object.entries(allCategoryData);
   const locale = getLanguagePath();
@@ -188,6 +180,15 @@ const buildCategorySection = (section, categories) => {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
+  // fetch and parse category and subcategory list
+  const rawCategoryList = await fetchCategories();
+  const parsedCategories = rawCategoryList.reduce((accumulator, currentItem) => {
+    const categoryKey = currentItem.key;
+    const subcategoryKeys = currentItem.subcategories.map((sub) => sub.key);
+    accumulator[categoryKey] = subcategoryKeys;
+    return accumulator;
+  }, {});
+
   // fetch nav content
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';

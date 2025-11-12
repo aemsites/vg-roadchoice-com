@@ -361,7 +361,6 @@
   text-decoration: none;
   font-size: var(--body-font-size-s);
   margin: 0 3px;
-  text-transform: capitalize;
 }
 
 .section.breadcrumbs .breadcrumb-item:nth-child(2),

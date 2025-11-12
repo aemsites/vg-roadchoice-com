@@ -1,8 +1,10 @@
-import { createElement, getTextLabel, getJsonFromUrl, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getTextLabel, getLocale } from '../../scripts/common.js';
 import { getMetadata } from '../../scripts/aem.js';
+import { fetchArticlesAndFacets } from '../search/graphql-api.js';
+import { getLimitFromBlock, clearCurrentArticle } from '../../scripts/services/blog.service.js';
 
 const blockName = 'recommendations';
-const category = getMetadata('category');
+const category = getMetadata('category') || null;
 const title = getTextLabel('recommendations_title');
 const linkText = getTextLabel('read_more');
 
@@ -30,29 +32,22 @@ export const clearRepeatedArticles = (articles) =>
 const formatDate = (date) => {
   const convertedDate = new Date(parseInt(date, 10) * 1000);
 
-  const day = convertedDate.getDate();
-  const month = convertedDate.getMonth() + 1;
-  const year = convertedDate.getFullYear();
-
-  return `${month}/${day}/${year}`;
+  return convertedDate.toLocaleDateString(getLocale(), {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  });
 };
 
 export default async function decorate(block) {
-  const limit = Number(getLimit(block));
-  const route = getLocaleContextedUrl('/blog/query-index.json');
-  const { data: allArticles } = await getJsonFromUrl(route);
+  const queryParams = {
+    sort: 'PUBLISH_DATE_DESC',
+    limit: getLimitFromBlock(block) + (isBlogArticle ? 1 : 0),
+    category,
+  };
 
-  const sortedArticles = allArticles.sort((a, b) => {
-    a.date = +a.date;
-    b.date = +b.date;
-    return b.date - a.date;
-  });
-  const filteredArticles = clearRepeatedArticles(sortedArticles);
-  const artByCategory = category ? filteredArticles.filter((e) => e.category.toLowerCase() === category.toLowerCase()) : filteredArticles;
-  const selectedArticles = artByCategory.slice(0, limit);
-
-  const noArticles = selectedArticles.length === 0;
-
+  const { articles } = await fetchArticlesAndFacets(queryParams);
+  const filteredArticles = clearCurrentArticle(articles);
   const recommendationsContent = createElement('div', { classes: `${blockName}-content` });
   const titleSection = createElement('div', { classes: ['title-section'] });
 
@@ -69,23 +64,22 @@ export default async function decorate(block) {
 
   const recommendationsList = createElement('ul', { classes: `${blockName}-list` });
 
-  selectedArticles.forEach((art) => {
+  filteredArticles.forEach((art) => {
     const article = createElement('li', { classes: ['article'] });
-
     const articleTitle = createElement('h2', { classes: ['article-title'] });
-    const articleTitleLink = createElement('a', { classes: ['article-title-link'], props: { href: art.path } });
+    const articleTitleLink = createElement('a', { classes: ['article-title-link'], props: { href: art.url } });
     articleTitleLink.innerText = art.title;
 
     articleTitle.appendChild(articleTitleLink);
 
     const articleDate = createElement('p', { classes: ['article-date'] });
-    articleDate.innerText = formatDate(art.date);
+    articleDate.innerText = formatDate(art.publishDate);
 
     const articleText = createElement('p', { classes: ['article-text'] });
     articleText.innerText = art.description;
 
     const strongLink = createElement('strong');
-    const articleLink = createElement('a', { classes: ['article-link'], props: { href: art.path } });
+    const articleLink = createElement('a', { classes: ['article-link'], props: { href: art.url } });
     articleLink.innerText = linkText;
     strongLink.appendChild(articleLink);
 
@@ -96,5 +90,7 @@ export default async function decorate(block) {
   recommendationsContent.append(titleSection, recommendationsList);
 
   block.textContent = '';
-  if (!noArticles) block.appendChild(recommendationsContent);
+  if (articles.length && filteredArticles.length) {
+    block.appendChild(recommendationsContent);
+  }
 }

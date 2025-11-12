@@ -8,6 +8,7 @@ import {
   setOrCreateMetadata,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
+import { fetchArticlesAndFacets } from '../search/graphql-api.js';
 
 const blockName = 'pdp';
 const docTypes = {
@@ -185,6 +186,7 @@ async function fetchCategoryKeys(category) {
       limit: DEFAULT_LIMIT,
     });
     if (!json || json.length === 0) return [];
+
     return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
     console.error(error);
@@ -283,11 +285,22 @@ function renderSDS(sdsList) {
   sdsContainer.classList.remove('hide');
 }
 
+/**
+ * Fetches a limited array of blog articles for a specific category.
+ * @param {string} category - The resolved category key to filter the blog articles by.
+ * @returns {Promise<Array>} A promise that resolves to an array of articles
+ */
 async function fetchBlogs(category) {
   try {
-    const json = await getJsonData(getLocaleContextedUrl('/blog/query-index.json'));
-    if (!json) return null;
-    return filterByCategory(json?.data, category);
+    const queryParams = {
+      sort: 'PUBLISH_DATE_DESC',
+      category,
+      limit: 3,
+    };
+
+    const { articles } = await fetchArticlesAndFacets(queryParams);
+
+    return articles || null;
   } catch (error) {
     console.error(error);
     return null;
@@ -305,25 +318,21 @@ function renderBlogs(blogList) {
   `);
   sectionWrapper.append(fragment);
 
-  blogList
-    .filter((blog) => Number.isInteger(parseInt(blog.date, 10)))
-    .sort((blog1, blog2) => blog1.date - blog2.date)
-    .slice(-3)
-    .forEach((sds) => {
-      const blogFragment = docRange.createContextualFragment(`
+  blogList.forEach((sds) => {
+    const blogFragment = docRange.createContextualFragment(`
         <li class="${blockName}-blogs-list-item">
-          <a class="${blockName}-blogs-anchor" target="_blank" href="${sds.path}">
+          <a class="${blockName}-blogs-anchor" target="_blank" href="${sds.url}">
             <h6 class="${blockName}-blogs-title">${sds.title}</h6>
           </a>
           <p class="${blockName}-blogs-date">
-            ${new Date(parseInt(sds.date, 10) * 1000).toLocaleDateString()}
+            ${new Date(parseInt(sds.publishDate, 10) * 1000).toLocaleDateString()}
           </p>
           <p class="${blockName}-blogs-description">${sds.description}</p>
-          <a class="${blockName}-blogs-cta" target="_blank" href="${sds.path}">Read More</a>
+          <a class="${blockName}-blogs-cta" target="_blank" href="${sds.url}">Read More</a>
         </li>
       `);
-      sectionWrapper.querySelector(`.${blockName}-blogs-list`).append(blogFragment);
-    });
+    sectionWrapper.querySelector(`.${blockName}-blogs-list`).append(blogFragment);
+  });
   blogsContainer.classList.remove('hide');
 }
 
@@ -542,6 +551,7 @@ function renderBreadcrumbs(part) {
 
 export default async function decorate(block) {
   const pathSegments = getPathParams();
+
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
 
@@ -553,6 +563,7 @@ export default async function decorate(block) {
       fetchCategoryKeys(pathSegments.category).then((categoryKeys) => {
         renderColDetails(part, block, categoryKeys);
       });
+      fetchBlogs(part.Subcategory).then(renderBlogs);
     }
   });
 
@@ -564,7 +575,6 @@ export default async function decorate(block) {
   fetchPartFit(pathSegments).then(renderPartFit);
   fetchDocs(pathSegments.category).then(renderDocs);
   fetchSDS(pathSegments.category).then(renderSDS);
-  fetchBlogs(pathSegments.category).then(renderBlogs);
 
   document.querySelector('main').addEventListener('click', (e) => {
     if (e.target.matches('.section.accordion h5')) {
