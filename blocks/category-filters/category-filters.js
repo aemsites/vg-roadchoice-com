@@ -1,5 +1,5 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
-import { subcategorySearch } from '../../blocks/search/graphql-api.js';
+import { subcategorySearch } from '../../scripts/graphql-api.js';
 
 const blockName = 'category-filters';
 let products = window.categoryData;

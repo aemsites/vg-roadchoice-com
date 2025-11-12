@@ -1,4 +1,4 @@
-import { SEARCH_CONFIG, getPageLanguage } from '../../scripts/common.js';
+import { SEARCH_CONFIG, getPageLanguage } from './common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
   try {

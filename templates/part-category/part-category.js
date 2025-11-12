@@ -1,4 +1,4 @@
-import { fetchCategories, subcategorySearch } from '../../blocks/search/graphql-api.js';
+import { fetchCategories, subcategorySearch } from '../../scripts/graphql-api.js';
 import {
   createElement,
   getLongJSONData,

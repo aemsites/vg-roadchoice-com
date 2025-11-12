@@ -1,6 +1,6 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
 import { readBlockConfig } from '../../scripts/aem.js';
-import { fetchArticlesAndFacets } from '../search/graphql-api.js';
+import { fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
 
 const blockName = 'blog-results';
 
