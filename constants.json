@@ -107,6 +107,14 @@
         "value": "rccategoriessubcategoriesSearch"
       },
       {
+        "name": "RC_BLOG_RECOMMEND",
+        "value": "rcrecommend"
+      },
+      {
+        "name": "RC_CATEGORY_FACETS",
+        "value": "rccategoriessubcategoriesFacets"
+      },
+      {
         "name": "TENANT",
         "value": "VG_ROADCHOICE_COM"
       }

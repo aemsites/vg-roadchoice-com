@@ -254,12 +254,12 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
 }
 
 export async function fetchCategories() {
-  const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
+  const { SEARCH_URL_DEV, RC_CATEGORY_FACETS, TENANT } = SEARCH_CONFIG;
 
   const categoriesQuery = {
     query: `
-      query RcCategoriesSubcategoriesFacets($tenant: RcTenantEnum, $language: RcLocaleEnum) {
-        rccategoriessubcategoriesFacets(tenant: $tenant, language: $language) {
+      query ${RC_CATEGORY_FACETS}($tenant: RcTenantEnum, $language: RcLocaleEnum) {
+        ${RC_CATEGORY_FACETS}(tenant: $tenant, language: $language) {
           facets {
             doc_count
             key
@@ -281,7 +281,63 @@ export async function fetchCategories() {
 
   if (error) return { facets: [], error };
 
-  return data.data.rccategoriessubcategoriesFacets.facets;
+  return data.data[RC_CATEGORY_FACETS].facets;
+}
+
+export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit = 100, category = null, offset = 0 }) {
+  const { SEARCH_URL_DEV, RC_BLOG_RECOMMEND, TENANT } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${RC_BLOG_RECOMMEND}($language: RcLocaleEnum!, $category: String, $sort: RcBlogsSortOptionsEnum, $facets: [RcBlogsFieldEnum], $tag: String, $tenant: RcTenantEnum!, $offset: Int, $limit: Int) {
+        ${RC_BLOG_RECOMMEND}(language: $language, category: $category, sort: $sort, facets: $facets, tag: $tag, tenant: $tenant, offset: $offset, limit: $limit) {
+          count
+          items {
+            uuid
+            metadata {
+              title
+              description
+              url
+              lastModified
+              language
+              category
+              tags
+              publishDate
+              image
+            }
+            score
+          }
+          facets {
+            field
+            items {
+              count
+              value
+            }
+          }
+          currentPage
+          numberOfPages
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      limit,
+      offset,
+      sort,
+      language: getPageLanguage() || 'EN',
+      category,
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { results: [], error };
+
+  const { items, facets } = data.data[RC_BLOG_RECOMMEND];
+
+  const articles = items.map((item) => item.metadata);
+
+  return { articles, facets };
 }
 
 export async function subcategorySearch({ category = '', subcategory = '', facetFields = [], dynamicFilters = [], limit = 100, offset = 0 }) {

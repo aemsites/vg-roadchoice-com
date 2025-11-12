@@ -46,6 +46,13 @@ function getTextLabel(key) {
 }
 
 /**
+ * Function that checks for the locale field in metadata an returns it.
+ * It defaults to 'en-us'
+ * @returns {string} The locale string
+ */
+export const getLocale = () => getMetadata('locale') || 'en-us';
+
+/**
  * Create an element with the given id and classes.
  * @param {string} tagName the tag
  * @param {Object} options the element options
@@ -705,6 +712,32 @@ function setOrCreateMetadata(propName, propVal) {
 export const isDevHost = () => {
   const devHosts = ['localhost', '127.0.0.1', 'aem.page', 'aem.live'];
   return devHosts.some((url) => window.location.host.includes(url));
+
+ * Finds the main category key and the exactly matched subcategory key.
+ * @param {Array<Object>} dataArray The array of category objects.
+ * @param {string} subcategoryName The subcategory key string to search for (e.g., "Antennas").
+ * @returns {{category: string, subcategory: string} | null} An object, or null if not found.
+ */
+export const getCategoryObject = (dataArray, subcategoryName) => {
+  const foundObject = dataArray.find((categoryObj) => {
+    const categoryKey = Object.keys(categoryObj)[0];
+    const subcategories = categoryObj[categoryKey];
+
+    if (subcategories.includes(subcategoryName)) {
+      return true;
+    }
+    return false;
+  });
+
+  if (foundObject) {
+    const categoryKey = Object.keys(foundObject)[0];
+
+    return {
+      category: categoryKey,
+      subcategory: subcategoryName,
+    };
+  }
+  return null;
 };
 
 function isPerformanceAllowed() {
