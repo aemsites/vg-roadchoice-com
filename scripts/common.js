@@ -712,31 +712,41 @@ function setOrCreateMetadata(propName, propVal) {
 export const isDevHost = () => {
   const devHosts = ['localhost', '127.0.0.1', 'aem.page', 'aem.live'];
   return devHosts.some((url) => window.location.host.includes(url));
+};
 
- * Finds the main category key and the exactly matched subcategory key.
- * @param {Array<Object>} dataArray The array of category objects.
+/**
+ * Finds the main category key and the exactly matched subcategory key from the lowercased subcategory.
+ * * @param {Array<Object>} dataArray The array of category objects.
  * @param {string} subcategoryName The subcategory key string to search for (e.g., "Antennas").
  * @returns {{category: string, subcategory: string} | null} An object, or null if not found.
  */
-export const getCategoryObject = (dataArray, subcategoryName) => {
-  const foundObject = dataArray.find((categoryObj) => {
-    const categoryKey = Object.keys(categoryObj)[0];
-    const subcategories = categoryObj[categoryKey];
+export const getCategoryObject = (dataArray, rawSubcategoryName) => {
+  const searchKey = rawSubcategoryName.toLowerCase().replaceAll('-', ' ');
+  let matchingSubcategory = null;
 
-    if (subcategories.includes(subcategoryName)) {
-      return true;
+  const foundObject = dataArray.find((categoryObj) => {
+    if (categoryObj.subcategories && categoryObj.subcategories.length > 0) {
+      const isMatch = categoryObj.subcategories.some((subCat) => {
+        const subCatSearchKey = subCat.key.toLowerCase().replaceAll('-', ' ');
+
+        if (subCatSearchKey === searchKey) {
+          matchingSubcategory = subCat;
+          return true;
+        }
+        return false;
+      });
+      return isMatch;
     }
     return false;
   });
 
-  if (foundObject) {
-    const categoryKey = Object.keys(foundObject)[0];
-
+  if (foundObject && matchingSubcategory) {
     return {
-      category: categoryKey,
-      subcategory: subcategoryName,
+      category: foundObject.key,
+      subcategory: matchingSubcategory.key,
     };
   }
+
   return null;
 };
 

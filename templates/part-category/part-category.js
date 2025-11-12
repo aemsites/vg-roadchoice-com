@@ -1,6 +1,14 @@
 import { fetchCategories, subcategorySearch } from '../../blocks/search/graphql-api.js';
-import { createElement, getLongJSONData, DEFAULT_LIMIT, getLocaleContextedUrl, setOrCreateMetadata, getTextLabel } from '../../scripts/common.js';
-import { getCategoryObject, transformFacets, getCategory } from '../../scripts/services/part-category.service.js';
+import {
+  createElement,
+  getLongJSONData,
+  DEFAULT_LIMIT,
+  getLocaleContextedUrl,
+  setOrCreateMetadata,
+  getTextLabel,
+  getCategoryObject,
+} from '../../scripts/common.js';
+import { transformFacets, getCategory } from '../../scripts/services/part-category.service.js';
 
 const amount = 12;
 let category;
