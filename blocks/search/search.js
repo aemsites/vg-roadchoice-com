@@ -1,5 +1,5 @@
 import { createElement, getTextLabel, getLocaleContextedUrl, SEARCH_CONFIG } from '../../scripts/common.js';
-import { fetchSearchResults, fetchFilterFacets } from './graphql-api.js';
+import { fetchSearchResults, fetchFilterFacets } from '../../scripts/graphql-api.js';
 import productCard from '../results-list/product-card.js';
 import { noResultsTemplate } from '../../templates/search-results/search-results.js';
 import { buildFilter } from '../filters/filters.js';
