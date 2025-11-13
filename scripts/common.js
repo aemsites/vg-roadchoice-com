@@ -50,7 +50,7 @@ function getTextLabel(key) {
  * It defaults to 'en-us'
  * @returns {string} The locale string
  */
-export const getLocale = () => getMetadata('locale') || 'en-us';
+const getLocale = () => getMetadata('locale') || 'en-us';
 
 /**
  * Create an element with the given id and classes.
@@ -664,13 +664,6 @@ function getLocaleContextedUrl(urlPathToConvert) {
 
   return pageUrl;
 }
-
-/**
- * Function that checks for the locale field in metadata an returns it.
- * It defaults to 'en-us'
- * @returns {string} The locale string
- */
-const getLocale = () => getMetadata('locale') || 'en-us';
 
 /**
  * Formats an array of objects into a single object with key-value pairs.
