@@ -112,4 +112,9 @@
   .v2-newsletter__form-container input[type='email'] {
     min-width: 334px;
   }
+
+  .v2-newsletter__form-container p {
+    font-size: 18px;
+    line-height: 25.92px;
+  }
 }
