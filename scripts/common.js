@@ -50,7 +50,7 @@ function getTextLabel(key) {
  * It defaults to 'en-us'
  * @returns {string} The locale string
  */
-export const getLocale = () => getMetadata('locale') || 'en-us';
+const getLocale = () => getMetadata('locale') || 'en-us';
 
 /**
  * Create an element with the given id and classes.
@@ -763,6 +763,7 @@ export { COOKIE_CONFIGS, TOOLS_CONFIGS, SEARCH_CONFIG, DEFAULT_LIMIT };
 
 export {
   getLocaleContextedUrl,
+  getLocale,
   checkLinkProps,
   loadWorker,
   getLongJSONData,
