@@ -1,4 +1,5 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
+import { subcategorySearch } from '../../scripts/graphql-api.js';
 
 const blockName = 'category-filters';
 let products = window.categoryData;
@@ -7,20 +8,25 @@ const titleText = getTextLabel('category_filters_title');
 const clearText = getTextLabel('category_filters_clear_button');
 const applyText = getTextLabel('category_filters_apply_button');
 
-function getFilters() {
+function getFiltersAndCategories() {
   let filters = {};
+  let categoryObject = {};
 
   try {
+    categoryObject = JSON.parse(sessionStorage.getItem('category-object'));
     filters = JSON.parse(sessionStorage.getItem('filter-attribs'));
   } catch (error) {
     throw new Error('Error getting filters from sessionStorage: ', error);
   }
 
-  return filters;
+  return { filters, categoryObject };
 }
 
 const renderBlock = async (block) => {
-  const filters = getFilters();
+  const { filters, categoryObject } = getFiltersAndCategories();
+  const { category, subcategory } = categoryObject;
+  const filterKeys = Object.keys(filters).sort();
+
   const filterTitle = createElement('h3', { classes: `${blockName}-title` });
   filterTitle.textContent = titleText;
   const filterForm = createElement('form', { classes: `${blockName}-form`, props: { id: `${blockName}-form` } });
@@ -47,30 +53,29 @@ const renderBlock = async (block) => {
   applyFilterBtn.textContent = applyText;
   const filterList = createElement('ul', { classes: `${blockName}-list` });
 
-  // filter the data to add extra filters to every attribute
-  filters.forEach((attribute) => {
+  // filter the data to add extra filters to every key
+  filterKeys.forEach((key) => {
     const filterItem = createElement('li', { classes: `${blockName}-item` });
     const titleWrapper = createElement('div', { classes: `${blockName}-title-wrapper` });
     const filterAttrib = createElement('h6', { classes: `${blockName}-item-title` });
-    filterAttrib.textContent = attribute;
+    filterAttrib.textContent = key;
     const plusBtn = createElement('span', { classes: ['plus-btn', 'fa', 'fa-plus'] });
     const filterOptionsWrapper = createElement('ul', {
       classes: [`${blockName}-options-wrapper`, 'hidden'],
     });
-    const set = new Set();
-    products.forEach((product) => {
-      if (product[attribute] !== '') set.add(product[attribute]);
-    });
-    if (set.size <= 0) return;
-    [...set].sort().forEach((el) => {
+
+    // Add checkbox for every attribute
+    const attributes = [...filters[key]];
+    attributes.forEach((el) => {
+      const { key: value, doc_count: count } = el;
       const filterOption = createElement('li', { classes: `${blockName}-option` });
-      const inputId = `${attribute ? attribute.replace(' ', '_') : null}<&>${el ? el.replace(' ', '_') : null}`;
+      const inputId = `${key ? key.replace(' ', '_') : null}<&>${value ? value.replace(' ', '_') : null}`;
       const filterInput = createElement('input', {
         classes: `${blockName}-input`,
         props: {
           type: 'checkbox',
-          'data-filter-title': attribute,
-          value: el,
+          'data-filter-title': key,
+          value: value,
           id: inputId,
         },
       });
@@ -80,10 +85,11 @@ const renderBlock = async (block) => {
           for: inputId,
         },
       });
-      filterLabel.textContent = el;
+      filterLabel.textContent = `${value} - (${count})`;
       filterOption.append(filterInput, filterLabel);
       filterOptionsWrapper.appendChild(filterOption);
     });
+
     titleWrapper.append(filterAttrib, plusBtn);
     filterItem.append(titleWrapper, filterOptionsWrapper);
     filterList.appendChild(filterItem);
@@ -108,32 +114,40 @@ const renderBlock = async (block) => {
     }
   };
 
-  filterForm.onsubmit = (e) => {
+  filterForm.onsubmit = async (e) => {
     e.preventDefault();
     const {
       submitter: { id },
     } = e;
     const isApply = id === 'apply-filter-btn';
+
     if (isApply) {
       const checkedInputs = [...filterList.querySelectorAll(`.${blockName}-input:checked`)];
       const filteredAttrib = [];
       filterForm.querySelector('.clear-filter-btn').disabled = false;
-      // [{ title, values: [value1, value2, ...] }]
+      // [{ fieldName, filterValue: [value1, value2, ...] }]
       checkedInputs.forEach((el) => {
-        const title = el.dataset.filterTitle;
+        const fieldName = el.dataset.filterTitle;
         const { value } = el;
-        const obj = filteredAttrib.find((attrib) => attrib.title === title);
+        const obj = filteredAttrib.find((attrib) => attrib.fieldName === fieldName);
         if (obj) {
-          obj.values.push(value);
+          obj.filterValue.push(value);
         } else {
-          filteredAttrib.push({ title, values: [value] });
+          filteredAttrib.push({ fieldName, filterValue: [value] });
         }
       });
-      const filteredProducts = new Set();
-      products.forEach((product) => {
-        const isFiltered = filteredAttrib.every((attrib) => attrib.values.includes(product[attrib.title]));
-        if (isFiltered) filteredProducts.add(product);
-      });
+
+      //Re-do query with selected filters
+      const filteredQueryParams = {
+        category,
+        subcategory,
+        facetFields: filterKeys,
+        dynamicFilters: [...filteredAttrib],
+      };
+
+      const filteredQueryResult = await subcategorySearch(filteredQueryParams);
+      const filteredProducts = filteredQueryResult.items.map((item) => item.metadata);
+
       const event = new CustomEvent('FilteredProducts', { detail: { filteredProducts } });
       document.dispatchEvent(event);
     } else {
@@ -157,7 +171,7 @@ const renderBlock = async (block) => {
 };
 
 const isRenderedCheck = (block) => {
-  if (getFilters() && products && !isDecorated) {
+  if (getFiltersAndCategories() && products && !isDecorated) {
     isDecorated = true;
     renderBlock(block);
   }

@@ -8,7 +8,7 @@ import {
   setOrCreateMetadata,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
-import { fetchArticlesAndFacets } from '../search/graphql-api.js';
+import { fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
 
 const blockName = 'pdp';
 const docTypes = {

@@ -1,4 +1,4 @@
-import { fetchCategories } from '../../blocks/search/graphql-api.js';
+import { fetchCategories } from '../graphql-api.js';
 import { getCategoryObject } from '../common.js';
 
 /**

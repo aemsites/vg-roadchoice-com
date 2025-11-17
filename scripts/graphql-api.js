@@ -1,4 +1,4 @@
-import { SEARCH_CONFIG, getPageLanguage } from '../../scripts/common.js';
+import { SEARCH_CONFIG, getPageLanguage } from './common.js';
 
 async function fetchGraphQLData(graphqlQuery, endpoint) {
   try {
@@ -338,4 +338,72 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
   const articles = items.map((item) => item.metadata);
 
   return { articles, facets };
+}
+
+export async function subcategorySearch({ category = '', subcategory = '', facetFields = [], dynamicFilters = [], limit = 100, offset = 0 }) {
+  const { SEARCH_URL_DEV, RC_SUBCATEGORIES_SEARCH, TENANT } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${RC_SUBCATEGORIES_SEARCH}($categoryFilter: String!, $subcategoryFilter: String!, $facetFields: [String], $dynamicFilters: [RcDynamicFilter], $sortOptions: RcSortOptionsEnum, $limit: Int, $offset: Int, $tenant: RcTenantEnum, $language: RcLocaleEnum) {
+        ${RC_SUBCATEGORIES_SEARCH}(categoryFilter: $categoryFilter, subcategoryFilter: $subcategoryFilter, facetFields: $facetFields, dynamicFilters: $dynamicFilters, sortOptions: $sortOptions, limit: $limit, offset: $offset, tenant: $tenant, language: $language) {
+          count
+          currentPage
+          numberOfPages
+          items {
+            uuid
+            metadata {
+              base_part_number
+              mack_part_number
+              volvo_part_number
+              part_name
+              tenant
+              path
+              part_category
+              description
+              image_url
+              manufacturer {
+                oem_number
+                name
+              }
+              model {
+                make
+                name
+                description
+              }
+            }
+            score
+          }
+          facets {
+            field_name
+            facets {
+              doc_count
+              key
+            }
+          }
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      language: getPageLanguage() || 'EN',
+      categoryFilter: category,
+      subcategoryFilter: subcategory,
+      facetFields,
+      dynamicFilters,
+      limit,
+      offset,
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { items: [], facets: [], error };
+
+  const result = {
+    items: data.data[RC_SUBCATEGORIES_SEARCH].items,
+    facets: data.data[RC_SUBCATEGORIES_SEARCH].facets,
+  };
+
+  return result;
 }

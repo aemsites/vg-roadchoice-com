@@ -103,6 +103,10 @@
         "value": "rcpartdidyoumean"
       },
       {
+        "name": "RC_SUBCATEGORIES_SEARCH",
+        "value": "rccategoriessubcategoriesSearch"
+      },
+      {
         "name": "RC_BLOG_RECOMMEND",
         "value": "rcrecommend"
       },

@@ -1,6 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { createElement, getLanguagePath, slugify } from '../../scripts/common.js';
-import { fetchCategories } from '../search/graphql-api.js';
+import { fetchCategories } from '../../scripts/graphql-api.js';
 
 // media query match that indicates mobile/tablet width
 const MQ = window.matchMedia('(min-width: 992px)');
