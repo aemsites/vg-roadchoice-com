@@ -1,5 +1,6 @@
-import { getTextLabel, getJsonFromUrl, createElement } from '../../scripts/common.js';
+import { getTextLabel, createElement } from '../../scripts/common.js';
 import { readBlockConfig } from '../../scripts/aem.js';
+import { fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
 
 const blockName = 'blog-results';
 
@@ -14,12 +15,6 @@ let totalArticleCount;
 let allArticles;
 
 const buildResults = (articles, page) => {
-  articles.sort((a, b) => {
-    a['publish-date'] = +a['publish-date'];
-    b['publish-date'] = +b['publish-date'];
-    return b['publish-date'] - a['publish-date'];
-  });
-
   const results = createElement('div', { classes: `${blockName}-articles` });
 
   const topPaginationSection = createElement('div', { classes: 'pagination-top-section' });
@@ -39,17 +34,17 @@ const buildResults = (articles, page) => {
   activePage.forEach((art, idx) => {
     const article = createElement('li', { classes: ['article', `page-${idx}`] });
     const title = createElement('h2', { classes: 'title' });
-    const titleLink = createElement('a', { classes: 'title-link', props: { href: art.path } });
+    const titleLink = createElement('a', { classes: 'title-link', props: { href: art.url } });
     titleLink.textContent = art.title;
     title.appendChild(titleLink);
 
     const date = createElement('p', { classes: 'date' });
-    date.textContent = formatDate(art['publish-date']);
+    date.textContent = formatDate(art['publishDate']);
 
     const description = createElement('p', { classes: 'description' });
     description.textContent = art.description;
 
-    const link = createElement('a', { classes: 'link', props: { href: art.path } });
+    const link = createElement('a', { classes: 'link', props: { href: art.url } });
     link.textContent = readMoreText;
 
     article.append(title, date, description, link);
@@ -319,19 +314,17 @@ const buildSidebar = (articles, titleContent) => {
 };
 
 export default async function decorate(block) {
-  const blockConfig = readBlockConfig(block);
-  const [titleContent, url, amount] = Object.values(blockConfig);
+  const { title, 'amount-of-articles': amount } = readBlockConfig(block);
   articlesPerPage = +amount;
 
-  const json = await getJsonFromUrl(url);
-  allArticles = json.data;
-  allArticles.sort((a, b) => {
-    a['publish-date'] = +a['publish-date'];
-    b['publish-date'] = +b['publish-date'];
-    return b['publish-date'] - a['publish-date'];
-  });
+  const queryParams = {
+    sort: 'PUBLISH_DATE_DESC',
+  };
 
-  const sidebar = buildSidebar(allArticles, titleContent);
+  const { articles } = await fetchArticlesAndFacets(queryParams);
+  allArticles = [...articles];
+
+  const sidebar = buildSidebar(allArticles, title);
   const results = buildResults(allArticles, 0);
 
   block.textContent = '';

@@ -164,7 +164,6 @@
   box-sizing: border-box;
   font-feature-settings: 'ss02' 1;
   /* stylelint-disable-next-line property-no-unknown */
-  font-smooth: antialiased;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -485,7 +484,6 @@ main .section.section--no-vertical-padding {
   padding: 0;
   margin: 0;
   overflow: hidden;
-  clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;

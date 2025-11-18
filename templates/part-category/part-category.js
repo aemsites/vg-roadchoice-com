@@ -1,15 +1,15 @@
+import { fetchCategories, subcategorySearch } from '../../scripts/graphql-api.js';
 import {
   createElement,
   getLongJSONData,
   DEFAULT_LIMIT,
   getLocaleContextedUrl,
-  getJsonFromUrl,
   setOrCreateMetadata,
   getTextLabel,
+  getCategoryObject,
 } from '../../scripts/common.js';
-import { decorateLinks } from '../../scripts/scripts.js';
+import { transformFacets, getCategory } from '../../scripts/services/part-category.service.js';
 
-const categoryMaster = getLocaleContextedUrl('/product-data/rc-attribute-master-file.json');
 const amount = 12;
 let category;
 let mainCategory;
@@ -24,31 +24,29 @@ function get404PageUrl() {
   return getLocaleContextedUrl('/404.html');
 }
 
-/* Cases that throw an error if the category is wrong or missing that goes to 404 page:
- * 1. "/part-category/" => 404 if is index path
- * 2. "/part-category/?" => 404 if is index path width query string or wrong query parameter
- * 3. "/part-category/?category" => 404 if is an empty category without "=" sign
- * 4. "/part-category/?category=" => 404 if is an empty category with "=" sign
- * 5. "/part-category/?category=asdf" => 404 if is a wrong category
- */
-
 /**
- * Extracts the category name from the URL path.
- *
- * Returns `null` if the path points to a clean-URL template page (e.g., a category landing page),
- * typically represented by `/part-category/`, `/en-ca/part-category/`, etc.
- *
- * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
+ * Fetches the filter attributes fron sharepoint.
+ * @param {string} subcategory The subcategory name.
+ * @returns {void}
+ * @throws {Error} If the filter attributes are not found.
+ * @emits {Event} _FilterAttribsLoaded_ When the filter attributes are loaded.
  */
-const getCategory = () => {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
+const getFilterAttrib = async (subcategory) => {
+  try {
+    const filtersJson = await getLongJSONData({
+      url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
+      limit: DEFAULT_LIMIT,
+    });
 
-  if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
-    return null;
+    if (!filtersJson) throw new Error('Failed to fetch filter data');
+
+    const filterAttribs = filtersJson.filter((el) => el.Subcategory === subcategory && el.Filter === '').map((el) => el.Attributes);
+
+    return filterAttribs;
+  } catch (err) {
+    console.log('%cError fetching filter attributes', 'color:red;background-color:aliceblue', err);
+    window.location.href = get404PageUrl();
   }
-
-  return segment;
 };
 
 /**
@@ -59,17 +57,26 @@ const getCategory = () => {
  * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
-const getCategoryData = async (cat) => {
-  try {
-    const productDataUrl = getLocaleContextedUrl(`/product-data/rc-${cat.replace(/[^\w]/g, '-')}.json`);
+const getCategoryData = async (categoryObj) => {
+  const { category, subcategory } = categoryObj;
+  const facetFields = await getFilterAttrib(subcategory);
 
-    const products = await getLongJSONData({
-      url: productDataUrl,
-      limit: DEFAULT_LIMIT,
-    });
+  try {
+    const queryParams = {
+      category,
+      subcategory,
+      facetFields,
+      dynamicFilters: [],
+    };
+
+    const productsAndFacets = await subcategorySearch(queryParams);
+    const { items, facets } = productsAndFacets;
+
+    const products = items.map((item) => item.metadata);
+    const facetFieldsAggregated = transformFacets(facets);
 
     if (!Array.isArray(products) || products.length === 0) {
-      console.warn(`[CategoryData] No product data found or empty array returned for category: "${cat}"`);
+      console.warn(`[CategoryData] No product data found or empty array returned for category: "${subcategory}"`);
       json.data = [];
       json.limit = 0;
       json.total = 0;
@@ -80,17 +87,23 @@ const getCategoryData = async (cat) => {
     json.limit = 20;
     json.total = products.length;
 
-    mainCategory = json.data[0]?.Category;
+    mainCategory = category;
 
     if (!mainCategory) {
-      console.warn(`[CategoryData] mainCategory is missing for: "${cat}"`);
+      console.warn(`[CategoryData] mainCategory is missing for: "${subcategory}"`);
     }
 
     window.categoryData = json.data;
     sessionStorage.setItem('amount', amount);
 
+    sessionStorage.setItem('category-object', JSON.stringify(categoryObj));
+
     const event = new Event('CategoryDataLoaded');
     document.dispatchEvent(event);
+
+    const filterEvent = new Event('FilterAttribsLoaded');
+    sessionStorage.setItem('filter-attribs', JSON.stringify(facetFieldsAggregated));
+    document.dispatchEvent(filterEvent);
 
     return products;
   } catch (err) {
@@ -99,39 +112,11 @@ const getCategoryData = async (cat) => {
   }
 };
 
-/**
- * Updates the sessionStorage with the filter attributes.
- * @param {string} cat The category name.
- * @returns {void}
- * @throws {Error} If the filter attributes are not found.
- * @emits {Event} _FilterAttribsLoaded_ When the filter attributes are loaded.
- */
-const getFilterAttrib = async (cat) => {
-  try {
-    const filtersJson = await getLongJSONData({
-      url: categoryMaster,
-      limit: DEFAULT_LIMIT,
-    });
-
-    if (!filtersJson) throw new Error('Failed to fetch filter data');
-
-    const filterAttribs = filtersJson
-      .filter((el) => el.Subcategory.toLowerCase().replace(/ /g, '-') === cat.toLowerCase() && el.Filter === '')
-      .map((el) => el.Attributes);
-
-    const event = new Event('FilterAttribsLoaded');
-    sessionStorage.setItem('filter-attribs', JSON.stringify(filterAttribs));
-    document.dispatchEvent(event);
-  } catch (err) {
-    console.log('%cError fetching filter attributes', 'color:red;background-color:aliceblue', err);
-    window.location.href = get404PageUrl();
-  }
-};
-
 const resetCategoryData = () => {
   sessionStorage.removeItem('category-data');
   sessionStorage.removeItem('filter-attribs');
   sessionStorage.removeItem('amount');
+  sessionStorage.removeItem('category-object');
 };
 
 /**
@@ -140,38 +125,13 @@ const resetCategoryData = () => {
  * @param {string} category - The fallback category name.
  * @param {Array} categoryData - The product data array to retrieve the Subcategory from.
  */
-const updateTitleWithSubcategory = (title, category, categoryData) => {
-  const subcategory = Array.isArray(categoryData) && categoryData.length > 0 ? categoryData[0]?.Subcategory : null;
+const updateTitleWithSubcategory = (title, category, subcategory) => {
   title.textContent = subcategory || category.replaceAll('-', ' ');
 
   if (!subcategory) {
     console.log(
       subcategory === null ? 'No product data found, using fallback category' : 'No subcategory found in product data, using fallback category',
     );
-  }
-};
-
-/**
- * Fetches and formats the subcategory data to build the subtitle.
- * @returns {Object} The subcategory data as single object.
- * @throws {Error} If the subcategory data is not found.
- */
-const getSubtitleData = async (cat) => {
-  try {
-    const url = getLocaleContextedUrl('/part-category/subcategory-text.json');
-    const response = await getJsonFromUrl(url);
-    const { data } = response;
-    const result = data?.find((obj) => obj.subcategory === cat);
-    if (result) {
-      for (const key in result) {
-        if (result[key] === '') {
-          result[key] = null;
-        }
-      }
-    }
-    return result;
-  } catch (err) {
-    console.log('%cError fetching subcategories', err);
   }
 };
 
@@ -233,27 +193,18 @@ export default async function decorate(doc) {
 
   titleWrapper.appendChild(title);
 
-  const subtitleObject = await getSubtitleData(category);
-  if (subtitleObject?.text) {
-    const { text, linkText, linkUrl } = subtitleObject;
-    const subtitle = document.createRange().createContextualFragment(`
-      <p class='part-category-subtitle'>
-        ${text}
-        ${linkText?.length > 0 ? `<a href='${linkUrl}'>${linkText}</a>` : ''}
-      </p>
-    `);
-    titleWrapper.appendChild(subtitle);
-    decorateLinks(titleWrapper);
-  }
-
   const section = [...main.children].filter((child) => !['breadcrumb-container', 'search-container'].some((el) => child.classList.contains(el)))[0];
   section.classList.add('part-category');
   section.prepend(titleWrapper);
 
+  const allCategories = await fetchCategories();
+  const categoryObject = getCategoryObject(allCategories, category);
+  mainCategory = categoryObject.category;
+
   resetCategoryData();
-  const categoryData = await getCategoryData(category);
-  updateTitleWithSubcategory(title, category, categoryData);
-  getFilterAttrib(category);
+  await getCategoryData(categoryObject);
+
+  updateTitleWithSubcategory(title, category, categoryObject.subcategory);
 
   // Update breadcrumb dynamically once the block is loaded
   const observer = new MutationObserver((mutations) => {

@@ -1,6 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { createElement, getLanguagePath, slugify } from '../../scripts/common.js';
-import { fetchCategories } from '../search/graphql-api.js';
+import { fetchCategories } from '../../scripts/graphql-api.js';
 
 // media query match that indicates mobile/tablet width
 const MQ = window.matchMedia('(min-width: 992px)');
@@ -140,14 +140,6 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
-const rawCategoryList = await fetchCategories();
-const parsedCategories = rawCategoryList.reduce((accumulator, currentItem) => {
-  const categoryKey = currentItem.key;
-  const subcategoryKeys = currentItem.subcategories.map((sub) => sub.key);
-  accumulator[categoryKey] = subcategoryKeys;
-  return accumulator;
-}, {});
-
 const buildLists = (allCategoryData) => {
   const categoryEntries = Object.entries(allCategoryData);
   const locale = getLanguagePath();
@@ -188,6 +180,15 @@ const buildCategorySection = (section, categories) => {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
+  // fetch and parse category and subcategory list
+  const rawCategoryList = await fetchCategories();
+  const parsedCategories = rawCategoryList.reduce((accumulator, currentItem) => {
+    const categoryKey = currentItem.key;
+    const subcategoryKeys = currentItem.subcategories.map((sub) => sub.key);
+    accumulator[categoryKey] = subcategoryKeys;
+    return accumulator;
+  }, {});
+
   // fetch nav content
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';

@@ -99,7 +99,7 @@ async function loadArtibot() {
     };
     let a = !1;
     const i = e.createElement('script');
-    (i.async = !0),
+    ((i.async = !0),
       (i.type = 'text/javascript'),
       (i.src = 'https://app.artibot.ai/loader.js'),
       e.getElementsByTagName('head').item(0).appendChild(i),
@@ -109,7 +109,7 @@ async function loadArtibot() {
             new window.ArtiBot({ i: ARTIBOT_ID });
             a = !0;
           }
-        });
+        }));
   })(window, document);
 }
 

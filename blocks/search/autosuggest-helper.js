@@ -1,4 +1,4 @@
-import { fetchCrossReferenceSuggest, fetchPartReferenceSuggest, fetchFuzzySuggest } from './graphql-api.js';
+import { fetchCrossReferenceSuggest, fetchPartReferenceSuggest, fetchFuzzySuggest } from '../../scripts/graphql-api.js';
 import { createElement, getTextLabel } from '../../scripts/common.js';
 import { blockName } from './search.js';
 
