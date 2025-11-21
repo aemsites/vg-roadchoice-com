@@ -46,6 +46,20 @@ function getPathParams() {
   };
 }
 
+function getResolvedParams() {
+  const isLocal = location.origin.startsWith('http://localhost');
+
+  if (isLocal) {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      category: params.get('category') || '',
+      sku: params.get('sku') || '',
+    };
+  }
+
+  return getPathParams();
+}
+
 function findPartBySKU(parts, sku) {
   return parts.find((part) => part['Base Part Number'].toLowerCase() === sku.toLowerCase());
 }
@@ -550,7 +564,7 @@ function renderBreadcrumbs(part) {
 }
 
 export default async function decorate(block) {
-  const pathSegments = getPathParams();
+  const pathSegments = getResolvedParams();
 
   updateCanonicalUrl(pathSegments.category, pathSegments.sku);
   renderPartBlock(block);
