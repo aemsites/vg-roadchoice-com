@@ -167,18 +167,32 @@ const renderBlock = (block, filters) => {
   block.append(filterTitle, filterForm);
 };
 
-export const formFiltersListener = (block) => {
+const fetchAndRender = async (queryObject, form) => {
+  const filteredQueryResult = await subcategorySearch(queryObject);
+  const { facets } = filteredQueryResult;
+
+  renderFilters(facets, form);
+};
+
+const setFormListeners = (block) => {
   const form = block.querySelector(`.${blockName}-form`);
   form.addEventListener('change', async (e) => {
     if (e.target.type === 'checkbox') {
       captureInputsIntoQueryObject(e.target);
-
-      const filteredQueryResult = await subcategorySearch(queryObject);
-      const { facets } = filteredQueryResult;
-
-      renderFilters(facets, form);
+      await fetchAndRender(queryObject, form);
     }
   });
+
+  const clearBtn = form.querySelector('.clear-filter-btn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      queryObject.dynamicFilters = [];
+      updateGlobalQueryObject('query-params', queryObject);
+      await fetchAndRender(queryObject, form);
+    });
+  }
 };
 
 export default async function decorate(block) {
@@ -189,5 +203,5 @@ export default async function decorate(block) {
 
   renderBlock(block, facets);
 
-  formFiltersListener(block);
+  setFormListeners(block);
 }
