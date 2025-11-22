@@ -21,6 +21,7 @@ export const getCategory = () => {
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(url.search);
 
+    // console.log(urlParams.get('facetFields').split('|'));
     return urlParams.get('category') || null;
   } else {
     const parts = window.location.pathname.split('/').filter(Boolean);
@@ -54,4 +55,124 @@ export const transformFacets = (facetArray) => {
 
     return accumulator;
   }, {});
+};
+
+/**
+ * Converts the object into a query string URL.
+ *
+ * The strategy is:
+ * 1. facetFields are joined by a pipe (|) and stored under the 'facetFields' key.
+ * 2. dynamicFilters are converted into individual parameters starting with 'df_' + FieldName.
+ * The FieldName and all values are URL-encoded to handle special characters (like '&', '(', ' ').
+ * @param {Object} obj The input object with facetFields and dynamicFilters.
+ * @returns {string} The constructed URL.
+ */
+export const objectToUrl = (obj) => {
+  const params = [];
+  // Use a base URL for context
+  const base = 'https://search.example.com/results?';
+
+  // 1. Process facetFields (using '|' as an internal separator)
+  if (obj.facetFields && obj.facetFields.length > 0) {
+    const ffValue = obj.facetFields.map(encodeURIComponent).join('|');
+    params.push(`facetFields=${ffValue}`);
+  }
+
+  // 2. Process dynamicFilters
+  if (obj.dynamicFilters && obj.dynamicFilters.length > 0) {
+    obj.dynamicFilters.forEach((filter) => {
+      const fieldName = filter.fieldName;
+      const filterValues = filter.filterValue;
+
+      if (fieldName && filterValues && filterValues.length > 0) {
+        // Key format: df_[Encoded FieldName]
+        const key = `df_${encodeURIComponent(fieldName)}`;
+        // Value format: Comma-separated list of encoded filter values
+        const value = filterValues.map(encodeURIComponent).join(',');
+        params.push(`${key}=${value}`);
+      }
+    });
+  }
+
+  return base + params.join('&');
+};
+
+/**
+ * Reconstructs the original object from a query string URL.
+ *
+ * This function reverses the encoding strategy used in objectToUrl.
+ * It uses URLSearchParams to extract parameters and then rebuilds the structure.
+ * @param {string} url The URL containing the encoded object data.
+ * @returns {Object} The reconstructed object.
+ */
+export const urlToObject = (url) => {
+  let urlObject;
+  try {
+    urlObject = new URL(url);
+  } catch (e) {
+    console.error('Invalid URL provided:', e);
+    return { facetFields: [], dynamicFilters: [] };
+  }
+
+  const searchParams = urlObject.searchParams;
+  const result = {
+    facetFields: [],
+    dynamicFilters: [],
+  };
+
+  // 1. Process facetFields
+  const ffString = searchParams.get('facetFields');
+  if (ffString) {
+    // Split by '|' and decode each part
+    result.facetFields = ffString.split('|').map(decodeURIComponent);
+  }
+
+  // 2. Process dynamicFilters (parameters starting with 'df_')
+  // Using a standard loop over searchParams.entries() to handle all keys
+  for (const [key, value] of searchParams.entries()) {
+    if (key.startsWith('df_')) {
+      // Extract the encoded field name after 'df_'
+      const encodedFieldName = key.substring(3);
+      // Decode to get the original field name (respecting capitalization/symbols)
+      const fieldName = decodeURIComponent(encodedFieldName);
+
+      // Split the value by ',' and decode each filter value
+      const filterValue = value.split(',').map(decodeURIComponent);
+
+      // Add the reconstructed filter object to the array
+      result.dynamicFilters.push({
+        fieldName: fieldName,
+        filterValue: filterValue,
+      });
+    }
+  }
+
+  return result;
+};
+
+// function updateURL(newFilters) {
+//   const newQueryString = createQueryString(newFilters);
+
+//   // Construct the new URL path
+//   const newUrl = `${window.location.pathname}?${newQueryString}`;
+
+//   // Update the browser URL without reloading the page
+//   window.history.replaceState(null, '', newUrl);
+// }
+
+/**
+ * Replaces an object in Session Storage entirely.
+ * @param {string} key - The key to store the data under.
+ * @param {object} newObject - The entire object to save.
+ */
+export const updateGlobalQueryObject = (key, newObject) => {
+  try {
+    const jsonString = JSON.stringify(newObject);
+    sessionStorage.setItem(key, jsonString);
+
+    const event = new CustomEvent('QueryUpdated', { detail: newObject });
+    document.dispatchEvent(event);
+  } catch (error) {
+    console.error('Error saving to sessionStorage:', error);
+  }
 };

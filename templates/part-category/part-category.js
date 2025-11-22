@@ -1,4 +1,4 @@
-import { fetchCategories, subcategorySearch } from '../../scripts/graphql-api.js';
+import { fetchCategories } from '../../scripts/graphql-api.js';
 import {
   createElement,
   getLongJSONData,
@@ -8,20 +8,13 @@ import {
   getTextLabel,
   getCategoryObject,
 } from '../../scripts/common.js';
-import { transformFacets, getCategory } from '../../scripts/services/part-category.service.js';
+import { getCategory, urlToObject, objectToUrl, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
-const amount = 12;
 let category;
 let mainCategory;
-const json = {
-  data: [],
-  limit: 0,
-  offset: 0,
-  total: 0,
-};
 
 function get404PageUrl() {
-  return getLocaleContextedUrl('/404.html');
+  // return getLocaleContextedUrl('/404.html');
 }
 
 /**
@@ -57,55 +50,28 @@ const getFilterAttrib = async (subcategory) => {
  * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
  * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
  */
-const getCategoryData = async (categoryObj) => {
-  const { category, subcategory } = categoryObj;
-  const facetFields = await getFilterAttrib(subcategory);
+const getCategoryData = async (queryObject) => {
+  const { category, subcategory, facetFields, dynamicFilters } = queryObject;
+
+  let fieldsToUse;
+  if (!Array.isArray(facetFields) || facetFields.length === 0) {
+    const sharepointFacetFields = await getFilterAttrib(subcategory);
+    fieldsToUse = sharepointFacetFields;
+  } else {
+    fieldsToUse = facetFields;
+  }
 
   try {
-    const queryParams = {
+    queryObject = {
       category,
       subcategory,
-      facetFields,
-      dynamicFilters: [],
+      facetFields: fieldsToUse,
+      dynamicFilters,
     };
 
-    const productsAndFacets = await subcategorySearch(queryParams);
-    const { items, facets } = productsAndFacets;
+    updateGlobalQueryObject('query-params', queryObject);
 
-    const products = items.map((item) => item.metadata);
-    const facetFieldsAggregated = transformFacets(facets);
-
-    if (!Array.isArray(products) || products.length === 0) {
-      console.warn(`[CategoryData] No product data found or empty array returned for category: "${subcategory}"`);
-      json.data = [];
-      json.limit = 0;
-      json.total = 0;
-      return [];
-    }
-
-    json.data = products;
-    json.limit = 20;
-    json.total = products.length;
-
-    mainCategory = category;
-
-    if (!mainCategory) {
-      console.warn(`[CategoryData] mainCategory is missing for: "${subcategory}"`);
-    }
-
-    window.categoryData = json.data;
-    sessionStorage.setItem('amount', amount);
-
-    sessionStorage.setItem('category-object', JSON.stringify(categoryObj));
-
-    const event = new Event('CategoryDataLoaded');
-    document.dispatchEvent(event);
-
-    const filterEvent = new Event('FilterAttribsLoaded');
-    sessionStorage.setItem('filter-attribs', JSON.stringify(facetFieldsAggregated));
-    document.dispatchEvent(filterEvent);
-
-    return products;
+    return;
   } catch (err) {
     console.error('%c[CategoryData] Error fetching category data', 'color:red;background-color:aliceblue', err);
     window.location.href = get404PageUrl();
@@ -113,10 +79,8 @@ const getCategoryData = async (categoryObj) => {
 };
 
 const resetCategoryData = () => {
-  sessionStorage.removeItem('category-data');
   sessionStorage.removeItem('filter-attribs');
-  sessionStorage.removeItem('amount');
-  sessionStorage.removeItem('category-object');
+  sessionStorage.removeItem('query-params');
 };
 
 /**
@@ -197,12 +161,23 @@ export default async function decorate(doc) {
   section.classList.add('part-category');
   section.prepend(titleWrapper);
 
+  resetCategoryData();
+
   const allCategories = await fetchCategories();
   const categoryObject = getCategoryObject(allCategories, category);
   mainCategory = categoryObject.category;
 
-  resetCategoryData();
-  await getCategoryData(categoryObject);
+  // WORKS
+  // const url = 'http://localhost:3000/part-category/?category=jacks&facetFields=Pair|Lift%20Height%20(in)&df_Lift%20Height%20(in)=10.32,10.12,10.41&df_Pair=Yes,No'
+  // const url = 'http://localhost:3000/part-category/jacks/?facetFields=Pair|Lift%20Height%20(in)&df_Lift%20Height%20(in)=10.32,10.12,10.41&df_Pair=Yes,No'
+
+  const sanitizedUrl = new URL(window.location.href);
+  const filtersFromUrl = urlToObject(sanitizedUrl.href);
+
+  const completeQueryObject = { ...filtersFromUrl, ...categoryObject };
+
+  // GET PRODUCTS
+  await getCategoryData(completeQueryObject);
 
   updateTitleWithSubcategory(title, category, categoryObject.subcategory);
 
