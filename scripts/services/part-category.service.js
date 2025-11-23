@@ -21,7 +21,6 @@ export const getCategory = () => {
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(url.search);
 
-    // console.log(urlParams.get('facetFields').split('|'));
     return urlParams.get('category') || null;
   } else {
     const parts = window.location.pathname.split('/').filter(Boolean);
@@ -69,25 +68,25 @@ export const transformFacets = (facetArray) => {
  */
 export const objectToUrl = (obj) => {
   const params = [];
-  // Use a base URL for context
-  const base = 'https://search.example.com/results?';
+  const isLocalhost = window.location.host.includes('localhost');
 
-  // 1. Process facetFields (using '|' as an internal separator)
+  const subcategory = getCategory();
+
+  const subcatParam = `${isLocalhost ? `?category=${subcategory}` : subcategory}&`;
+  const base = window.location.pathname + subcatParam;
+
   if (obj.facetFields && obj.facetFields.length > 0) {
     const ffValue = obj.facetFields.map(encodeURIComponent).join('|');
     params.push(`facetFields=${ffValue}`);
   }
 
-  // 2. Process dynamicFilters
   if (obj.dynamicFilters && obj.dynamicFilters.length > 0) {
     obj.dynamicFilters.forEach((filter) => {
       const fieldName = filter.fieldName;
       const filterValues = filter.filterValue;
 
       if (fieldName && filterValues && filterValues.length > 0) {
-        // Key format: df_[Encoded FieldName]
         const key = `df_${encodeURIComponent(fieldName)}`;
-        // Value format: Comma-separated list of encoded filter values
         const value = filterValues.map(encodeURIComponent).join(',');
         params.push(`${key}=${value}`);
       }
@@ -120,26 +119,18 @@ export const urlToObject = (url) => {
     dynamicFilters: [],
   };
 
-  // 1. Process facetFields
   const ffString = searchParams.get('facetFields');
   if (ffString) {
-    // Split by '|' and decode each part
     result.facetFields = ffString.split('|').map(decodeURIComponent);
   }
 
-  // 2. Process dynamicFilters (parameters starting with 'df_')
-  // Using a standard loop over searchParams.entries() to handle all keys
   for (const [key, value] of searchParams.entries()) {
     if (key.startsWith('df_')) {
-      // Extract the encoded field name after 'df_'
       const encodedFieldName = key.substring(3);
-      // Decode to get the original field name (respecting capitalization/symbols)
       const fieldName = decodeURIComponent(encodedFieldName);
 
-      // Split the value by ',' and decode each filter value
       const filterValue = value.split(',').map(decodeURIComponent);
 
-      // Add the reconstructed filter object to the array
       result.dynamicFilters.push({
         fieldName: fieldName,
         filterValue: filterValue,
@@ -150,15 +141,10 @@ export const urlToObject = (url) => {
   return result;
 };
 
-// function updateURL(newFilters) {
-//   const newQueryString = createQueryString(newFilters);
-
-//   // Construct the new URL path
-//   const newUrl = `${window.location.pathname}?${newQueryString}`;
-
-//   // Update the browser URL without reloading the page
-//   window.history.replaceState(null, '', newUrl);
-// }
+function updateURL(newFilters) {
+  const newUrl = objectToUrl(newFilters);
+  window.history.replaceState(null, '', newUrl);
+}
 
 /**
  * Replaces an object in Session Storage entirely.
@@ -172,7 +158,11 @@ export const updateGlobalQueryObject = (key, newObject) => {
 
     const event = new CustomEvent('QueryUpdated', { detail: newObject });
     document.dispatchEvent(event);
+
+    if (newObject.dynamicFilters.length !== 0) {
+      updateURL(newObject);
+    }
   } catch (error) {
-    console.error('Error saving to sessionStorage:', error);
+    console.error('Error updating query object:', error);
   }
 };

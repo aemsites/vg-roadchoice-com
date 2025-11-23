@@ -8,7 +8,7 @@ import {
   getTextLabel,
   getCategoryObject,
 } from '../../scripts/common.js';
-import { getCategory, urlToObject, objectToUrl, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
+import { getCategory, urlToObject, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 let category;
 let mainCategory;
