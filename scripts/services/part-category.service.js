@@ -72,7 +72,7 @@ export const objectToUrl = (obj) => {
 
   const subcategory = getCategory();
 
-  const subcatParam = `${isLocalhost ? `?category=${subcategory}` : subcategory}&`;
+  const subcatParam = isLocalhost ? `?category=${subcategory}&` : '&';
   const base = window.location.pathname + subcatParam;
 
   if (obj.facetFields && obj.facetFields.length > 0) {
