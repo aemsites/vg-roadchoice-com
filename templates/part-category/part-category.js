@@ -167,18 +167,12 @@ export default async function decorate(doc) {
   const categoryObject = getCategoryObject(allCategories, category);
   mainCategory = categoryObject.category;
 
-  // WORKS
-  // const url = 'http://localhost:3000/part-category/?category=jacks&facetFields=Pair|Lift%20Height%20(in)&df_Lift%20Height%20(in)=10.32,10.12,10.41&df_Pair=Yes,No'
-  // const url = 'http://localhost:3000/part-category/jacks/?facetFields=Pair|Lift%20Height%20(in)&df_Lift%20Height%20(in)=10.32,10.12,10.41&df_Pair=Yes,No'
-
   const sanitizedUrl = new URL(window.location.href);
   const filtersFromUrl = urlToObject(sanitizedUrl.href);
 
   const completeQueryObject = { ...filtersFromUrl, ...categoryObject };
 
-  // GET PRODUCTS
   await getCategoryData(completeQueryObject);
-
   updateTitleWithSubcategory(title, category, categoryObject.subcategory);
 
   // Update breadcrumb dynamically once the block is loaded

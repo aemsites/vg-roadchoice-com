@@ -127,7 +127,7 @@ const renderFilters = (filters, wrapper) => {
   });
 
   filterList.onclick = (e) => {
-    const elements = [`${blockName}-title-wrapper`, `${blockName}-title`, 'plus-btn'];
+    const elements = [`${blockName}-title-wrapper`, `${blockName}-item-title`, 'plus-btn'];
     if (elements.some((el) => e.target.classList.contains(el))) {
       const element = e.target.classList.contains(`${blockName}-title-wrapper`) ? e.target : e.target.parentElement;
       element.classList.toggle('active');
@@ -202,6 +202,5 @@ export default async function decorate(block) {
   const { facets } = initialQuery;
 
   renderBlock(block, facets);
-
   setFormListeners(block);
 }

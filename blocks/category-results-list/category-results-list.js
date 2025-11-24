@@ -14,7 +14,6 @@ const setCountAndAmount = (count) => {
     pages: Math.ceil(count / amount),
   };
 
-  console.log(countAndAmount);
   const event = new CustomEvent('CountReady', { detail: countAndAmount });
   document.dispatchEvent(event);
 };
@@ -42,7 +41,7 @@ const updateProductList = async (wrapper) => {
 
 const renderBlock = async (block) => {
   const resultsWrapper = createElement('div', { classes: 'results-wrapper' });
-  const productList = createElement('ul', { classes: 'results-list' });
+  const productList = createElement('ul', { classes: 'category-results-list' });
 
   await updateProductList(productList);
 

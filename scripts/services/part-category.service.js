@@ -138,13 +138,9 @@ export const urlToObject = (url) => {
   return result;
 };
 
-function updateURL(newFilters) {
-  const newUrl = objectToUrl(newFilters);
-  window.history.replaceState(null, '', newUrl);
-}
-
 /**
- * Replaces an object in Session Storage entirely.
+ * Updates the global query object in session storage, the url and triggers an event captured
+ * by the product list component
  * @param {string} key - The key to store the data under.
  * @param {object} newObject - The entire object to save.
  */
@@ -155,9 +151,9 @@ export const updateGlobalQueryObject = (key, newObject) => {
 
     const event = new CustomEvent('QueryUpdated', { detail: newObject });
     document.dispatchEvent(event);
-    console.log(newObject);
 
-    updateURL(newObject);
+    const newUrl = objectToUrl(newObject);
+    window.history.replaceState(null, '', newUrl);
   } catch (error) {
     console.error('Error updating query object:', error);
   }

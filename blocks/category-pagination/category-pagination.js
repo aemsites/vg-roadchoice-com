@@ -7,25 +7,34 @@ let hasMoreItems;
 let currentAmount;
 let currentPage = 1;
 
+const resetValues = () => {
+  firstPass = true;
+  hasMoreItems;
+  currentAmount;
+  currentPage = 1;
+};
+
 const handleShowMore = (buttons, countAndAmount) => {
   const { count, amount, pages } = countAndAmount;
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
+      const activeSection = btn.closest('.category-filters-container');
+
       //check button visibility
       currentPage++;
       if (currentPage >= pages) {
-        buttons.forEach((btn) => btn.classList.add('hidden'));
+        buttons.forEach((btn) => btn.remove());
       }
 
       //update pagination text
-      const textNode = document.querySelector('.category-pagination .text-wrapper p');
+      const textNode = activeSection.querySelector('.category-pagination .text-wrapper p');
       const visibleProductsNumber = currentAmount + amount >= count ? count : currentAmount + amount;
       currentAmount = currentAmount + amount;
 
       textNode.textContent = paginationText.replace('[$]', visibleProductsNumber);
 
       // show cards
-      const productCards = document.querySelectorAll('.category-results-list .results-list .product-card.hidden');
+      const productCards = activeSection.querySelectorAll('.category-results-list .product-card.hidden');
       productCards.forEach((card, idx) => {
         if (idx < amount) {
           card.classList.remove('hidden');
@@ -44,22 +53,32 @@ const renderBlock = async (block, countAndAmount) => {
   if (!firstPass) {
     block.querySelector('.text-wrapper p').remove();
   }
+
   const textWrapper = createElement('div', { classes: 'text-wrapper' });
   const text = createElement('p', { classes: 'text' });
   text.textContent = paginationText.replace('[$]', currentAmount);
+
+  const container = document.querySelector('.category-filters-container');
+  const hasOldButtons = container.querySelectorAll('.more-button');
+
+  if (hasOldButtons) {
+    hasOldButtons.forEach((btn) => btn.remove());
+  }
 
   if (hasMoreItems) {
     const topMoreBtn = createElement('button', { classes: ['more-button'] });
     topMoreBtn.textContent = buttonText;
     const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
     bottomMoreBtn.textContent = buttonText;
-    const resultsListBlock = document.querySelector('.category-results-list.block');
+    const resultsListBlock = container.querySelector('.category-results-list.block');
+
     resultsListBlock.insertAdjacentElement('afterend', bottomMoreBtn);
     textWrapper.append(topMoreBtn);
     const buttons = [topMoreBtn, bottomMoreBtn];
 
     handleShowMore(buttons, countAndAmount);
   }
+
   textWrapper.prepend(text);
   block.append(textWrapper);
 
@@ -70,5 +89,8 @@ export default async function decorate(block) {
   document.addEventListener('CountReady', (e) => {
     const countAndAmount = e.detail;
     renderBlock(block, countAndAmount);
+    if (firstPass) {
+      resetValues();
+    }
   });
 }
