@@ -32,7 +32,6 @@ const captureInputsIntoQueryObject = (input) => {
 
       if (filterObj.filterValue.length === 0) {
         queryObject.dynamicFilters.splice(filterIndex, 1);
-        queryObject.facetFields = queryObject.facetFields.filter((field) => field !== key);
       }
     } else {
       filterObj.filterValue.push(value);
@@ -50,6 +49,7 @@ const captureInputsIntoQueryObject = (input) => {
       queryObject.facetFields.push(key);
     }
   }
+
   updateGlobalQueryObject('query-params', queryObject);
 };
 

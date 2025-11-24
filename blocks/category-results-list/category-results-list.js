@@ -2,14 +2,20 @@ import { createElement } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 import { subcategorySearch } from '../../scripts/graphql-api.js';
 
-let queryObject;
 const searchType = 'parts';
-let products;
 const amount = 12;
+let count;
+let queryObject;
+let products;
 
 const updateProductList = async (wrapper) => {
   queryObject = JSON.parse(sessionStorage.getItem('query-params'));
   const filteredQueryResult = await subcategorySearch(queryObject);
+  const count = filteredQueryResult.count;
+
+  const event = new CustomEvent('CountReady', { detail: count });
+  document.dispatchEvent(event);
+
   products = filteredQueryResult.items.map((item) => item.metadata);
 
   if (wrapper.hasChildNodes()) {
@@ -37,6 +43,12 @@ const renderBlock = async (block) => {
 
 export default async function decorate(block) {
   await renderBlock(block);
+
+  const amountObject = {
+    amount: amount,
+    count,
+  };
+  sessionStorage.setItem('amountObject', amountObject);
 
   document.addEventListener('QueryUpdated', async (e) => {
     queryObject = e.detail;

@@ -1,3 +1,5 @@
+const isLocalhost = window.location.host.includes('localhost');
+
 /* Cases that throw an error if the category is wrong or missing that goes to 404 page:
  * 1. "/part-category/" => 404 if is index path
  * 2. "/part-category/?" => 404 if is index path width query string or wrong query parameter
@@ -17,7 +19,7 @@
  * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
 export const getCategory = () => {
-  if (window.location.host.includes('localhost')) {
+  if (isLocalhost) {
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(url.search);
 
@@ -68,17 +70,11 @@ export const transformFacets = (facetArray) => {
  */
 export const objectToUrl = (obj) => {
   const params = [];
-  const isLocalhost = window.location.host.includes('localhost');
 
   const subcategory = getCategory();
 
   const subcatParam = isLocalhost ? `?category=${subcategory}&` : '?';
   const base = window.location.pathname + subcatParam;
-
-  if (obj.facetFields && obj.facetFields.length > 0) {
-    const ffValue = obj.facetFields.map(encodeURIComponent).join('|');
-    params.push(`facetFields=${ffValue}`);
-  }
 
   if (obj.dynamicFilters && obj.dynamicFilters.length > 0) {
     obj.dynamicFilters.forEach((filter) => {
@@ -93,7 +89,14 @@ export const objectToUrl = (obj) => {
     });
   }
 
-  return base + params.join('&');
+  let finalUrl = base + params.join('&');
+
+  // Remove & if no filter is selected
+  if (obj.dynamicFilters.length === 0) {
+    finalUrl = finalUrl.slice(0, -1);
+  }
+
+  return finalUrl;
 };
 
 /**
@@ -110,19 +113,13 @@ export const urlToObject = (url) => {
     urlObject = new URL(url);
   } catch (e) {
     console.error('Invalid URL provided:', e);
-    return { facetFields: [], dynamicFilters: [] };
+    return { dynamicFilters: [] };
   }
 
   const searchParams = urlObject.searchParams;
   const result = {
-    facetFields: [],
     dynamicFilters: [],
   };
-
-  const ffString = searchParams.get('facetFields');
-  if (ffString) {
-    result.facetFields = ffString.split('|').map(decodeURIComponent);
-  }
 
   for (const [key, value] of searchParams.entries()) {
     if (key.startsWith('df_')) {
@@ -159,9 +156,7 @@ export const updateGlobalQueryObject = (key, newObject) => {
     const event = new CustomEvent('QueryUpdated', { detail: newObject });
     document.dispatchEvent(event);
 
-    if (newObject.dynamicFilters.length !== 0) {
-      updateURL(newObject);
-    }
+    updateURL(newObject);
   } catch (error) {
     console.error('Error updating query object:', error);
   }
