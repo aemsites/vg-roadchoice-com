@@ -14,7 +14,7 @@ let category;
 let mainCategory;
 
 function get404PageUrl() {
-  // return getLocaleContextedUrl('/404.html');
+  return getLocaleContextedUrl('/404.html');
 }
 
 /**

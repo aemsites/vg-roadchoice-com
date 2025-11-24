@@ -155,6 +155,7 @@ export const updateGlobalQueryObject = (key, newObject) => {
 
     const event = new CustomEvent('QueryUpdated', { detail: newObject });
     document.dispatchEvent(event);
+    console.log(newObject);
 
     updateURL(newObject);
   } catch (error) {

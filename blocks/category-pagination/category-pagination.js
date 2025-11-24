@@ -49,6 +49,9 @@ let firstPass = true;
 // };
 
 const renderBlock = async (block, currentAmount) => {
+  if (!firstPass) {
+    block.querySelector('.text-wrapper p').remove();
+  }
   const textWrapper = createElement('div', { classes: 'text-wrapper' });
   const text = createElement('p', { classes: 'text' });
   text.textContent = paginationText.replace('[$]', currentAmount);
@@ -63,12 +66,7 @@ const renderBlock = async (block, currentAmount) => {
   //   addShowMoreHandler(bottomMoreBtn, resultsListBlock, text);
   //   textWrapper.append(moreBtn);
   // }
-
-  if (firstPass) {
-    textWrapper.prepend(text);
-  } else {
-    text.textContent = paginationText.replace('[$]', currentAmount);
-  }
+  textWrapper.prepend(text);
   firstPass = false;
   block.append(textWrapper);
 };

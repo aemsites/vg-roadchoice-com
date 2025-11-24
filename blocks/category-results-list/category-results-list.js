@@ -4,7 +4,6 @@ import { subcategorySearch } from '../../scripts/graphql-api.js';
 
 const searchType = 'parts';
 const amount = 12;
-let count;
 let queryObject;
 let products;
 
@@ -43,12 +42,6 @@ const renderBlock = async (block) => {
 
 export default async function decorate(block) {
   await renderBlock(block);
-
-  const amountObject = {
-    amount: amount,
-    count,
-  };
-  sessionStorage.setItem('amountObject', amountObject);
 
   document.addEventListener('QueryUpdated', async (e) => {
     queryObject = e.detail;
