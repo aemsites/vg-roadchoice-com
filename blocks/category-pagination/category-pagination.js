@@ -1,54 +1,46 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
 
-// // let products = window.categoryData;
-// // let isRendered = false;
-// const moreBtns = [];
-// let hasMoreItems = false;
-// let hasImagesData = false;
-// let currentAmount = 0;
 const paginationText = getTextLabel('pagination_text');
 const buttonText = getTextLabel('pagination_button');
 let firstPass = true;
+let hasMoreItems;
+let currentAmount;
+let currentPage = 1;
 
-// const loadMoreProducts = (props) => {
-//   const { hidden, amountText } = props;
-//   const { length } = hidden;
-//   const isLessThanAmount = length <= amount;
-//   const nextAmount = isLessThanAmount ? length : amount;
-//   currentAmount += nextAmount;
+const handleShowMore = (buttons, countAndAmount) => {
+  const { count, amount, pages } = countAndAmount;
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      //check button visibility
+      currentPage++;
+      if (currentPage >= pages) {
+        buttons.forEach((btn) => btn.classList.add('hidden'));
+      }
 
-//   for (let i = 0; i < nextAmount; i += 1) {
-//     hidden[i].classList.remove('hidden');
-//   }
+      //update pagination text
+      const textNode = document.querySelector('.category-pagination .text-wrapper p');
+      const visibleProductsNumber = currentAmount + amount >= count ? count : currentAmount + amount;
+      currentAmount = currentAmount + amount;
 
-//   amountText.textContent = paginationText.replace('[$]', currentAmount);
+      textNode.textContent = paginationText.replace('[$]', visibleProductsNumber);
 
-//   if (isLessThanAmount) moreBtns.forEach((btn) => btn.classList.add('hidden'));
-// };
+      // show cards
+      const productCards = document.querySelectorAll('.category-results-list .results-list .product-card.hidden');
+      productCards.forEach((card, idx) => {
+        if (idx < amount) {
+          card.classList.remove('hidden');
+        }
+      });
+    });
+  });
+};
 
-// const addShowMoreHandler = (btn, resultsListBlock, amountText) => {
-//   btn.onclick = () =>
-//     loadMoreProducts({
-//       hidden: resultsListBlock.querySelectorAll('.product-card.hidden'),
-//       amountText,
-//     });
-// };
+const renderBlock = async (block, countAndAmount) => {
+  const { count, amount } = countAndAmount;
 
-// const addShowMoreBtns = (props) => {
-//   const { resultsListBlock, moreBtn, bottomMoreBtn } = props;
-//   resultsListBlock.querySelector('.results-wrapper').appendChild(bottomMoreBtn);
-//   moreBtn.classList.remove('hidden');
-//   moreBtns.push(moreBtn, bottomMoreBtn);
-// };
+  hasMoreItems = count > amount;
+  currentAmount = hasMoreItems ? amount : count;
 
-// const addImagesHandler = ({ resultsListBlock, moreBtn, bottomMoreBtn }) => {
-//   document.addEventListener('ImagesLoaded', () => {
-//     hasImagesData = true;
-//     addShowMoreBtns({ resultsListBlock, moreBtn, bottomMoreBtn });
-//   });
-// };
-
-const renderBlock = async (block, currentAmount) => {
   if (!firstPass) {
     block.querySelector('.text-wrapper p').remove();
   }
@@ -56,61 +48,27 @@ const renderBlock = async (block, currentAmount) => {
   const text = createElement('p', { classes: 'text' });
   text.textContent = paginationText.replace('[$]', currentAmount);
 
-  // if (hasMoreItems) {
-  //   const moreBtn = createElement('button', { classes: ['more-button', 'hidden'] });
-  //   moreBtn.textContent = buttonText;
-  //   const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
-  //   bottomMoreBtn.textContent = buttonText;
-  //   const resultsListBlock = document.querySelector('.category-results-list.block');
-  //   addShowMoreHandler(moreBtn, resultsListBlock, text);
-  //   addShowMoreHandler(bottomMoreBtn, resultsListBlock, text);
-  //   textWrapper.append(moreBtn);
-  // }
+  if (hasMoreItems) {
+    const topMoreBtn = createElement('button', { classes: ['more-button'] });
+    topMoreBtn.textContent = buttonText;
+    const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
+    bottomMoreBtn.textContent = buttonText;
+    const resultsListBlock = document.querySelector('.category-results-list.block');
+    resultsListBlock.insertAdjacentElement('afterend', bottomMoreBtn);
+    textWrapper.append(topMoreBtn);
+    const buttons = [topMoreBtn, bottomMoreBtn];
+
+    handleShowMore(buttons, countAndAmount);
+  }
   textWrapper.prepend(text);
-  firstPass = false;
   block.append(textWrapper);
+
+  firstPass = false;
 };
 
-// // const isRenderedCheck = (block) => {
-// //   if (products && amount && !isRendered) {
-// //     isRendered = true;
-// //     hasMoreItems = products && products.length > amount;
-// //     currentAmount = hasMoreItems ? amount : products.length;
-// //     newText = paginationText.replace('[$]', currentAmount);
-// //     renderBlock(block);
-// //   }
-// // };
-
-// const getAmount = async () => {
-//   let amount = await JSON.parse(sessionStorage.getItem('amountObject'));
-
-//   return amount;
-// }
-
 export default async function decorate(block) {
-  // const test = await getAmount()
-  // console.log(test);
-
   document.addEventListener('CountReady', (e) => {
-    const amountOfProducts = e.detail;
-
-    renderBlock(block, amountOfProducts);
+    const countAndAmount = e.detail;
+    renderBlock(block, countAndAmount);
   });
-
-  // console.log(amount);
-  // document.addEventListener('FilteredProducts', (e) => {
-  //   products = [...e.detail.filteredProducts];
-  //   hasMoreItems = products && products.length > amount;
-  //   currentAmount = hasMoreItems ? amount : products.length;
-  //   newText = paginationText.replace('[$]', currentAmount);
-  //   block.textContent = '';
-  //   renderBlock(block);
-  // });
-  // isRenderedCheck(block);
-  // if (isRendered) return;
-  // document.addEventListener('CategoryDataLoaded', () => {
-  //   amount = JSON.parse(sessionStorage.getItem('amount'));
-  //   // products = JSON.parse(sessionStorage.getItem('category-data'));
-  //   isRenderedCheck(block);
-  // });
 }

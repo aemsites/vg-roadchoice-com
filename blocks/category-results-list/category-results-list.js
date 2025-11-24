@@ -3,17 +3,27 @@ import productCard from '../results-list/product-card.js';
 import { subcategorySearch } from '../../scripts/graphql-api.js';
 
 const searchType = 'parts';
-const amount = 12;
 let queryObject;
 let products;
+const amount = 12;
+
+const setCountAndAmount = (count) => {
+  const countAndAmount = {
+    count,
+    amount,
+    pages: Math.ceil(count / amount),
+  };
+
+  console.log(countAndAmount);
+  const event = new CustomEvent('CountReady', { detail: countAndAmount });
+  document.dispatchEvent(event);
+};
 
 const updateProductList = async (wrapper) => {
   queryObject = JSON.parse(sessionStorage.getItem('query-params'));
   const filteredQueryResult = await subcategorySearch(queryObject);
-  const count = filteredQueryResult.count;
 
-  const event = new CustomEvent('CountReady', { detail: count });
-  document.dispatchEvent(event);
+  setCountAndAmount(filteredQueryResult.count);
 
   products = filteredQueryResult.items.map((item) => item.metadata);
 
