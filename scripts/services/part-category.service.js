@@ -101,17 +101,17 @@ export const transformFacets = (facetArray) => {
  * // window.location.pathname is '/part-category'
  *
  * const filterObj = {
- * dynamicFilters: [
- * { fieldName: 'Pair', filterValue: ['No'] },
- * { fieldName: 'Lift Height (in)', filterValue: ['10.32'] }
- * ]
+ *   dynamicFilters: [
+ *     { fieldName: 'Pair', filterValue: ['No'] },
+ *     { fieldName: 'Lift Height (in)', filterValue: ['10.32'] }
+ *   ]
  * };
  *
- * // if isLocalhost is false
+ * If isLocalhost is false
  * objectToUrl(filterObj);
  * // Returns: '/part-category/jacks?df_Pair=No&df_Lift%20Height%20(in)=10.32'
  *
- * // if isLocalhost is true
+ * If isLocalhost is true
  * objectToUrl(filterObj);
  * // Returns: '/part-category/?category=jacks&df_Pair=No&df_Lift%20Height%20(in)=10.32'
  */
@@ -165,12 +165,12 @@ export const objectToUrl = (obj) => {
  *
  * urlToObject(url);
  * // Output:
- * // {
- * //   dynamicFilters: [
- * //     { fieldName: 'Pair', filterValue: ['No'] },
- * //     { fieldName: 'Lifth Height (in)', filterValue: ['10.32'] }
- * //   ]
- * // }
+ * {
+ *   dynamicFilters: [
+ *     { fieldName: 'Pair', filterValue: ['No'] },
+ *     { fieldName: 'Lifth Height (in)', filterValue: ['10.32'] }
+ *   ]
+ * }
  */
 export const urlToObject = (url) => {
   let urlObject;
