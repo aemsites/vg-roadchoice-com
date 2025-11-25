@@ -35,6 +35,7 @@ function mapGraphQLProductToPart(product, categoryKeys) {
   const attributeLabels = (categoryKeys || []).map((item) => item.Attributes).filter(Boolean);
 
   attributeLabels.forEach((label) => {
+    if (label.toLowerCase() === 'description') return; // prevent duplicate
     const value = dynamic[label];
     if (value !== undefined && value !== null && String(value).length > 0) {
       attributes[label] = value;
