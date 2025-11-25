@@ -15,6 +15,7 @@ const fetchQueryParams = () => {
   }
 };
 
+// Update query object with the checked inputs
 const captureInputsIntoQueryObject = (input) => {
   const {
     value,
@@ -53,6 +54,7 @@ const captureInputsIntoQueryObject = (input) => {
   updateGlobalQueryObject('query-params', queryObject);
 };
 
+// when rebuilding the filters, make sure the correct inputs are active
 const updateCheckboxes = (form) => {
   const dynamicFilters = queryObject.dynamicFilters;
   const inputs = form.querySelectorAll(`.${blockName}-input`);
@@ -167,7 +169,7 @@ const renderBlock = (block, filters) => {
   block.append(filterTitle, filterForm);
 };
 
-const fetchAndRender = async (queryObject, form) => {
+const fetchAndRenderFilters = async (queryObject, form) => {
   const filteredQueryResult = await subcategorySearch(queryObject);
   const { facets } = filteredQueryResult;
 
@@ -179,7 +181,7 @@ const setFormListeners = (block) => {
   form.addEventListener('change', async (e) => {
     if (e.target.type === 'checkbox') {
       captureInputsIntoQueryObject(e.target);
-      await fetchAndRender(queryObject, form);
+      await fetchAndRenderFilters(queryObject, form);
     }
   });
 
@@ -190,7 +192,7 @@ const setFormListeners = (block) => {
 
       queryObject.dynamicFilters = [];
       updateGlobalQueryObject('query-params', queryObject);
-      await fetchAndRender(queryObject, form);
+      await fetchAndRenderFilters(queryObject, form);
     });
   }
 };
