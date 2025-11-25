@@ -1,4 +1,4 @@
-import { createElement } from '../../scripts/common.js';
+import { createElement, getLocaleContextedUrl } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 import { subcategorySearch } from '../../scripts/graphql-api.js';
 
@@ -6,6 +6,10 @@ const searchType = 'parts';
 let queryObject;
 let products;
 const amount = 12;
+
+function get404PageUrl() {
+  return getLocaleContextedUrl('/404.html');
+}
 
 const setCountAndAmount = (count) => {
   const countAndAmount = {
@@ -19,24 +23,31 @@ const setCountAndAmount = (count) => {
 };
 
 const updateProductList = async (wrapper) => {
-  queryObject = JSON.parse(sessionStorage.getItem('query-params'));
-  const filteredQueryResult = await subcategorySearch(queryObject);
+  try {
+    queryObject = JSON.parse(sessionStorage.getItem('query-params'));
+    const filteredQueryResult = await subcategorySearch(queryObject);
 
-  setCountAndAmount(filteredQueryResult.count);
+    if (filteredQueryResult.items.length === 0) throw new Error('No items retrieved with current URL');
 
-  products = filteredQueryResult.items.map((item) => item.metadata);
+    setCountAndAmount(filteredQueryResult.count);
 
-  if (wrapper.hasChildNodes()) {
-    wrapper.replaceChildren();
+    products = filteredQueryResult.items.map((item) => item.metadata);
+
+    if (wrapper.hasChildNodes()) {
+      wrapper.replaceChildren();
+    }
+
+    products.forEach((prod, idx) => {
+      const productItem = productCard(prod, searchType);
+      if (idx >= amount) productItem.classList.add('hidden');
+      wrapper.appendChild(productItem);
+    });
+
+    return wrapper;
+  } catch (err) {
+    console.log('%cError fetching items', 'color:red;background-color:aliceblue', err);
+    window.location.href = get404PageUrl();
   }
-
-  products.forEach((prod, idx) => {
-    const productItem = productCard(prod, searchType);
-    if (idx >= amount) productItem.classList.add('hidden');
-    wrapper.appendChild(productItem);
-  });
-
-  return wrapper;
 };
 
 const renderBlock = async (block) => {
