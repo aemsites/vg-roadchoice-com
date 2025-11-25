@@ -31,9 +31,13 @@ const productCard = (product, searchType) => {
   const { category, name, partNumber, hasImage, imgUrl } = object;
 
   const item = createElement('li', { classes: blockName });
+
+  const isLocal = location.origin.startsWith('http://localhost');
   const safeCategory = category.replace(/[^\w]/g, '-').toLowerCase();
-  const safePartNumber = encodeURIComponent(partNumber);
-  const linkUrl = getLocaleContextedUrl(`/parts/${safeCategory}/${safePartNumber}/`);
+  const safePart = encodeURIComponent(partNumber);
+  const legacyUrl = `/parts?category=${safeCategory}&sku=${safePart}`;
+  const cleanUrl = `/parts/${safeCategory}/${safePart}/`;
+  const linkUrl = getLocaleContextedUrl(isLocal ? legacyUrl : cleanUrl);
 
   const imageLink = createElement('a', { classes: 'image-link', props: { href: linkUrl } });
 
