@@ -1,3 +1,4 @@
+// Determines if the current environment is 'localhost'
 const isLocalhost = window.location.host.includes('localhost');
 
 /* Cases that throw an error if the category is wrong or missing that goes to 404 page:
@@ -36,12 +37,32 @@ export const getCategory = () => {
 };
 
 /**
- * Transforms an array of facet objects into a single object where:
- * - The field_name becomes the key.
- * - The value is an array of objects, each containing the facet's key and its doc_count.
+ * Transforms an array of facet objects into a standardized, flattened key-value
+ * object map for easier consumption.
  *
- * @param {Array<Object>} facetArray - The input array of facet objects (e.g., from an API response).
- * @returns {Object} The transformed object with the format: { "field_name": [{ key: string, doc_count: number }, ...] }.
+ * @param {Array<Object>} facetArray - The array of facet objects received from an API response (e.g., Elasticsearch).
+ * @returns {Object<string, Array<Object>>} An accumulator object where keys are the `field_name`s,
+ * and values are arrays containing objects with `key` and `doc_count`.
+ *
+ * @example
+ * // Input:
+ * // [
+ * //   {
+ * //     field_name: "Pair",
+ * //     facets: [
+ * //       { key: "Yes", doc_count: 50 },
+ * //       { key: "No", doc_count: 35 }
+ * //     ]
+ * //   }
+ * // ]
+ *
+ * // Output:
+ * // {
+ * //   "Pair": [
+ * //     { key: "Yes", doc_count: 50 },
+ * //     { key: "No", doc_count: 35 }
+ * //   ]
+ * // }
  */
 export const transformFacets = (facetArray) => {
   return facetArray.reduce((accumulator, currentItem) => {
@@ -59,21 +80,47 @@ export const transformFacets = (facetArray) => {
 };
 
 /**
- * Converts the object into a query string URL.
+ * Converts a filter object containing dynamic filter parameters into a URL string,
+ * correctly encoding filter fields and values.
  *
- * The strategy is:
- * 1. facetFields are joined by a pipe (|) and stored under the 'facetFields' key.
- * 2. dynamicFilters are converted into individual parameters starting with 'df_' + FieldName.
- * The FieldName and all values are URL-encoded to handle special characters (like '&', '(', ' ').
- * @param {Object} obj The input object with facetFields and dynamicFilters.
- * @returns {string} The constructed URL.
+ * The function constructs the base URL using the current window location pathname
+ * and handles the inclusion of the subcategory parameters.
+ *
+ * @param {object} obj - The object containing filter parameters to convert to URL parameters.
+ * @param {Array<Object>} obj.dynamicFilters - An array of dynamic filters to be converted into query parameters.
+ * @param {string} obj.dynamicFilters[].fieldName - The name of the filter field (e.g., 'size', 'color').
+ * @param {Array<string>} obj.dynamicFilters[].filterValue - An array of selected values for the field.
+ * @returns {string} The complete URL string with encoded parameters.
+ *
+ * @requires getCategory - Assumes a globally available function to retrieve the subcategory string.
+ * @global isLocalhost - Assumes a global boolean variable that determines the application's environment.
+ *
+ * @example
+ * // Assuming:
+ * // getCategory() returns 'jacks'
+ * // window.location.pathname is '/part-category'
+ *
+ * const filterObj = {
+ * dynamicFilters: [
+ * { fieldName: 'Pair', filterValue: ['No'] },
+ * { fieldName: 'Lift Height (in)', filterValue: ['10.32'] }
+ * ]
+ * };
+ *
+ * // if isLocalhost is false
+ * objectToUrl(filterObj);
+ * // Returns: '/part-category/jacks?df_Pair=No&df_Lift%20Height%20(in)=10.32'
+ *
+ * // if isLocalhost is true
+ * objectToUrl(filterObj);
+ * // Returns: '/part-category/?category=jacks&df_Pair=No&df_Lift%20Height%20(in)=10.32'
  */
 export const objectToUrl = (obj) => {
   const params = [];
 
-  const subcategory = getCategory();
+  const metaCategory = getCategory();
 
-  const subcatParam = isLocalhost ? `?category=${subcategory}&` : '?';
+  const subcatParam = isLocalhost ? `?category=${metaCategory}&` : '?';
   const base = window.location.pathname + subcatParam;
 
   if (obj.dynamicFilters && obj.dynamicFilters.length > 0) {
@@ -91,7 +138,7 @@ export const objectToUrl = (obj) => {
 
   let finalUrl = base + params.join('&');
 
-  // Remove & if no filter is selected
+  // Remove trialing '&' or '?' if no filter is selected
   if (obj.dynamicFilters.length === 0) {
     finalUrl = finalUrl.slice(0, -1);
   }
@@ -100,12 +147,30 @@ export const objectToUrl = (obj) => {
 };
 
 /**
- * Reconstructs the original object from a query string URL.
+ * Parses a full URL string, extracts specific URL search parameters prefixed with 'df_'
+ * (dynamicFilters), and transforms them back into an object.
  *
- * This function reverses the encoding strategy used in objectToUrl.
- * It uses URLSearchParams to extract parameters and then rebuilds the structure.
- * @param {string} url The URL containing the encoded object data.
- * @returns {Object} The reconstructed object.
+ * This function is the inverse of `objectToUrl`. It correctly decodes field names and
+ * comma-separated filter values from the URL query string.
+ *
+ * @param {string} url - The complete URL string containing dynamic filter parameters (e.g., 'https://example.com/products?df_Brand=Sony%2CLG&df_Price=Low').
+ * @returns {object} An object containing the extracted dynamic filters.
+ * @returns {Array<Object>} return.dynamicFilters - An array of dynamic filter objects.
+ * @returns {string} return.dynamicFilters[].fieldName - The decoded name of the filter field (e.g., 'Brand').
+ * @returns {Array<string>} return.dynamicFilters[].filterValue - An array of decoded selected values for the field (e.g., ['Sony', 'LG']).
+ *
+ * @example
+ * // Input URL:
+ * const url = '/part-category/jacks?df_Pair=No&df_Lift%20Height%20(in)=10.32';
+ *
+ * urlToObject(url);
+ * // Output:
+ * // {
+ * //   dynamicFilters: [
+ * //     { fieldName: 'Pair', filterValue: ['No'] },
+ * //     { fieldName: 'Lifth Height (in)', filterValue: ['10.32'] }
+ * //   ]
+ * // }
  */
 export const urlToObject = (url) => {
   let urlObject;
@@ -139,10 +204,18 @@ export const urlToObject = (url) => {
 };
 
 /**
- * Updates the global query object in session storage, the url and triggers an event captured
- * by the product list component
- * @param {string} key - The key to store the data under.
- * @param {object} newObject - The entire object to save.
+ * Updates global 'queryObject', performing three tasks:
+ * 1. Stores the new query object in `sessionStorage` under the given key.
+ * 2. Dispatches a 'QueryUpdated' custom event so other components can react to the change.
+ * 3. Generates a new URL based on the object and updates the browser's history
+ * without a page reload.
+ *
+ * @param {string} key - The key under which the object will be stored in sessionStorage.
+ * @param {object} newObject - The new query object containing parameters (e.g., dynamicFilters, facetFields).
+ * @returns {void}
+ *
+ * @fires QueryUpdated - A CustomEvent dispatched on the document, carrying the `newObject` in its `detail` property.
+ * @requires objectToUrl - Function used to convert the query object into a URL query string.
  */
 export const updateGlobalQueryObject = (key, newObject) => {
   try {

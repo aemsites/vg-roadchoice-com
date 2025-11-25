@@ -7,6 +7,7 @@ let hasMoreItems;
 let currentAmount;
 let currentPage = 1;
 
+// reset all values when the query is updated
 const resetValues = () => {
   firstPass = true;
   hasMoreItems;
@@ -86,6 +87,7 @@ const renderBlock = async (block, countAndAmount) => {
 };
 
 export default async function decorate(block) {
+  // once the event is captured, render the block with the updated amounts
   document.addEventListener('CountReady', (e) => {
     const countAndAmount = e.detail;
     renderBlock(block, countAndAmount);

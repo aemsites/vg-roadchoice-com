@@ -11,6 +11,10 @@ function get404PageUrl() {
   return getLocaleContextedUrl('/404.html');
 }
 
+// Dispatches an event to be captured by the category-pagination block with:
+// amount: products to be shown
+// count: total items retrieved
+// pages: number of pages to be shown
 const setCountAndAmount = (count) => {
   const countAndAmount = {
     count,
@@ -22,7 +26,8 @@ const setCountAndAmount = (count) => {
   document.dispatchEvent(event);
 };
 
-const updateProductList = async (wrapper) => {
+// fetches the items with the updated query and replaces the product list with the new products
+const fetchAndUpdateProductList = async (wrapper) => {
   try {
     queryObject = JSON.parse(sessionStorage.getItem('query-params'));
     const filteredQueryResult = await subcategorySearch(queryObject);
@@ -54,7 +59,7 @@ const renderBlock = async (block) => {
   const resultsWrapper = createElement('div', { classes: 'results-wrapper' });
   const productList = createElement('ul', { classes: 'category-results-list' });
 
-  await updateProductList(productList);
+  await fetchAndUpdateProductList(productList);
 
   resultsWrapper.append(productList);
   block.append(resultsWrapper);
@@ -63,8 +68,9 @@ const renderBlock = async (block) => {
 export default async function decorate(block) {
   await renderBlock(block);
 
+  // when the global query object gets updated, the products list gets re-rendered
   document.addEventListener('QueryUpdated', async (e) => {
     queryObject = e.detail;
-    await updateProductList(block);
+    await fetchAndUpdateProductList(block);
   });
 }

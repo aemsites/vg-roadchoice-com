@@ -10,9 +10,6 @@ import {
 } from '../../scripts/common.js';
 import { getCategory, urlToObject, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
-let category;
-let mainCategory;
-
 function get404PageUrl() {
   return getLocaleContextedUrl('/404.html');
 }
@@ -43,14 +40,19 @@ const getFilterAttrib = async (subcategory) => {
 };
 
 /**
- * Loads product data for the given category and updates internal state and sessionStorage.
- * If the data file does not exist or contains no products, the state is reset and an empty array is returned.
+ * Determines the appropriate facet fields (filters) for a category query
+ * and updates the global application state with the final query object.
  *
- * @param {string} cat - The category name.
- * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
- * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
+ * This function handles fetching default facet fields if none are provided
+ * and redirects the user to a 404 page if an error occurs during the process.
+ * Note: The function currently returns undefined (return;) on success.
+ *
+ * @async
+ * @param {object} queryObject - The incoming query parameters and configuration.
+ * @returns {Promise<void>} A Promise that resolves when the operation is complete.
+ * Note: It returns nothing (void) on successful execution but updates the global state.
  */
-const getCategoryData = async (queryObject) => {
+const initializeCategoryQuery = async (queryObject) => {
   const { category, subcategory, facetFields, dynamicFilters } = queryObject;
 
   let fieldsToUse;
@@ -143,13 +145,13 @@ function updateMetadata(category) {
 }
 
 export default async function decorate(doc) {
-  category = getCategory();
-  if (!category) {
+  const metaSubcategory = getCategory();
+  if (!metaSubcategory) {
     console.log('No category provided — assuming this is the category template');
     return;
   }
-  setCanonicalUrl(category);
-  updateMetadata(category);
+  setCanonicalUrl(metaSubcategory);
+  updateMetadata(metaSubcategory);
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
@@ -164,15 +166,16 @@ export default async function decorate(doc) {
   resetCategoryData();
 
   const allCategories = await fetchCategories();
-  const categoryObject = getCategoryObject(allCategories, category);
-  mainCategory = categoryObject.category;
+  const categoryObject = getCategoryObject(allCategories, metaSubcategory);
+
+  const { category, subcategory } = categoryObject;
 
   const sanitizedUrl = new URL(window.location.href);
   const filtersFromUrl = urlToObject(sanitizedUrl.href);
 
   const completeQueryObject = { ...filtersFromUrl, ...categoryObject };
 
-  await getCategoryData(completeQueryObject);
+  await initializeCategoryQuery(completeQueryObject);
   updateTitleWithSubcategory(title, category, categoryObject.subcategory);
 
   // Update breadcrumb dynamically once the block is loaded
@@ -193,14 +196,14 @@ export default async function decorate(doc) {
 
       let index = breadcrumbList.children.length;
 
-      // If mainCategory is present, add it before the final category
-      if (mainCategory) {
-        const mainSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
+      // If category is present, add it before the final category
+      if (category) {
+        const mainSlug = category.toLowerCase().replace(/\s/g, '-');
         const mainLink = createElement('a', {
           classes: 'breadcrumb-link',
           props: { href: getLocaleContextedUrl(`/part-category/${mainSlug}`) },
         });
-        mainLink.textContent = mainCategory;
+        mainLink.textContent = category;
 
         const mainItem = createElement('li', {
           classes: ['breadcrumb-item', `breadcrumb-item-${index}`],
@@ -210,10 +213,10 @@ export default async function decorate(doc) {
         index += 1;
       }
 
-      // Add final category (the one from the URL)
+      // Add final subcategory (the one from the URL)
       const finalLink = createElement('a', {
         classes: 'breadcrumb-link active-link',
-        props: { href: getLocaleContextedUrl(`/part-category/${category}`) },
+        props: { href: getLocaleContextedUrl(`/part-category/${subcategory}`) },
       });
       finalLink.textContent = title.textContent;
 
