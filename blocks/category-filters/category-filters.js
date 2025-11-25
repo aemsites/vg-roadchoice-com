@@ -94,11 +94,11 @@ const renderFilters = (filters, wrapper) => {
     clearBtn.disabled = isClearBtnEnabled();
 
     const attributes = [...facetFieldsAggregated[key]];
+    // if no attribute is present for the filter then no need to add it
+    if (attributes.length === 0) return;
+
     attributes.forEach((el) => {
       const { key: value, doc_count: count } = el;
-      if (count === 0) {
-        filterItem.classList.add('hidden');
-      }
       const filterOption = createElement('li', { classes: `${blockName}-option` });
       const inputId = `${key ? key.replace(' ', '_') : null}<&>${value ? value.replace(' ', '_') : null}`;
       const filterInput = createElement('input', {
