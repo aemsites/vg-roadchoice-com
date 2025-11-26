@@ -6,6 +6,7 @@ import {
   DEFAULT_LIMIT,
   getLocaleContextedUrl,
   setOrCreateMetadata,
+  isLocalhost,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 import { fetchArticlesAndFacets, fetchPdpProduct } from '../../scripts/graphql-api.js';
@@ -81,9 +82,7 @@ function getPathParams() {
 }
 
 function getResolvedParams() {
-  const isLocal = location.hostname === 'localhost';
-
-  if (isLocal) {
+  if (isLocalhost()) {
     const params = new URLSearchParams(window.location.search);
     return {
       category: params.get('category') || '',
@@ -563,7 +562,7 @@ function renderBreadcrumbs(part) {
   const locale = getMetadata('locale')?.toLowerCase();
   const isLocalizedMarket = ['en-ca', 'fr-ca'].includes(locale);
   const prefix = isLocalizedMarket ? `/${locale}` : '';
-  const isLocal = location.hostname === 'localhost';
+  const isLocal = isLocalhost();
   const categorySlug = (part.category || '').toLowerCase().replace(/[^\w]/g, '-');
   const subcategorySlug = (part.subcategory || '').toLowerCase().replace(/[^\w]/g, '-');
   const categoryHref = isLocal ? `/part-category/${categorySlug}` : `${prefix}/part-category/${categorySlug}`;

@@ -1,4 +1,4 @@
-import { getTextLabel, createElement, getLocaleContextedUrl } from '../../scripts/common.js';
+import { getTextLabel, createElement, getLocaleContextedUrl, isLocalhost } from '../../scripts/common.js';
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
 const blockName = 'product-card';
@@ -32,7 +32,7 @@ const productCard = (product, searchType) => {
 
   const item = createElement('li', { classes: blockName });
 
-  const isLocal = location.origin.startsWith('http://localhost');
+  const isLocal = isLocalhost();
   const safeCategory = category.replace(/[^\w]/g, '-').toLowerCase();
   const safePart = encodeURIComponent(partNumber);
   const legacyUrl = `/parts?category=${safeCategory}&sku=${safePart}`;
