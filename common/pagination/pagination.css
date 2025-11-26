@@ -1,0 +1,146 @@
+.pagination-nav {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 1200px) {
+  .pagination-nav {
+    margin-top: 20px;
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0;
+  list-style: none;
+  margin: 0;
+}
+
+.pagination-item {
+  display: flex;
+  align-items: center;
+}
+
+.pagination-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--secondary-gray-3);
+  width: 32px;
+  height: 32px;
+}
+
+.pagination-button:hover {
+  background-color: rgb(20 20 20 / 4%);
+}
+
+.pagination-button.active {
+  background-color: var(--primary-red);
+  color: var(--primary-white);
+}
+
+.pagination-button.active:hover {
+  background-color: var(--secondary-red);
+}
+
+.pagination-arrow {
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--primary-black);
+}
+
+.pagination-arrow .icon {
+  display: flex;
+}
+
+.pagination-arrow .icon svg {
+  fill: currentcolor;
+  height: 1em;
+  width: 1em;
+}
+
+.pagination-arrow.prev {
+  margin-right: 11px;
+}
+
+.pagination-arrow.next {
+  margin-left: 11px;
+}
+
+.pagination-arrow:hover {
+  color: var(--primary-black);
+}
+
+.pagination-arrow:disabled {
+  background-color: transparent;
+  color: var(--secondary-gray-1);
+  cursor: not-allowed;
+}
+
+.pagination-arrow:disabled:hover {
+  background-color: transparent;
+  color: var(--secondary-gray-1);
+  cursor: not-allowed;
+}
+
+.pagination-arrow:not([disabled]):hover {
+  background-color: rgb(20 20 20 / 4%);
+}
+
+.pagination-dots {
+  cursor: not-allowed;
+  font-size: 14px;
+  padding: 0 10px;
+  color: var(--secondary-dark-gray);
+}
+
+.section--black-background {
+  /* stylelint-disable-next-line no-descending-specificity */
+  .pagination-arrow {
+    color: var(--secondary-light-gray);
+  }
+
+  .pagination-arrow:disabled {
+    color: #6b6b6b;
+  }
+
+  .pagination-arrow:not([disabled]):hover {
+    background-color: var(--secondary-gray-2);
+  }
+
+  .pagination-button {
+    color: var(--secondary-light-gray);
+  }
+
+  .pagination-button.active {
+    background-color: var(--c-white);
+    color: var(--c-main-black);
+  }
+
+  .pagination-button.active:hover {
+    background-color: var(--secondary-gray-3);
+  }
+
+  .pagination-button:hover {
+    background-color: var(--secondary-gray-2);
+  }
+
+  .pagination-dots {
+    color: var(--secondary-light-gray);
+  }
+}

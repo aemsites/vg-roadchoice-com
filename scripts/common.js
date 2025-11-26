@@ -7,6 +7,15 @@ const DEFAULT_LIMIT = 100_000;
 
 let placeholders = null;
 
+/**
+ * Returns the true origin of the current page in the browser.
+ * If the page is running in a iframe with srcdoc, the ancestor origin is returned.
+ * @returns {String} The true origin
+ */
+export function getOrigin() {
+  return window.location.href === 'about:srcdoc' ? window.parent.location.origin : window.location.origin;
+}
+
 /** Gets the language of the page from the HTML lang attribute or metadata tag.
  * @returns {string|null} The language code, or null if not found.
  */
@@ -53,6 +62,19 @@ function getTextLabel(key) {
 const getLocale = () => getMetadata('locale') || 'en-us';
 
 /**
+ * Function that recieves a timestamp in seconds and returns a date
+ * in its locale's format. Defaults to US format date (MM/DD/YYYY)
+ * @param {string} timestamp The date in seconds as a string
+ * @param {object} options The date options obj for a specific format
+ */
+export const getDateFromTimestamp = (timestamp, options) => {
+  const date = new Date(timestamp * 1000 + new Date().getTimezoneOffset() * 60000);
+  const localeDate = Intl.DateTimeFormat(getLocale(), options).format(date);
+
+  return localeDate;
+};
+
+/**
  * Create an element with the given id and classes.
  * @param {string} tagName the tag
  * @param {Object} options the element options
@@ -87,6 +109,81 @@ function createElement(tagName, options = {}) {
   }
 
   return elem;
+}
+
+const ICONS_CACHE = {};
+/**
+ * Replace icons with inline SVG and prefix with codeBasePath.
+ * @param {Element} [element] Element containing icons
+ */
+export async function decorateIcons(element) {
+  // Prepare the inline sprite
+  let svgSprite = document.getElementById('franklin-svg-sprite');
+  if (!svgSprite) {
+    const div = document.createElement('div');
+    div.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" id="franklin-svg-sprite" style="display: none"></svg>';
+    svgSprite = div.firstElementChild;
+    document.body.append(div.firstElementChild);
+  }
+
+  // Download all new icons
+  const icons = [...element.querySelectorAll('span.icon')];
+  await Promise.all(
+    icons.map(async (span) => {
+      const iconName = Array.from(span.classList)
+        .find((c) => c.startsWith('icon-'))
+        .substring(5);
+      if (!ICONS_CACHE[iconName]) {
+        ICONS_CACHE[iconName] = true;
+        try {
+          console.log(`${window.hlx.codeBasePath}/icons/${iconName}.svg`);
+          const response = await fetch(`${window.hlx.codeBasePath}/icons/${iconName}.svg`);
+          if (!response.ok) {
+            ICONS_CACHE[iconName] = false;
+            return;
+          }
+          // Styled icons don't play nice with the sprite approach because of shadow dom isolation
+          const svg = await response.text();
+          if (svg.match(/(<style | class=)/)) {
+            ICONS_CACHE[iconName] = { styled: true, html: svg };
+          } else {
+            ICONS_CACHE[iconName] = {
+              html: svg
+                .replace('<svg', `<symbol id="icons-sprite-${iconName}"`)
+                .replace(/ width=".*?"/, '')
+                .replace(/ height=".*?"/, '')
+                .replace('</svg>', '</symbol>'),
+            };
+          }
+        } catch (error) {
+          ICONS_CACHE[iconName] = false;
+
+          console.error(error);
+        }
+      }
+    }),
+  );
+
+  const symbols = Object.keys(ICONS_CACHE)
+    .filter((k) => !svgSprite.querySelector(`#icons-sprite-${k}`))
+    .map((k) => ICONS_CACHE[k])
+    .filter((v) => !v.styled)
+    .map((v) => v.html)
+    .join('\n');
+  svgSprite.innerHTML += symbols;
+
+  icons.forEach((span) => {
+    const iconName = Array.from(span.classList)
+      .find((c) => c.startsWith('icon-'))
+      .substring(5);
+    const parent = span.firstElementChild?.tagName === 'A' ? span.firstElementChild : span;
+    // Styled icons need to be inlined as-is, while unstyled ones can leverage the sprite
+    if (ICONS_CACHE[iconName].styled) {
+      parent.innerHTML = ICONS_CACHE[iconName].html;
+    } else {
+      parent.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg"><use href="#icons-sprite-${iconName}"/></svg>`;
+    }
+  });
 }
 
 /**

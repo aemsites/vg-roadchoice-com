@@ -170,6 +170,10 @@
     {
       "Key": "v2_newsletter:success_text",
       "Text": "We’ll be sending you all the latest Road Choice info"
+    },
+    {
+      "Key": "press_releases:search_placeholder",
+      "Text": "Search for..."
     }
   ],
   ":type": "sheet"

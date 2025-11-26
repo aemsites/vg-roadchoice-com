@@ -407,3 +407,60 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
 
   return result;
 }
+
+export async function searchArticles({ q, sort = 'PUBLISH_DATE_DESC', limit = 100, offset = 0 }) {
+  const { SEARCH_URL_DEV, RC_BLOG_SEARCH, TENANT } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${RC_BLOG_SEARCH}($q: String!, $tenant: RcTenantEnum!, $language: RcLocaleEnum!, $limit: Int, $category: [String], $facets: [RcBlogsFieldEnum], $offset: Int, $tags: [String], $sort: RcBlogsSortOptionsEnum) {
+        ${RC_BLOG_SEARCH}(q: $q, tenant: $tenant, language: $language, limit: $limit, category: $category, facets: $facets, offset: $offset, tags: $tags, sort: $sort) {
+          count
+          items {
+            uuid
+            metadata {
+              title
+              description
+              url
+              lastModified
+              language
+              category
+              tags
+              publishDate
+              image
+            }
+            score
+          }
+          facets {
+            field
+            items {
+              value
+              count
+            }
+          }
+          numberOfPages
+          currentPage
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      q,
+      limit,
+      offset,
+      sort,
+      language: getPageLanguage() || 'EN',
+    },
+  };
+
+  console.log(graphqlQuery.variables);
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+  if (error) return { results: [], error };
+
+  const { items } = data.data[RC_BLOG_SEARCH];
+
+  const articles = items.map((item) => item.metadata);
+  console.log(articles);
+
+  return { articles };
+}
