@@ -81,7 +81,7 @@ function getPathParams() {
 }
 
 function getResolvedParams() {
-  const isLocal = location.origin.startsWith('http://localhost');
+  const isLocal = location.hostname === 'localhost';
 
   if (isLocal) {
     const params = new URLSearchParams(window.location.search);
@@ -562,7 +562,7 @@ function renderBreadcrumbs(part) {
   const locale = getMetadata('locale')?.toLowerCase();
   const isLocalizedMarket = ['en-ca', 'fr-ca'].includes(locale);
   const prefix = isLocalizedMarket ? `/${locale}` : '';
-  const isLocal = location.origin.startsWith('http://localhost');
+  const isLocal = location.hostname === 'localhost';
   const categorySlug = (part.category || '').toLowerCase().replace(/[^\w]/g, '-');
   const subcategorySlug = (part.subcategory || '').toLowerCase().replace(/[^\w]/g, '-');
   const categoryHref = isLocal ? `/part-category/${categorySlug}` : `${prefix}/part-category/${categorySlug}`;
