@@ -37,7 +37,7 @@ function mapGraphQLProductToPart(product, categoryKeys) {
   attributeLabels.forEach((label) => {
     if (label.toLowerCase() === 'description') return; // prevent duplicate
     const value = dynamic[label];
-    if (value !== undefined && value !== null && String(value).length > 0) {
+    if (value != null && value !== '') {
       attributes[label] = value;
     }
   });
@@ -123,15 +123,16 @@ async function fetchPartImages(sku) {
 
 function renderColDetails(part, block, categoryKeys) {
   const list = block.querySelector(`.${blockName}-list`);
-  if (!list || !Array.isArray(categoryKeys)) return;
+  if (!list) return;
 
   const attributes = part.attributes || {};
+  const keys = Array.isArray(categoryKeys) ? categoryKeys : [];
 
-  categoryKeys.forEach((item) => {
+  keys.forEach((item) => {
     const label = item.Attributes;
     const value = attributes[label];
 
-    if (!label || value === undefined || value === null || String(value).length === 0) return;
+    if (!label || value == null || value === '') return;
 
     const liFragment = docRange.createContextualFragment(`
       <li class="${blockName}-list-item">
@@ -148,7 +149,7 @@ function renderImages(block, images) {
   const selectedImage = block.querySelector(`.${blockName}-selected-image`);
 
   if (!images || !images.length) return;
-
+  // main image
   const mainPictureUrl = images[0]['Image URL'];
   const mainPicture = createOptimizedPicture(mainPictureUrl, 'Part image', true, undefined, !mainPictureUrl.startsWith('/'));
   mainPicture.querySelector('img').classList.add(`${blockName}-image`);
