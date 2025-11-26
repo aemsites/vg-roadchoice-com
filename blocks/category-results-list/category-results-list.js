@@ -1,29 +1,31 @@
-import { createElement, getLocaleContextedUrl } from '../../scripts/common.js';
+import { createElement, getLocaleContextedUrl, isLocalhost } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 import { subcategorySearch } from '../../scripts/graphql-api.js';
+import { triggerCustomEventWithPayload } from '../../scripts/services/part-category.service.js';
 
 const searchType = 'parts';
 let queryObject;
 let products;
-const amount = 12;
+const productsPerPage = 12;
 
 function get404PageUrl() {
-  return getLocaleContextedUrl('/404.html');
+  if (!isLocalhost) {
+    return getLocaleContextedUrl('/404.html');
+  }
 }
 
 // Dispatches an event to be captured by the category-pagination block with:
-// amount: products to be shown
-// count: total items retrieved
-// pages: number of pages to be shown
-const setCountAndAmount = (count) => {
-  const countAndAmount = {
-    count,
-    amount,
-    pages: Math.ceil(count / amount),
+// productsPerPage: products to be shown per page
+// productCount: total amount of products retrieved
+// totalPages: total number of pages
+const setPaginationData = (productCount) => {
+  const paginationData = {
+    productCount,
+    productsPerPage,
+    totalPages: Math.ceil(productCount / productsPerPage),
   };
 
-  const event = new CustomEvent('CountReady', { detail: countAndAmount });
-  document.dispatchEvent(event);
+  triggerCustomEventWithPayload('CountReady', paginationData);
 };
 
 // fetches the items with the updated query and replaces the product list with the new products
@@ -34,7 +36,7 @@ const fetchAndUpdateProductList = async (wrapper) => {
 
     if (filteredQueryResult.items.length === 0) throw new Error('No items retrieved with current URL');
 
-    setCountAndAmount(filteredQueryResult.count);
+    setPaginationData(filteredQueryResult.count);
 
     products = filteredQueryResult.items.map((item) => item.metadata);
 
@@ -44,7 +46,7 @@ const fetchAndUpdateProductList = async (wrapper) => {
 
     products.forEach((prod, idx) => {
       const productItem = productCard(prod, searchType);
-      if (idx >= amount) productItem.classList.add('hidden');
+      if (idx >= productsPerPage) productItem.classList.add('hidden');
       wrapper.appendChild(productItem);
     });
 

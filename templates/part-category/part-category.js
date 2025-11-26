@@ -7,11 +7,14 @@ import {
   setOrCreateMetadata,
   getTextLabel,
   getCategoryObject,
+  isLocalhost,
 } from '../../scripts/common.js';
-import { getCategory, urlToObject, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
+import { getCategory, urlToQueryObject, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 function get404PageUrl() {
-  return getLocaleContextedUrl('/404.html');
+  if (!isLocalhost) {
+    return getLocaleContextedUrl('/404.html');
+  }
 }
 
 /**
@@ -23,6 +26,7 @@ function get404PageUrl() {
  */
 const getFilterAttrib = async (subcategory) => {
   try {
+    // TODO change this for graphQL endpoint when available and remove DEFAULT_LIMIT
     const filtersJson = await getLongJSONData({
       url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
       limit: DEFAULT_LIMIT,
@@ -171,7 +175,7 @@ export default async function decorate(doc) {
   const { category, subcategory } = categoryObject;
 
   const sanitizedUrl = new URL(window.location.href);
-  const filtersFromUrl = urlToObject(sanitizedUrl.href);
+  const filtersFromUrl = urlToQueryObject(sanitizedUrl.href);
 
   const completeQueryObject = { ...filtersFromUrl, ...categoryObject };
 

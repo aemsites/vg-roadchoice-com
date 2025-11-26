@@ -2,65 +2,66 @@ import { createElement, getTextLabel } from '../../scripts/common.js';
 
 const paginationText = getTextLabel('pagination_text');
 const buttonText = getTextLabel('pagination_button');
-let firstPass = true;
+let isFirstRenderPass = true;
 let hasMoreItems;
-let currentAmount;
+let currentDisplayedProds;
 let currentPage = 1;
 
-// reset all values when the query is updated
-const resetValues = () => {
-  firstPass = true;
+// Set all global values to initial state whenever the query is updated
+const setValuesToInitialState = () => {
+  isFirstRenderPass = true;
   hasMoreItems;
-  currentAmount;
+  currentDisplayedProds;
   currentPage = 1;
 };
 
-const handleShowMore = (buttons, countAndAmount) => {
-  const { count, amount, pages } = countAndAmount;
+const showMoreProducts = (productSection, productsToBeShown) => {
+  const productCards = productSection.querySelectorAll('.category-results-list .product-card.hidden');
+  productCards.forEach((card, idx) => {
+    if (idx < productsToBeShown) {
+      card.classList.remove('hidden');
+    }
+  });
+};
+
+const updatePaginationText = (paginationSection, visibleProducts) => {
+  paginationSection.querySelector('.category-pagination .text-wrapper p').textContent = paginationText.replace('[$]', visibleProducts);
+};
+
+const handleShowMore = (buttons, paginationData) => {
+  const { productCount, productsPerPage, totalPages } = paginationData;
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const activeSection = btn.closest('.category-filters-container');
 
-      //check button visibility
       currentPage++;
-      if (currentPage >= pages) {
-        buttons.forEach((btn) => btn.remove());
-      }
+      if (currentPage >= totalPages) buttons.forEach((btn) => btn.remove());
 
-      //update pagination text
-      const textNode = activeSection.querySelector('.category-pagination .text-wrapper p');
-      const visibleProductsNumber = currentAmount + amount >= count ? count : currentAmount + amount;
-      currentAmount = currentAmount + amount;
+      const visibleProductsNumber = currentDisplayedProds + productsPerPage >= productCount ? productCount : currentDisplayedProds + productsPerPage;
+      currentDisplayedProds = currentDisplayedProds + productsPerPage;
 
-      textNode.textContent = paginationText.replace('[$]', visibleProductsNumber);
-
-      // show cards
-      const productCards = activeSection.querySelectorAll('.category-results-list .product-card.hidden');
-      productCards.forEach((card, idx) => {
-        if (idx < amount) {
-          card.classList.remove('hidden');
-        }
-      });
+      updatePaginationText(activeSection, visibleProductsNumber);
+      showMoreProducts(activeSection, productsPerPage);
     });
   });
 };
 
-const renderBlock = async (block, countAndAmount) => {
-  const { count, amount } = countAndAmount;
+const renderBlock = async (block, paginationData) => {
+  const { productCount, productsPerPage } = paginationData;
 
-  hasMoreItems = count > amount;
-  currentAmount = hasMoreItems ? amount : count;
+  hasMoreItems = productCount > productsPerPage;
+  currentDisplayedProds = hasMoreItems ? productsPerPage : productCount;
 
-  if (!firstPass) {
+  if (!isFirstRenderPass) {
     block.querySelector('.text-wrapper p').remove();
   }
 
   const textWrapper = createElement('div', { classes: 'text-wrapper' });
   const text = createElement('p', { classes: 'text' });
-  text.textContent = paginationText.replace('[$]', currentAmount);
+  text.textContent = paginationText.replace('[$]', currentDisplayedProds);
 
-  const container = document.querySelector('.category-filters-container');
-  const hasOldButtons = container.querySelectorAll('.more-button');
+  const filtersContainer = document.querySelector('.category-filters-container');
+  const hasOldButtons = filtersContainer.querySelectorAll('.more-button');
 
   if (hasOldButtons) {
     hasOldButtons.forEach((btn) => btn.remove());
@@ -71,28 +72,29 @@ const renderBlock = async (block, countAndAmount) => {
     topMoreBtn.textContent = buttonText;
     const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
     bottomMoreBtn.textContent = buttonText;
-    const resultsListBlock = container.querySelector('.category-results-list.block');
+    const resultsListBlock = filtersContainer.querySelector('.category-results-list.block');
 
     resultsListBlock.insertAdjacentElement('afterend', bottomMoreBtn);
     textWrapper.append(topMoreBtn);
     const buttons = [topMoreBtn, bottomMoreBtn];
 
-    handleShowMore(buttons, countAndAmount);
+    handleShowMore(buttons, paginationData);
   }
 
   textWrapper.prepend(text);
   block.append(textWrapper);
 
-  firstPass = false;
+  isFirstRenderPass = false;
 };
 
 export default async function decorate(block) {
-  // once the event is captured, render the block with the updated amounts
+  // once the event is captured, render the block with the updated amounts of products
   document.addEventListener('CountReady', (e) => {
-    const countAndAmount = e.detail;
-    renderBlock(block, countAndAmount);
-    if (firstPass) {
-      resetValues();
+    console.log('test');
+    const paginationData = e.detail;
+    renderBlock(block, paginationData);
+    if (isFirstRenderPass) {
+      setValuesToInitialState();
     }
   });
 }

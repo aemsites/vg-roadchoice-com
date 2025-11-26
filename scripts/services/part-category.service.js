@@ -1,5 +1,4 @@
-// Determines if the current environment is 'localhost'
-const isLocalhost = window.location.host.includes('localhost');
+import { isLocalhost } from '../common.js';
 
 /* Cases that throw an error if the category is wrong or missing that goes to 404 page:
  * 1. "/part-category/" => 404 if is index path
@@ -64,7 +63,7 @@ export const getCategory = () => {
  * //   ]
  * // }
  */
-export const transformFacets = (facetArray) => {
+export const aggregateFilters = (facetArray) => {
   return facetArray.reduce((accumulator, currentItem) => {
     const { field_name, facets } = currentItem;
 
@@ -108,14 +107,14 @@ export const transformFacets = (facetArray) => {
  * };
  *
  * If isLocalhost is false
- * objectToUrl(filterObj);
+ * queryObjectToUrl(filterObj);
  * // Returns: '/part-category/jacks?df_Pair=No&df_Lift%20Height%20(in)=10.32'
  *
  * If isLocalhost is true
- * objectToUrl(filterObj);
+ * queryObjectToUrl(filterObj);
  * // Returns: '/part-category/?category=jacks&df_Pair=No&df_Lift%20Height%20(in)=10.32'
  */
-export const objectToUrl = (obj) => {
+export const queryObjectToUrl = (obj) => {
   const params = [];
 
   const metaCategory = getCategory();
@@ -150,7 +149,7 @@ export const objectToUrl = (obj) => {
  * Parses a full URL string, extracts specific URL search parameters prefixed with 'df_'
  * (dynamicFilters), and transforms them back into an object.
  *
- * This function is the inverse of `objectToUrl`. It correctly decodes field names and
+ * This function is the inverse of `queryObjectToUrl`. It correctly decodes field names and
  * comma-separated filter values from the URL query string.
  *
  * @param {string} url - The complete URL string containing dynamic filter parameters (e.g., 'https://example.com/products?df_Brand=Sony%2CLG&df_Price=Low').
@@ -163,7 +162,7 @@ export const objectToUrl = (obj) => {
  * // Input URL:
  * const url = '/part-category/jacks?df_Pair=No&df_Lift%20Height%20(in)=10.32';
  *
- * urlToObject(url);
+ * urlToQueryObject(url);
  * // Output:
  * {
  *   dynamicFilters: [
@@ -172,7 +171,7 @@ export const objectToUrl = (obj) => {
  *   ]
  * }
  */
-export const urlToObject = (url) => {
+export const urlToQueryObject = (url) => {
   let urlObject;
   try {
     urlObject = new URL(url);
@@ -204,29 +203,67 @@ export const urlToObject = (url) => {
 };
 
 /**
- * Updates global 'queryObject', performing three tasks:
- * 1. Stores the new query object in `sessionStorage` under the given key.
- * 2. Dispatches a 'QueryUpdated' custom event so other components can react to the change.
- * 3. Generates a new URL based on the object and updates the browser's history
- * without a page reload.
+ * Utility function to serialize an object to JSON and store it in sessionStorage.
  *
- * @param {string} key - The key under which the object will be stored in sessionStorage.
- * @param {object} newObject - The new query object containing parameters (e.g., dynamicFilters, facetFields).
+ * @param {string} key - The key under which to store the object in sessionStorage.
+ * @param {object} obj - The object to be serialized and stored.
  * @returns {void}
+ */
+const updateSessionStorage = (key, obj) => {
+  const jsonString = JSON.stringify(obj);
+  sessionStorage.setItem(key, jsonString);
+};
+
+/**
+ * Dispatches a custom event on the document with a specified name and payload.
+ * Components across the application can listen for this event to react to state changes.
  *
- * @fires QueryUpdated - A CustomEvent dispatched on the document, carrying the `newObject` in its `detail` property.
- * @requires objectToUrl - Function used to convert the query object into a URL query string.
+ * @param {string} query - The name of the custom event to dispatch (e.g., 'QueryUpdated').
+ * @param {object} payload - The data object to include in the event's `detail` property.
+ * @returns {void}
+ * @fires {CustomEvent} document#query - Dispatches an event with the name provided in `query`.
+ */
+export const triggerCustomEventWithPayload = (query, payload) => {
+  const event = new CustomEvent(query, { detail: payload });
+  document.dispatchEvent(event);
+};
+
+/**
+ * Updates the browser's current URL based on the provided query object without
+ * reloading the page, using the History API's `replaceState` method.
+ *
+ * @param {object} obj - The query object (containing filters, etc.) to convert into a URL string.
+ * @returns {void}
+ * @requires queryObjectToUrl - Assumes a function with this name exists globally to convert the object to a URL string.
+ */
+const updateUrl = (obj) => {
+  // NOTE: Assuming queryObjectToUrl is the function that converts the object into a URL string.
+  // It should be the same as the previously documented `objectToUrl` (or similar).
+  const newUrl = queryObjectToUrl(obj);
+  window.history.replaceState(null, '', newUrl);
+};
+
+/**
+ * The main orchestrator function for managing the global query object.
+ *
+ * It updates the query in three ways:
+ * 1. Persistence: Calls `updateSessionStorage` to save the object.
+ * 2. Communication: Calls `triggerCustomEventWithPayload` to notify subscribers.
+ * 3. Synchronization: Calls `updateUrl` to synchronize the browser's address bar.
+ *
+ * The operation is wrapped in a try/catch block to silently handle and log errors
+ * related to storage, event dispatch, or the History API.
+ *
+ * @param {string} key - The key used for session storage persistence.
+ * @param {object} newObject - The new query object to be saved and broadcasted.
+ * @returns {void}
+ * @fires document#QueryUpdated - Dispatched internally by `triggerCustomEventWithPayload`.
  */
 export const updateGlobalQueryObject = (key, newObject) => {
   try {
-    const jsonString = JSON.stringify(newObject);
-    sessionStorage.setItem(key, jsonString);
-
-    const event = new CustomEvent('QueryUpdated', { detail: newObject });
-    document.dispatchEvent(event);
-
-    const newUrl = objectToUrl(newObject);
-    window.history.replaceState(null, '', newUrl);
+    updateSessionStorage(key, newObject);
+    triggerCustomEventWithPayload('QueryUpdated', newObject);
+    updateUrl(newObject);
   } catch (error) {
     console.error('Error updating query object:', error);
   }

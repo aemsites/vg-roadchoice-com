@@ -715,12 +715,18 @@ export const isDevHost = () => {
 };
 
 /**
+ * Returns true when running on localhost.
+ * @returns {boolean}
+ */
+const isLocalhost = () => location.hostname === 'localhost';
+
+/**
  * Finds the main category key and the exactly matched subcategory key from the lowercased subcategory.
  * * @param {Array<Object>} dataArray The array of category objects.
  * @param {string} subcategoryName The subcategory key string to search for (e.g., "Antennas").
  * @returns {{category: string, subcategory: string} | null} An object, or null if not found.
  */
-export const getCategoryObject = (dataArray, rawSubcategoryName) => {
+const getCategoryObject = (dataArray, rawSubcategoryName) => {
   const searchKey = rawSubcategoryName.toLowerCase().replaceAll('-', ' ');
   let matchingSubcategory = null;
 
@@ -804,6 +810,8 @@ export {
   getTextLabel,
   getLanguagePath,
   setOrCreateMetadata,
+  isLocalhost,
+  getCategoryObject,
 };
 
 // Not used in this project:

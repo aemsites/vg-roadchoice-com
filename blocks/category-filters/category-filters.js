@@ -1,6 +1,6 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
 import { subcategorySearch } from '../../scripts/graphql-api.js';
-import { transformFacets, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
+import { aggregateFilters, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 const blockName = 'category-filters';
 const titleText = getTextLabel('category_filters_title');
@@ -9,14 +9,15 @@ let queryObject;
 
 const fetchQueryParams = () => {
   try {
-    queryObject = JSON.parse(sessionStorage.getItem('query-params'));
+    const item = sessionStorage.getItem('query-params');
+    queryObject = JSON.parse(item || '{}');
   } catch (error) {
     throw new Error('Error getting filters from sessionStorage: ', error);
   }
 };
 
 // Update query object with the checked inputs
-const captureInputsIntoQueryObject = (input) => {
+const captureInputsAndUpdateQuery = (input) => {
   const {
     value,
     dataset: { filterTitle: key },
@@ -50,7 +51,6 @@ const captureInputsIntoQueryObject = (input) => {
       queryObject.facetFields.push(key);
     }
   }
-
   updateGlobalQueryObject('query-params', queryObject);
 };
 
@@ -73,9 +73,9 @@ const isFilterActive = (key = '') => {
 
 const isClearBtnEnabled = () => queryObject.dynamicFilters.length < 1;
 
-const renderFilters = (filters, wrapper) => {
-  const facetFieldsAggregated = transformFacets(filters);
-  const filterKeys = Object.keys(facetFieldsAggregated).sort();
+const renderFilters = (dynamicFilters, wrapper) => {
+  const filterFields = aggregateFilters(dynamicFilters);
+  const filterKeys = Object.keys(filterFields).sort();
   const filterList = createElement('ul', { classes: `${blockName}-list` });
 
   filterKeys.forEach((key) => {
@@ -95,20 +95,20 @@ const renderFilters = (filters, wrapper) => {
     const clearBtn = wrapper.querySelector('.clear-filter-btn');
     clearBtn.disabled = isClearBtnEnabled();
 
-    const attributes = [...facetFieldsAggregated[key]];
+    const productAttributes = [...filterFields[key]];
     // if no attribute is present for the filter then no need to add it
-    if (attributes.length === 0) return;
+    if (productAttributes.length === 0) return;
 
-    attributes.forEach((el) => {
-      const { key: value, doc_count: count } = el;
+    productAttributes.forEach((attribute) => {
+      const { key: attrName, doc_count: count } = attribute;
       const filterOption = createElement('li', { classes: `${blockName}-option` });
-      const inputId = `${key ? key.replace(' ', '_') : null}<&>${value ? value.replace(' ', '_') : null}`;
+      const inputId = `${key ? key.replace(' ', '_') : null}<&>${attrName ? attrName.replace(' ', '_') : null}`;
       const filterInput = createElement('input', {
         classes: `${blockName}-input`,
         props: {
           type: 'checkbox',
           'data-filter-title': key,
-          value: value,
+          value: attrName,
           id: inputId,
         },
       });
@@ -118,7 +118,7 @@ const renderFilters = (filters, wrapper) => {
           for: inputId,
         },
       });
-      filterLabel.textContent = `${value} - (${count})`;
+      filterLabel.textContent = `${attrName} - (${count})`;
       filterOption.append(filterInput, filterLabel);
       filterOptionsWrapper.appendChild(filterOption);
     });
@@ -180,7 +180,7 @@ const setFormListeners = (block) => {
   const form = block.querySelector(`.${blockName}-form`);
   form.addEventListener('change', async (e) => {
     if (e.target.type === 'checkbox') {
-      captureInputsIntoQueryObject(e.target);
+      captureInputsAndUpdateQuery(e.target);
       await fetchAndRenderFilters(queryObject, form);
     }
   });
