@@ -1,3 +1,7 @@
+.section.blog-results-container {
+  padding-bottom: 50px;
+}
+
 .blog-results__article img {
   display: block;
   width: 100%;
