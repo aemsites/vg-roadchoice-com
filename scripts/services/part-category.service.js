@@ -119,7 +119,7 @@ export const queryObjectToUrl = (obj) => {
 
   const metaCategory = getCategory();
 
-  const subcatParam = isLocalhost ? `?category=${metaCategory}&` : '?';
+  const subcatParam = isLocalhost() ? `?category=${metaCategory}&` : '?';
   const base = window.location.pathname + subcatParam;
 
   if (obj.dynamicFilters && obj.dynamicFilters.length > 0) {
