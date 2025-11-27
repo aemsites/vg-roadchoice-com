@@ -173,21 +173,21 @@ const initBlogPagination = async (block, baseParams = {}) => {
   const { total, totalPages } = await fetchCountAndPrimeCache(baseParams);
   const loadPageData = await makePageLoader(baseParams);
 
-  createPagination({
-    block,
-    contentArea,
-    totalPages,
-    renderItems: renderBlogList,
-    loadPageData,
-    initialPage: 0,
-  });
-
   if (total === 0) {
     contentArea.innerHTML = '';
     const noResultsMsg = createElement('p', { classes: `${blockName}__no-results-message` });
     const q = baseParams?.q || '';
     noResultsMsg.textContent = getTextLabel('blog_results:no_results').replace('$0', `"${q}"`);
     contentArea.append(noResultsMsg);
+  } else {
+    createPagination({
+      block,
+      contentArea,
+      totalPages,
+      renderItems: renderBlogList,
+      loadPageData,
+      initialPage: 0,
+    });
   }
 };
 
