@@ -3,7 +3,6 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  margin-bottom: 16px;
 }
 
 .press-releases__article p {
@@ -62,6 +61,11 @@
   border: 0;
   font-size: 16px;
   min-width: 64px;
+}
+
+.press-releases__search-bar button:hover {
+  cursor: pointer;
+  background-color: var(--secondary-red);
 }
 
 .press-releases__no-results-message {

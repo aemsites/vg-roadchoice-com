@@ -52,7 +52,7 @@
 }
 
 .pagination-button.active:hover {
-  background-color: var(--secondary-red);
+  cursor: default;
 }
 
 .pagination-arrow {

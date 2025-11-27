@@ -333,11 +333,11 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
 
   if (error) return { results: [], error };
 
-  const { items, facets } = data.data[RC_BLOG_RECOMMEND];
+  const { items, facets, count } = data.data[RC_BLOG_RECOMMEND];
 
   const articles = items.map((item) => item.metadata);
 
-  return { articles, facets };
+  return { articles, facets, count };
 }
 
 export async function subcategorySearch({ category = '', subcategory = '', facetFields = [], dynamicFilters = [], limit = 100, offset = 0 }) {
@@ -408,7 +408,7 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
   return result;
 }
 
-export async function searchArticles({ q, sort = 'PUBLISH_DATE_DESC', limit = 100, offset = 0 }) {
+export async function searchArticles({ q = 'Road', sort = 'PUBLISH_DATE_DESC', limit = 100, offset = 0 }) {
   const { SEARCH_URL_DEV, RC_BLOG_SEARCH, TENANT } = SEARCH_CONFIG;
 
   const graphqlQuery = {
@@ -453,14 +453,12 @@ export async function searchArticles({ q, sort = 'PUBLISH_DATE_DESC', limit = 10
     },
   };
 
-  console.log(graphqlQuery.variables);
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
   if (error) return { results: [], error };
 
-  const { items } = data.data[RC_BLOG_SEARCH];
+  const { items, count } = data.data[RC_BLOG_SEARCH];
 
   const articles = items.map((item) => item.metadata);
-  console.log(articles);
 
-  return { articles };
+  return { articles, count };
 }

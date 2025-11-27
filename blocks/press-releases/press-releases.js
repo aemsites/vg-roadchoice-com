@@ -1,7 +1,7 @@
 import { createElement, getOrigin, getDateFromTimestamp, getTextLabel } from '../../scripts/common.js';
 import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
 import createPagination from '../../common/pagination/pagination.js';
-import { fetchPressReleases } from '../../scripts/services/press-release.service.js';
+import { searchArticles, fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
 
 const blockName = 'press-releases';
 const PAGE_SIZE = 10;
@@ -86,6 +86,22 @@ const loadPaginationCss = async () => {
 };
 
 /**
+ * Conditionally retrieve article data based on the presence of a search query (q) in the parameters.
+ * If a query exists, the query is done to rcsearch, otherwise its done to rcrecommend since it needs all articles.
+ *
+ * @async
+ * @param {object} params - The query parameters, including search terms and filters.
+ * @param {string} [params.q] - The search query string. If present, triggers the search function.
+ * @returns {Promise<object>} A promise that resolves with the articles and associated data (e.g., facets or metadata).
+ *
+ * @requires searchArticles - Function for fetching articles with SEARCH query.
+ * @requires fetchArticlesAndFacets - Function for fetching articles with RECOMMEND query.
+ */
+const getArticleData = async (params) => {
+  return params.q ? await searchArticles(params) : await fetchArticlesAndFacets(params);
+};
+
+/**
  * Returns a per-page loader function bound to the provided base params,
  * with a tiny in-memory cache to avoid refetching visited pages.
  *
@@ -98,12 +114,16 @@ const makePageLoader =
     if (pageDataCache.has(pageIndex)) {
       return pageDataCache.get(pageIndex);
     }
-    const { articles = [] } = await fetchPressReleases({
+
+    const queryParams = {
       ...baseParams,
-      // sort: 'PUBLISH_DATE_DESC',
+      sort: 'PUBLISH_DATE_DESC',
       limit: PAGE_SIZE,
       offset: pageIndex * PAGE_SIZE,
-    });
+    };
+
+    const { articles } = (await getArticleData(queryParams)) || [];
+
     const parsed = articles.map((article) => parsePressRelease(article));
     pageDataCache.set(pageIndex, parsed);
     return parsed;
@@ -116,20 +136,22 @@ const makePageLoader =
  * @returns {{ total:number, totalPages:number }}
  */
 const fetchCountAndPrimeCache = async (baseParams = {}) => {
-  const first = await fetchPressReleases({
+  const queryParams = {
     ...baseParams,
-    // sort: 'PUBLISH_DATE_DESC',
+    sort: 'PUBLISH_DATE_DESC',
     limit: PAGE_SIZE,
     offset: 0,
-  });
+  };
+
+  const first = (await getArticleData(queryParams)) || [];
 
   const total = Number(first?.count || 0);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  if (first?.items?.length) {
+  if (first?.articles?.length) {
     pageDataCache.set(
       0,
-      first.items.map((i) => parsePressRelease(i)),
+      first.articles.map((i) => parsePressRelease(i)),
     );
   }
 
@@ -149,7 +171,7 @@ const initPressReleasesPagination = async (block, baseParams = {}) => {
   pageDataCache.clear();
 
   const { total, totalPages } = await fetchCountAndPrimeCache(baseParams);
-  const loadPageData = makePageLoader(baseParams);
+  const loadPageData = await makePageLoader(baseParams);
 
   createPagination({
     block,
@@ -160,7 +182,7 @@ const initPressReleasesPagination = async (block, baseParams = {}) => {
     initialPage: 0,
   });
 
-  if (!total) {
+  if (total === 0) {
     contentArea.innerHTML = '';
     const noResultsMsg = createElement('p', { classes: `${blockName}__no-results-message` });
     const q = baseParams?.q || '';
