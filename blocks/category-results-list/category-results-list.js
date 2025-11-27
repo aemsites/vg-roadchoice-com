@@ -1,4 +1,4 @@
-import { createElement, getLocaleContextedUrl, isLocalhost } from '../../scripts/common.js';
+import { createElement, getLocaleContextedUrl } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 import { subcategorySearch } from '../../scripts/graphql-api.js';
 import { triggerCustomEventWithPayload } from '../../scripts/services/part-category.service.js';
@@ -9,9 +9,7 @@ let products;
 const productsPerPage = 12;
 
 function get404PageUrl() {
-  if (!isLocalhost) {
-    return getLocaleContextedUrl('/404.html');
-  }
+  return getLocaleContextedUrl('/404.html');
 }
 
 // Dispatches an event to be captured by the category-pagination block with:

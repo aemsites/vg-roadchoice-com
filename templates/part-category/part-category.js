@@ -7,14 +7,11 @@ import {
   setOrCreateMetadata,
   getTextLabel,
   getCategoryObject,
-  isLocalhost,
 } from '../../scripts/common.js';
 import { getCategory, urlToQueryObject, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 function get404PageUrl() {
-  if (!isLocalhost) {
-    return getLocaleContextedUrl('/404.html');
-  }
+  return getLocaleContextedUrl('/404.html');
 }
 
 /**
