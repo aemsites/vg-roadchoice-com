@@ -19,7 +19,7 @@ import { isLocalhost } from '../common.js';
  * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
 export const getCategory = () => {
-  if (isLocalhost) {
+  if (isLocalhost()) {
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(url.search);
 
