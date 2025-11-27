@@ -172,11 +172,11 @@
       "Text": "We’ll be sending you all the latest Road Choice info"
     },
     {
-      "Key": "press_releases:search_placeholder",
+      "Key": "blog_results:search_placeholder",
       "Text": "Search for..."
     },
     {
-    "Key": "press_releases:no_results",
+    "Key": "blog_results:no_results",
     "Text": "sorry, your search for $0 returned no results!"
     }
   ],
