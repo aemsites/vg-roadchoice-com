@@ -278,25 +278,18 @@ function getMetadata(name, doc = document) {
  * @param {Array} [breakpoints] Breakpoints and corresponding params (eg. width)
  * @returns {Element} The picture element
  */
-function createOptimizedPicture(
-  src,
-  alt = '',
-  eager = false,
-  breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }],
-  isExternal,
-) {
+function createOptimizedPicture(src, alt = '', eager = false, breakpoints = [{ media: '(min-width: 600px)', width: '2000' }, { width: '750' }]) {
   const url = new URL(src, window.location.href);
   const picture = document.createElement('picture');
-  // WARNING: isExternal is a custom implementation!
-  // The original implementation to retrieve the pathname is:
-  // const { pathname } = url;
-  const pathname = (isExternal && src) || url.pathname;
+  const { pathname } = url;
   const ext = pathname.substring(pathname.lastIndexOf('.') + 1);
 
   // webp
   breakpoints.forEach((br) => {
     const source = document.createElement('source');
-    if (br.media) source.setAttribute('media', br.media);
+    if (br.media) {
+      source.setAttribute('media', br.media);
+    }
     source.setAttribute('type', 'image/webp');
     source.setAttribute('srcset', `${pathname}?width=${br.width}&format=webply&optimize=medium`);
     picture.appendChild(source);
@@ -306,7 +299,9 @@ function createOptimizedPicture(
   breakpoints.forEach((br, i) => {
     if (i < breakpoints.length - 1) {
       const source = document.createElement('source');
-      if (br.media) source.setAttribute('media', br.media);
+      if (br.media) {
+        source.setAttribute('media', br.media);
+      }
       source.setAttribute('srcset', `${pathname}?width=${br.width}&format=${ext}&optimize=medium`);
       picture.appendChild(source);
     } else {

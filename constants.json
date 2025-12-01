@@ -111,6 +111,10 @@
         "value": "rcrecommend"
       },
       {
+        "name": "RC_BLOG_SEARCH",
+        "value": "rcsearch"
+      },
+      {
         "name": "RC_CATEGORY_FACETS",
         "value": "rccategoriessubcategoriesFacets"
       },

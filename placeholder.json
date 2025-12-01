@@ -166,6 +166,14 @@
     {
       "Key": "v2_newsletter:success_text",
       "Text": "We’ll be sending you all the latest Road Choice info"
+    },
+    {
+      "Key": "blog_results:search_placeholder",
+      "Text": "Search for..."
+    },
+    {
+    "Key": "blog_results:no_results",
+    "Text": "sorry, your search for $0 returned no results!"
     }
   ],
   ":type": "sheet"
