@@ -6,9 +6,10 @@ import {
   DEFAULT_LIMIT,
   getLocaleContextedUrl,
   setOrCreateMetadata,
+  isLocalhost,
 } from '../../scripts/common.js';
 import { createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
-import { fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
+import { fetchArticlesAndFacets, fetchPdpProduct } from '../../scripts/graphql-api.js';
 
 const blockName = 'pdp';
 const docTypes = {
@@ -17,6 +18,40 @@ const docTypes = {
 };
 const docRange = document.createRange();
 const SUPPORTED_LOCALES_WITH_PREFIX = ['en-ca', 'fr-ca'];
+const PDP_BASE_FIELDS = ['part_name', 'description', 'category', 'subcategory'];
+
+function normalizeField(value) {
+  if (Array.isArray(value)) return value[0] ?? '';
+  return value ?? '';
+}
+
+function mapGraphQLProductToPart(product, categoryKeys) {
+  const dynamic = product?.dynamicFields || {};
+  const basePartNumber = product.basePartNumber || '';
+  const name = normalizeField(dynamic.part_name);
+  const description = normalizeField(dynamic.description);
+  const category = normalizeField(dynamic.category);
+  const subcategory = normalizeField(dynamic.subcategory);
+  const attributes = {};
+  const attributeLabels = (categoryKeys || []).map((item) => item.Attributes).filter(Boolean);
+
+  attributeLabels.forEach((label) => {
+    if (label.toLowerCase() === 'description') return; // prevent duplicate
+    const value = dynamic[label];
+    if (value != null && value !== '') {
+      attributes[label] = value;
+    }
+  });
+
+  return {
+    basePartNumber,
+    name,
+    description,
+    category,
+    subcategory,
+    attributes,
+  };
+}
 
 function getJsonData(route) {
   const requestUrl = new URL(window.location.origin + route);
@@ -46,25 +81,20 @@ function getPathParams() {
   };
 }
 
-function findPartBySKU(parts, sku) {
-  return parts.find((part) => part['Base Part Number'].toLowerCase() === sku.toLowerCase());
+function getResolvedParams() {
+  if (isLocalhost()) {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      category: params.get('category') || '',
+      sku: params.get('sku') || '',
+    };
+  }
+
+  return getPathParams();
 }
 
 function filterModelsBySKU(models, sku) {
   return models.filter((model) => model['Base Part Number'].toLowerCase() === sku.toLowerCase());
-}
-
-async function getPDPData(pathSegments) {
-  const { category, sku } = pathSegments;
-
-  try {
-    const json = await getJsonData(getLocaleContextedUrl(`/product-data/rc-${category.replaceAll(' ', '-')}.json`));
-    if (!json) return null;
-    return findPartBySKU(json?.data, sku);
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
 }
 
 function findPartImagesBySKU(parts, sku) {
@@ -92,17 +122,24 @@ async function fetchPartImages(sku) {
 
 function renderColDetails(part, block, categoryKeys) {
   const list = block.querySelector(`.${blockName}-list`);
-  const keys = Object.keys(part);
-  keys.forEach((key) => {
-    if (categoryKeys.map((item) => item.Attributes).includes(key) && part[key].length) {
-      const liFragment = docRange.createContextualFragment(`
-        <li class="${blockName}-list-item">
-          <span class="${blockName}-list-item-title">${key}</span>:
-          <span class="${blockName}-list-item-value">${part[key]}</span>
-        </li>
-      `);
-      list.append(liFragment);
-    }
+  if (!list) return;
+
+  const attributes = part.attributes || {};
+  const keys = Array.isArray(categoryKeys) ? categoryKeys : [];
+
+  keys.forEach((item) => {
+    const label = item.Attributes;
+    const value = attributes[label];
+
+    if (!label || value == null || value === '') return;
+
+    const liFragment = docRange.createContextualFragment(`
+      <li class="${blockName}-list-item">
+        <span class="${blockName}-list-item-title">${label}</span>:
+        <span class="${blockName}-list-item-value">${value}</span>
+      </li>
+    `);
+    list.append(liFragment);
   });
 }
 
@@ -110,6 +147,7 @@ function renderImages(block, images) {
   const imageWrapper = block.querySelector(`.${blockName}-image-wrapper`);
   const selectedImage = block.querySelector(`.${blockName}-selected-image`);
 
+  if (!images || !images.length) return;
   // main image
   const mainPictureUrl = images[0]['Image URL'];
   const mainPicture = createOptimizedPicture(mainPictureUrl, 'Part image', true, undefined, !mainPictureUrl.startsWith('/'));
@@ -122,7 +160,8 @@ function renderImages(block, images) {
   const imageList = createElement('ul', { classes: `${blockName}-image-list` });
   images.forEach((image, id) => {
     const liFragment = docRange.createContextualFragment(`
-      <li class="${blockName}-image-item ${id === 0 ? 'active' : ''}"> </li>`);
+      <li class="${blockName}-image-item ${id === 0 ? 'active' : ''}"></li>
+    `);
     const picture = createOptimizedPicture(image['Image URL'], 'Additional part image', false, undefined, !image['Image URL'].startsWith('/'));
     picture.querySelector('img').classList.add(`${blockName}-gallery-image`);
     liFragment.querySelector('li').append(picture);
@@ -162,9 +201,13 @@ function renderPartBlock(block) {
   block.append(pdpFragment);
 }
 
+function capitalizeWords(str) {
+  return str.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function setPartData(part, block) {
-  block.querySelector(`.${blockName}-title`).textContent = part['Base Part Number'];
-  block.querySelector(`.${blockName}-description`).textContent = part['Part Name'];
+  block.querySelector(`.${blockName}-title`).textContent = part.basePartNumber || '';
+  block.querySelector(`.${blockName}-description`).textContent = part.name ? capitalizeWords(part.name) : '';
 }
 
 function filterByCategory(data, category, categoryKey = 'category') {
@@ -318,17 +361,17 @@ function renderBlogs(blogList) {
   `);
   sectionWrapper.append(fragment);
 
-  blogList.forEach((sds) => {
+  blogList.forEach((blog) => {
     const blogFragment = docRange.createContextualFragment(`
         <li class="${blockName}-blogs-list-item">
-          <a class="${blockName}-blogs-anchor" target="_blank" href="${sds.url}">
-            <h6 class="${blockName}-blogs-title">${sds.title}</h6>
+          <a class="${blockName}-blogs-anchor" target="_blank" href="${blog.url}">
+            <h6 class="${blockName}-blogs-title">${blog.title}</h6>
           </a>
           <p class="${blockName}-blogs-date">
-            ${new Date(parseInt(sds.publishDate, 10) * 1000).toLocaleDateString()}
+            ${new Date(parseInt(blog.publishDate, 10) * 1000).toLocaleDateString()}
           </p>
-          <p class="${blockName}-blogs-description">${sds.description}</p>
-          <a class="${blockName}-blogs-cta" target="_blank" href="${sds.url}">Read More</a>
+          <p class="${blockName}-blogs-description">${blog.description}</p>
+          <a class="${blockName}-blogs-cta" target="_blank" href="${blog.url}">Read More</a>
         </li>
       `);
     sectionWrapper.querySelector(`.${blockName}-blogs-list`).append(blogFragment);
@@ -471,18 +514,18 @@ function renderPartFit(partFitData) {
 }
 
 function resolvePartLabel(type, part) {
-  const { 'Base Part Number': partNumber, 'Part Name': partName } = part;
+  const { basePartNumber, name } = part;
   let label = getTextLabel(`pdp_metadata_${type}`);
   if (label) {
-    label = label.replace('[[part_number]]', partNumber);
-    label = label.replace('[[part_name]]', partName);
+    label = label.replace('[[part_number]]', basePartNumber || '');
+    label = label.replace('[[part_name]]', name || '');
   }
-  return label || partName;
+  return label || name;
 }
 
 function updateMetadata(part) {
   const title = resolvePartLabel('title', part);
-  const description = resolvePartLabel('description', part);
+  const description = resolvePartLabel('description', part) || part.description || '';
 
   document.title = title;
   setOrCreateMetadata('description', description);
@@ -507,6 +550,7 @@ function updateCanonicalUrl(category, sku) {
 }
 
 function updateImageMetadata(images) {
+  if (!images || !images.length) return;
   setOrCreateMetadata('og:image', images[0]['Image URL']);
   setOrCreateMetadata('twitter:image', images[0]['Image URL']);
 }
@@ -518,9 +562,11 @@ function renderBreadcrumbs(part) {
   const locale = getMetadata('locale')?.toLowerCase();
   const isLocalizedMarket = ['en-ca', 'fr-ca'].includes(locale);
   const prefix = isLocalizedMarket ? `/${locale}` : '';
-
-  const categorySlug = part.Category.toLowerCase().replace(/[^\w]/g, '-');
-  const subcategorySlug = part.Subcategory.toLowerCase().replace(/[^\w]/g, '-');
+  const isLocal = isLocalhost();
+  const categorySlug = (part.category || '').toLowerCase().replace(/[^\w]/g, '-');
+  const subcategorySlug = (part.subcategory || '').toLowerCase().replace(/[^\w]/g, '-');
+  const categoryHref = isLocal ? `/part-category/${categorySlug}` : `${prefix}/part-category/${categorySlug}`;
+  const subcategoryHref = isLocal ? `/part-category/?category=${subcategorySlug}` : `${prefix}/part-category/${subcategorySlug}`;
 
   const breadcrumbs = docRange.createContextualFragment(`
     <div class="breadcrumb-wrapper">
@@ -531,13 +577,13 @@ function renderBreadcrumbs(part) {
               <a class="breadcrumb-link" href="${prefix}/">Road Choice</a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-1">
-              <a class="breadcrumb-link" href="${prefix}/part-category/${categorySlug}">
-                ${part.Category}
+              <a class="breadcrumb-link" href="${categoryHref}">
+                ${part.category || ''}
               </a>
             </li>
             <li class="breadcrumb-item breadcrumb-item-2">
-              <a class="breadcrumb-link active-link" href="${prefix}/part-category/${subcategorySlug}">
-                ${part.Subcategory}
+              <a class="breadcrumb-link active-link" href="${subcategoryHref}">
+                ${part.subcategory || ''}
               </a>
             </li>
           </ul>
@@ -549,36 +595,76 @@ function renderBreadcrumbs(part) {
   breadcrumbSection.append(breadcrumbs);
 }
 
-export default async function decorate(block) {
-  const pathSegments = getPathParams();
-
-  updateCanonicalUrl(pathSegments.category, pathSegments.sku);
-  renderPartBlock(block);
-
-  getPDPData(pathSegments).then((part) => {
-    if (part) {
-      renderBreadcrumbs(part, block);
-      setPartData(part, block);
-      updateMetadata(part);
-      fetchCategoryKeys(pathSegments.category).then((categoryKeys) => {
-        renderColDetails(part, block, categoryKeys);
-      });
-      fetchBlogs(part.Subcategory).then(renderBlogs);
-    }
+async function loadPdpData({ category, sku }) {
+  const categoryKeys = await fetchCategoryKeys(category);
+  const attributeFields = categoryKeys.map((item) => item.Attributes).filter(Boolean);
+  const productResult = await fetchPdpProduct({
+    sku,
+    requestedFields: [...PDP_BASE_FIELDS, ...attributeFields],
   });
 
-  fetchPartImages(pathSegments.sku).then((images) => {
+  return {
+    categoryKeys,
+    attributeFields,
+    product: productResult.product,
+    error: productResult.error,
+  };
+}
+
+function renderPdpCore(part, block, categoryKeys) {
+  renderBreadcrumbs(part);
+  setPartData(part, block);
+  updateMetadata(part);
+  renderColDetails(part, block, categoryKeys);
+}
+
+function loadAndRenderExtras({ sku, category, part, pathSegments, block }) {
+  fetchPartImages(sku).then((images) => {
     updateImageMetadata(images);
     renderImages(block, images);
   });
 
   fetchPartFit(pathSegments).then(renderPartFit);
-  fetchDocs(pathSegments.category).then(renderDocs);
-  fetchSDS(pathSegments.category).then(renderSDS);
+  fetchDocs(category).then(renderDocs);
+  fetchSDS(category).then(renderSDS);
 
+  if (part.subcategory) {
+    fetchBlogs(part.subcategory).then(renderBlogs);
+  }
+}
+
+function initAccordionBehavior() {
   document.querySelector('main').addEventListener('click', (e) => {
     if (e.target.matches('.section.accordion h5')) {
       e.target.closest('.section.accordion').classList.toggle('accordion-open');
     }
   });
+}
+
+export default async function decorate(block) {
+  const { category, sku } = getResolvedParams();
+
+  updateCanonicalUrl(category, sku);
+  renderPartBlock(block);
+
+  const { categoryKeys, product, error } = await loadPdpData({ category, sku });
+
+  if (!product || error) {
+    console.error('PDP: GraphQL product not found or error', error);
+    return;
+  }
+
+  const part = mapGraphQLProductToPart(product, categoryKeys);
+
+  renderPdpCore(part, block, categoryKeys);
+
+  loadAndRenderExtras({
+    sku,
+    category,
+    part,
+    pathSegments: { category, sku },
+    block,
+  });
+
+  initAccordionBehavior();
 }
