@@ -90,7 +90,6 @@ const renderBlock = async (block, paginationData) => {
 export default async function decorate(block) {
   // once the event is captured, render the block with the updated amounts of products
   document.addEventListener('CountReady', (e) => {
-    console.log('test');
     const paginationData = e.detail;
     renderBlock(block, paginationData);
     if (isFirstRenderPass) {
