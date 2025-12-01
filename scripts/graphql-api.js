@@ -406,7 +406,6 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
   return result;
 }
 
-
 export async function fetchPdpProduct({ sku, requestedFields = [], language = getPageLanguage() || 'EN' }) {
   const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
 
