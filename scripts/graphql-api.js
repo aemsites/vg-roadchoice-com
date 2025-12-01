@@ -400,10 +400,8 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
 
   if (error) return { items: [], facets: [], error };
 
-  const result = {
-    items: data.data[RC_SUBCATEGORIES_SEARCH].items,
-    facets: data.data[RC_SUBCATEGORIES_SEARCH].facets,
-  };
+  const { items, facets, count } = data.data[RC_SUBCATEGORIES_SEARCH];
+  const result = { items, facets, count };
 
   return result;
 }

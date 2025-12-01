@@ -726,7 +726,7 @@ const isLocalhost = () => location.hostname === 'localhost';
  * @param {string} subcategoryName The subcategory key string to search for (e.g., "Antennas").
  * @returns {{category: string, subcategory: string} | null} An object, or null if not found.
  */
-export const getCategoryObject = (dataArray, rawSubcategoryName) => {
+const getCategoryObject = (dataArray, rawSubcategoryName) => {
   const searchKey = rawSubcategoryName.toLowerCase().replaceAll('-', ' ');
   let matchingSubcategory = null;
 
@@ -811,6 +811,8 @@ export {
   getLanguagePath,
   setOrCreateMetadata,
   isLocalhost,
+  getCategoryObject,
+
 };
 
 // Not used in this project:

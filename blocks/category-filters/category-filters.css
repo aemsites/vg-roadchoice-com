@@ -77,6 +77,10 @@
   padding: 20px 20px 10px;
 }
 
+.category-filters-wrapper .category-filters-list .category-filters-item.hidden {
+  display: none;
+}
+
 .category-filters-wrapper .category-filters-list .category-filters-item:not(:last-of-type) {
   border-block-end: var(--table-border);
 }

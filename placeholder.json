@@ -88,10 +88,6 @@
       "Text": "Clear Filters"
     },
     {
-      "Key": "category_filters_apply_button",
-      "Text": "Apply"
-    },
-    {
       "Key": "loading_label",
       "Text": "Loading..."
     },
