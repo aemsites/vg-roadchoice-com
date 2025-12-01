@@ -400,12 +400,54 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
 
   if (error) return { items: [], facets: [], error };
 
-  const result = {
-    items: data.data[RC_SUBCATEGORIES_SEARCH].items,
-    facets: data.data[RC_SUBCATEGORIES_SEARCH].facets,
-  };
+  const { items, facets, count } = data.data[RC_SUBCATEGORIES_SEARCH];
+  const result = { items, facets, count };
 
   return result;
+}
+
+
+export async function fetchPdpProduct({ sku, requestedFields = [], language = getPageLanguage() || 'EN' }) {
+  const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query PDP(
+        $requestedFields: [String!]!,
+        $tenant: RcTenantEnum!,
+        $language: RcLocaleEnum!,
+        $basePartNumber: String!
+      ) {
+        rcProductDescription(
+          requestedFields: $requestedFields,
+          tenant: $tenant,
+          language: $language,
+          basePartNumber: $basePartNumber
+        ) {
+          items {
+            metadata {
+              basePartNumber
+              dynamicFields
+            }
+          }
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      language,
+      basePartNumber: sku,
+      requestedFields,
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { product: null, error };
+
+  const product = data?.data?.rcProductDescription?.items?.[0]?.metadata || null;
+
+  return { product, error: null };
 }
 
 export async function searchArticles({ q = 'Road', sort = 'PUBLISH_DATE_DESC', limit = 100, offset = 0 }) {

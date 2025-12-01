@@ -1,88 +1,78 @@
-import { getProductsWorker } from '../../scripts/delayed.js';
-import { createElement, getTextLabel } from '../../scripts/common.js';
+import { createElement, getLocaleContextedUrl, isLocalhost } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
+import { subcategorySearch } from '../../scripts/graphql-api.js';
+import { triggerCustomEventWithPayload } from '../../scripts/services/part-category.service.js';
 
-let amount = JSON.parse(sessionStorage.getItem('amount'));
-let products = window.categoryData;
-let isRendered = false;
-let hasImagesData = false;
-let imgData;
 const searchType = 'parts';
-const loadingLabel = getTextLabel('loading_label');
-const productsWorker = getProductsWorker();
+let queryObject;
+let products;
+const productsPerPage = 12;
 
-productsWorker.onmessage = ({ data }) => {
-  if (products && data.imgData && !hasImagesData) {
-    hasImagesData = true;
-    imgData = data.imgData;
-    const event = new CustomEvent('ImagesLoaded', { detail: data.imgData });
-    document.dispatchEvent(event);
+function get404PageUrl() {
+  if (isLocalhost()) {
+    return getLocaleContextedUrl('/404.html');
   }
-  // allProducts properties needs to be set again
-  if (data.crData && data.pnData && data.imgData) {
-    window.allProducts = data;
-  }
+}
+
+// Dispatches an event to be captured by the category-pagination block with:
+// productsPerPage: products to be shown per page
+// productCount: total amount of products retrieved
+// totalPages: total number of pages
+const setPaginationData = (productCount) => {
+  const paginationData = {
+    productCount,
+    productsPerPage,
+    totalPages: Math.ceil(productCount / productsPerPage),
+  };
+
+  triggerCustomEventWithPayload('CountReady', paginationData);
 };
 
-const getImagesData = ({ productList, loadingElement, detail }) => {
-  loadingElement.remove();
-  products.forEach((prod, idx) => {
-    prod.hasImage = false;
-    const filterLoop = detail.filter((e) => e['Part Number'] === prod['Base Part Number']);
-    if (filterLoop.length >= 1) {
-      prod.hasImage = true;
-      prod.imgUrl = filterLoop[0]['Image URL'];
+// fetches the items with the updated query and replaces the product list with the new products
+const fetchAndUpdateProductList = async (wrapper) => {
+  try {
+    queryObject = JSON.parse(sessionStorage.getItem('query-params'));
+    const filteredQueryResult = await subcategorySearch(queryObject);
+
+    if (filteredQueryResult.items.length === 0) throw new Error('No items retrieved with current URL');
+
+    setPaginationData(filteredQueryResult.count);
+
+    products = filteredQueryResult.items.map((item) => item.metadata);
+
+    if (wrapper.hasChildNodes()) {
+      wrapper.replaceChildren();
     }
-    const productItem = productCard(prod, searchType);
-    if (idx >= amount) productItem.classList.add('hidden');
-    productList.appendChild(productItem);
-  });
-};
 
-const addImagesHandler = ({ productList, loadingElement }) => {
-  document.addEventListener('ImagesLoaded', ({ detail }) => {
-    getImagesData({ productList, loadingElement, detail });
-  });
+    products.forEach((prod, idx) => {
+      const productItem = productCard(prod, searchType);
+      if (idx >= productsPerPage) productItem.classList.add('hidden');
+      wrapper.appendChild(productItem);
+    });
+
+    return wrapper;
+  } catch (err) {
+    console.log('%cError fetching items', 'color:red;background-color:aliceblue', err);
+    window.location.href = get404PageUrl();
+  }
 };
 
 const renderBlock = async (block) => {
   const resultsWrapper = createElement('div', { classes: 'results-wrapper' });
-  const productList = createElement('ul', { classes: 'results-list' });
-  const loadingElement = createElement('div', { classes: 'loading' });
-  loadingElement.textContent = loadingLabel;
+  const productList = createElement('ul', { classes: 'category-results-list' });
 
-  resultsWrapper.append(productList, loadingElement);
+  await fetchAndUpdateProductList(productList);
+
+  resultsWrapper.append(productList);
   block.append(resultsWrapper);
-
-  if (hasImagesData) {
-    getImagesData({ productList, loadingElement, detail: imgData });
-  } else {
-    addImagesHandler({ productList, loadingElement });
-  }
-};
-
-const isRenderedCheck = (block) => {
-  if (products && amount && !isRendered) {
-    isRendered = true;
-    renderBlock(block);
-  }
 };
 
 export default async function decorate(block) {
-  document.addEventListener('FilteredProducts', (e) => {
-    products = [...e.detail.filteredProducts];
-    const bottomBtn = block.querySelector('.bottom-more-button');
-    block.textContent = '';
-    renderBlock(block);
-    if (products.length > amount) {
-      block.querySelector('.results-wrapper').appendChild(bottomBtn);
-    }
-  });
-  isRenderedCheck(block);
-  if (isRendered) return;
-  document.addEventListener('CategoryDataLoaded', () => {
-    amount = JSON.parse(sessionStorage.getItem('amount'));
-    products = JSON.parse(sessionStorage.getItem('category-data'));
-    renderBlock(block);
+  await renderBlock(block);
+
+  // when the global query object gets updated, the products list gets re-rendered
+  document.addEventListener('QueryUpdated', async (e) => {
+    queryObject = e.detail;
+    await fetchAndUpdateProductList(block);
   });
 }

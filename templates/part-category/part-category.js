@@ -1,4 +1,4 @@
-import { fetchCategories, subcategorySearch } from '../../scripts/graphql-api.js';
+import { fetchCategories } from '../../scripts/graphql-api.js';
 import {
   createElement,
   getLongJSONData,
@@ -7,21 +7,14 @@ import {
   setOrCreateMetadata,
   getTextLabel,
   getCategoryObject,
+  isLocalhost,
 } from '../../scripts/common.js';
-import { transformFacets, getCategory } from '../../scripts/services/part-category.service.js';
-
-const amount = 12;
-let category;
-let mainCategory;
-const json = {
-  data: [],
-  limit: 0,
-  offset: 0,
-  total: 0,
-};
+import { getCategory, urlToQueryObject, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 function get404PageUrl() {
-  return getLocaleContextedUrl('/404.html');
+  if (isLocalhost()) {
+    return getLocaleContextedUrl('/404.html');
+  }
 }
 
 /**
@@ -33,6 +26,7 @@ function get404PageUrl() {
  */
 const getFilterAttrib = async (subcategory) => {
   try {
+    // TODO change this for graphQL endpoint when available and remove DEFAULT_LIMIT
     const filtersJson = await getLongJSONData({
       url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
       limit: DEFAULT_LIMIT,
@@ -50,62 +44,40 @@ const getFilterAttrib = async (subcategory) => {
 };
 
 /**
- * Loads product data for the given category and updates internal state and sessionStorage.
- * If the data file does not exist or contains no products, the state is reset and an empty array is returned.
+ * Determines the appropriate facet fields (filters) for a category query
+ * and updates the global application state with the final query object.
  *
- * @param {string} cat - The category name.
- * @returns {Promise<Array>} The list of products in the category, or an empty array if not found.
- * @emits {Event} CategoryDataLoaded - When the category data is successfully loaded.
+ * This function handles fetching default facet fields if none are provided
+ * and redirects the user to a 404 page if an error occurs during the process.
+ * Note: The function currently returns undefined (return;) on success.
+ *
+ * @async
+ * @param {object} queryObject - The incoming query parameters and configuration.
+ * @returns {Promise<void>} A Promise that resolves when the operation is complete.
+ * Note: It returns nothing (void) on successful execution but updates the global state.
  */
-const getCategoryData = async (categoryObj) => {
-  const { category, subcategory } = categoryObj;
-  const facetFields = await getFilterAttrib(subcategory);
+const initializeCategoryQuery = async (queryObject) => {
+  const { category, subcategory, facetFields, dynamicFilters } = queryObject;
+
+  let fieldsToUse;
+  if (!Array.isArray(facetFields) || facetFields.length === 0) {
+    const sharepointFacetFields = await getFilterAttrib(subcategory);
+    fieldsToUse = sharepointFacetFields;
+  } else {
+    fieldsToUse = facetFields;
+  }
 
   try {
-    const queryParams = {
+    queryObject = {
       category,
       subcategory,
-      facetFields,
-      dynamicFilters: [],
+      facetFields: fieldsToUse,
+      dynamicFilters,
     };
 
-    const productsAndFacets = await subcategorySearch(queryParams);
-    const { items, facets } = productsAndFacets;
+    updateGlobalQueryObject('query-params', queryObject);
 
-    const products = items.map((item) => item.metadata);
-    const facetFieldsAggregated = transformFacets(facets);
-
-    if (!Array.isArray(products) || products.length === 0) {
-      console.warn(`[CategoryData] No product data found or empty array returned for category: "${subcategory}"`);
-      json.data = [];
-      json.limit = 0;
-      json.total = 0;
-      return [];
-    }
-
-    json.data = products;
-    json.limit = 20;
-    json.total = products.length;
-
-    mainCategory = category;
-
-    if (!mainCategory) {
-      console.warn(`[CategoryData] mainCategory is missing for: "${subcategory}"`);
-    }
-
-    window.categoryData = json.data;
-    sessionStorage.setItem('amount', amount);
-
-    sessionStorage.setItem('category-object', JSON.stringify(categoryObj));
-
-    const event = new Event('CategoryDataLoaded');
-    document.dispatchEvent(event);
-
-    const filterEvent = new Event('FilterAttribsLoaded');
-    sessionStorage.setItem('filter-attribs', JSON.stringify(facetFieldsAggregated));
-    document.dispatchEvent(filterEvent);
-
-    return products;
+    return;
   } catch (err) {
     console.error('%c[CategoryData] Error fetching category data', 'color:red;background-color:aliceblue', err);
     window.location.href = get404PageUrl();
@@ -113,10 +85,8 @@ const getCategoryData = async (categoryObj) => {
 };
 
 const resetCategoryData = () => {
-  sessionStorage.removeItem('category-data');
   sessionStorage.removeItem('filter-attribs');
-  sessionStorage.removeItem('amount');
-  sessionStorage.removeItem('category-object');
+  sessionStorage.removeItem('query-params');
 };
 
 /**
@@ -179,13 +149,13 @@ function updateMetadata(category) {
 }
 
 export default async function decorate(doc) {
-  category = getCategory();
-  if (!category) {
+  const metaSubcategory = getCategory();
+  if (!metaSubcategory) {
     console.log('No category provided — assuming this is the category template');
     return;
   }
-  setCanonicalUrl(category);
-  updateMetadata(category);
+  setCanonicalUrl(metaSubcategory);
+  updateMetadata(metaSubcategory);
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
@@ -197,13 +167,19 @@ export default async function decorate(doc) {
   section.classList.add('part-category');
   section.prepend(titleWrapper);
 
-  const allCategories = await fetchCategories();
-  const categoryObject = getCategoryObject(allCategories, category);
-  mainCategory = categoryObject.category;
-
   resetCategoryData();
-  await getCategoryData(categoryObject);
 
+  const allCategories = await fetchCategories();
+  const categoryObject = getCategoryObject(allCategories, metaSubcategory);
+
+  const { category, subcategory } = categoryObject;
+
+  const sanitizedUrl = new URL(window.location.href);
+  const filtersFromUrl = urlToQueryObject(sanitizedUrl.href);
+
+  const completeQueryObject = { ...filtersFromUrl, ...categoryObject };
+
+  await initializeCategoryQuery(completeQueryObject);
   updateTitleWithSubcategory(title, category, categoryObject.subcategory);
 
   // Update breadcrumb dynamically once the block is loaded
@@ -224,14 +200,14 @@ export default async function decorate(doc) {
 
       let index = breadcrumbList.children.length;
 
-      // If mainCategory is present, add it before the final category
-      if (mainCategory) {
-        const mainSlug = mainCategory.toLowerCase().replace(/\s/g, '-');
+      // If category is present, add it before the final category
+      if (category) {
+        const mainSlug = category.toLowerCase().replace(/\s/g, '-');
         const mainLink = createElement('a', {
           classes: 'breadcrumb-link',
           props: { href: getLocaleContextedUrl(`/part-category/${mainSlug}`) },
         });
-        mainLink.textContent = mainCategory;
+        mainLink.textContent = category;
 
         const mainItem = createElement('li', {
           classes: ['breadcrumb-item', `breadcrumb-item-${index}`],
@@ -241,10 +217,10 @@ export default async function decorate(doc) {
         index += 1;
       }
 
-      // Add final category (the one from the URL)
+      // Add final subcategory (the one from the URL)
       const finalLink = createElement('a', {
         classes: 'breadcrumb-link active-link',
-        props: { href: getLocaleContextedUrl(`/part-category/${category}`) },
+        props: { href: getLocaleContextedUrl(`/part-category/${subcategory}`) },
       });
       finalLink.textContent = title.textContent;
 

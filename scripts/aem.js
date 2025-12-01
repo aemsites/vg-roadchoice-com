@@ -50,7 +50,7 @@ function sampleRUM(checkpoint, data) {
               .replace(/ at /, '@')
               .trim();
           } catch (err) {
-            console.warn(err);
+            console.error(err);
             /* error structure was not as expected */
           }
           return errData;
@@ -114,7 +114,7 @@ function sampleRUM(checkpoint, data) {
     }
     document.dispatchEvent(new CustomEvent('rum', { detail: { checkpoint, data } }));
   } catch (error) {
-    console.warn(error);
+    console.error(error);
     // something went awry
   }
 }
