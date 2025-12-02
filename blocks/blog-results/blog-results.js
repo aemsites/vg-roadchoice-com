@@ -1,332 +1,217 @@
-import { getTextLabel, createElement } from '../../scripts/common.js';
-import { readBlockConfig } from '../../scripts/aem.js';
-import { fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
+import { createElement, getOrigin, getDateFromTimestamp, getTextLabel } from '../../scripts/common.js';
+import { createOptimizedPicture, loadCSS } from '../../scripts/aem.js';
+import createPagination from '../../common/pagination/pagination.js';
+import { searchArticles, fetchArticlesAndFacets } from '../../scripts/graphql-api.js';
 
 const blockName = 'blog-results';
+const PAGE_SIZE = 10;
+let paginationCssOnce;
+const pageDataCache = new Map();
 
-let selectedCategories = [];
-let articlesPerPage = 4;
-let firstBuild = true;
-const paginationText = getTextLabel('pagination');
-const rawText = getTextLabel('blog_pagination_number');
-const readMoreText = getTextLabel('read_more');
+const parseBlogArticle = (item) => {
+  const isImageLink = (link) => `${link}`.split('?')[0].match(/\.(jpeg|jpg|gif|png|svg|bmp|webp)$/) !== null;
 
-let totalArticleCount;
-let allArticles;
+  const getDefaultImage = () => {
+    const logoImageURL = '/media/logo/media_10a115d2f3d50f3a22ecd2075307b4f4dcaedb366.jpeg';
+    return getOrigin() + logoImageURL;
+  };
 
-const buildResults = (articles, page) => {
-  const results = createElement('div', { classes: `${blockName}-articles` });
+  return {
+    ...item,
+    image: item.image ? item.image : getDefaultImage(),
+    path: item.url,
+    isDefaultImage: !isImageLink(item.image),
+  };
+};
 
-  const topPaginationSection = createElement('div', { classes: 'pagination-top-section' });
-  const topPagination = createElement('p', { classes: 'pagination-top' });
+const renderSearchBar = () => {
+  const searchBar = createElement('div', { classes: `${blockName}__search-bar` });
+  searchBar.innerHTML = `
+    <input type="text" name="search" autocomplete="off" placeholder="${getTextLabel('blog_results:search_placeholder')}"/>
+    <button type="submit"><i class="fa fa-search"></i></button>`;
+  return searchBar;
+};
 
-  if (firstBuild) totalArticleCount = rawText.replace('[$]', articles.length);
-  topPagination.textContent = totalArticleCount;
-  topPaginationSection.appendChild(topPagination);
+const renderArticleCard = (entry) => {
+  const { path, image, title, description, publishDate } = entry;
+  const card = createElement('article', { classes: `${blockName}__article` });
+  const picture = createOptimizedPicture(image, title, false, [{ width: '414' }]);
+  const formattedDate = getDateFromTimestamp(publishDate);
 
-  const articleSection = createElement('ul', { classes: 'articles-section' });
+  card.innerHTML = `
+    <a href="${path}">
+      ${picture.outerHTML}
+    </a>
+    <div>
+      <span class="date">${formattedDate}</span>
+      <h3><a href="${path}">${title}</a></h3>
+      <p>${description}</p>
+    </div>`;
 
-  const groupedArticles = page === 0 && firstBuild ? divideArray(articles, articlesPerPage) : articles;
+  return card;
+};
 
-  const amountOfPages = groupedArticles.length;
-  const activePage = groupedArticles[page];
-
-  activePage.forEach((art, idx) => {
-    const article = createElement('li', { classes: ['article', `page-${idx}`] });
-    const title = createElement('h2', { classes: 'title' });
-    const titleLink = createElement('a', { classes: 'title-link', props: { href: art.url } });
-    titleLink.textContent = art.title;
-    title.appendChild(titleLink);
-
-    const date = createElement('p', { classes: 'date' });
-    date.textContent = formatDate(art['publishDate']);
-
-    const description = createElement('p', { classes: 'description' });
-    description.textContent = art.description;
-
-    const link = createElement('a', { classes: 'link', props: { href: art.url } });
-    link.textContent = readMoreText;
-
-    article.append(title, date, description, link);
-    articleSection.appendChild(article);
+const renderBlogList = (block, articles) => {
+  const list = createElement('ul', { classes: ['article-list'] });
+  articles.forEach((pr) => {
+    list.append(renderArticleCard(pr));
   });
-  const bottomPagination = buildPagination(groupedArticles, amountOfPages, page);
-  results.append(topPaginationSection, articleSection, bottomPagination);
-
-  return results;
+  block.append(list);
 };
 
-const divideArray = (mainArray, perChunk) => {
-  const dividedArrays = mainArray.reduce((resultArray, item, index) => {
-    const chunkIndex = Math.floor(index / perChunk);
-    if (!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = [];
+/**
+ * Ensures a reusable pagination content area exists on the block.
+ *
+ * @param {HTMLElement} block
+ * @returns {HTMLElement}
+ */
+const getOrCreateContentArea = (block) => {
+  let contentArea = block.querySelector('.pagination-content');
+  if (!contentArea) {
+    contentArea = createElement('div', { classes: ['pagination-content'] });
+    block.appendChild(contentArea);
+  }
+  return contentArea;
+};
+
+/**
+ * Loads the pagination CSS exactly once.
+ */
+const loadPaginationCss = async () => {
+  if (!paginationCssOnce) {
+    const baseURL = window.location.origin;
+    paginationCssOnce = loadCSS(`${baseURL}/common/pagination/pagination.css`);
+  }
+  await paginationCssOnce;
+};
+
+/**
+ * Conditionally retrieve article data based on the presence of a search query (q) in the parameters.
+ * If a query exists, the query is done to rcsearch, otherwise its done to rcrecommend since it needs all articles.
+ *
+ * @async
+ * @param {object} params - The query parameters, including search terms and filters.
+ * @param {string} [params.q] - The search query string. If present, triggers the search function.
+ * @returns {Promise<object>} A promise that resolves with the articles and associated data (e.g., facets or metadata).
+ *
+ * @requires searchArticles - Function for fetching articles with SEARCH query.
+ * @requires fetchArticlesAndFacets - Function for fetching articles with RECOMMEND query.
+ */
+const getArticleData = async (params) => {
+  return params.q ? await searchArticles(params) : await fetchArticlesAndFacets(params);
+};
+
+/**
+ * Returns a per-page loader function bound to the provided base params,
+ * with a tiny in-memory cache to avoid refetching visited pages.
+ *
+ * @param {Object} baseParams
+ * @returns {(pageIndex:number) => Promise<Array>}
+ */
+const makePageLoader =
+  (baseParams = {}) =>
+  async (pageIndex) => {
+    if (pageDataCache.has(pageIndex)) {
+      return pageDataCache.get(pageIndex);
     }
-    resultArray[chunkIndex].push(item);
-    return resultArray;
-  }, []);
-  return dividedArrays;
-};
 
-const reduceArrays = (array) => {
-  const initialValue = {};
-  const reduced = array.reduce((acc, value) => ({ ...acc, [value]: (acc[value] || 0) + 1 }), initialValue);
-  return reduced;
-};
-
-const filterCats = () => {
-  firstBuild = true;
-  let newResults;
-  if (selectedCategories.length === 0) {
-    newResults = buildResults(allArticles, 0);
-  } else {
-    const getArticlesWithCat = (categories, articles) => {
-      const selectedArticles = [];
-      categories.forEach((category) => {
-        const selectedArticle = articles.filter((article) => article.category === category);
-        selectedArticles.push(selectedArticle);
-      });
-      const groupedArticles = selectedArticles.flat();
-      return groupedArticles;
+    const queryParams = {
+      ...baseParams,
+      sort: 'PUBLISH_DATE_DESC',
+      limit: PAGE_SIZE,
+      offset: pageIndex * PAGE_SIZE,
     };
-    const newArts = getArticlesWithCat(selectedCategories, allArticles);
-    newResults = buildResults(newArts, 0);
+
+    const { articles } = (await getArticleData(queryParams)) || [];
+
+    const parsed = articles.map((article) => parseBlogArticle(article));
+    pageDataCache.set(pageIndex, parsed);
+    return parsed;
+  };
+
+/**
+ * Fetches the first page to compute totals and seed cache.
+ *
+ * @param {Object} baseParams
+ * @returns {{ total:number, totalPages:number }}
+ */
+const fetchCountAndPrimeCache = async (baseParams = {}) => {
+  const queryParams = {
+    ...baseParams,
+    sort: 'PUBLISH_DATE_DESC',
+    limit: PAGE_SIZE,
+    offset: 0,
+  };
+
+  const first = (await getArticleData(queryParams)) || [];
+
+  const total = Number(first?.count || 0);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  if (first?.articles?.length) {
+    pageDataCache.set(
+      0,
+      first.articles.map((i) => parseBlogArticle(i)),
+    );
   }
-  const oldResults = document.querySelector(`.${blockName}-articles`);
-  oldResults.insertAdjacentElement('beforebegin', newResults);
-  oldResults.remove();
+
+  return { total, totalPages };
 };
 
-const deleteCats = (sidebar) => {
-  firstBuild = true;
-  selectedCategories = [];
-  const allBtns = sidebar.querySelectorAll('.category');
-  allBtns.forEach((btn) => delete btn.dataset.active);
+/**
+ * Initializes dynamic pagination with API-backed totalPages and per-page fetching.
+ *
+ * @param {HTMLElement} block
+ * @param {Object} baseParams
+ */
+const initBlogPagination = async (block, baseParams = {}) => {
+  const contentArea = getOrCreateContentArea(block);
+  await loadPaginationCss();
 
-  const newResults = buildResults(allArticles, 0);
-  const oldResults = document.querySelector(`.${blockName}-articles`);
-  oldResults.insertAdjacentElement('beforebegin', newResults);
-  oldResults.remove();
-};
+  pageDataCache.clear();
 
-const selectCats = (e) => {
-  const currentBtn = e.target;
-  const currentCategory = e.target.id;
-  if (selectedCategories.includes(currentCategory)) {
-    delete currentBtn.dataset.active;
-    const index = selectedCategories.indexOf(currentCategory);
-    selectedCategories.splice(index, 1);
+  const { total, totalPages } = await fetchCountAndPrimeCache(baseParams);
+  const loadPageData = await makePageLoader(baseParams);
+
+  if (total === 0) {
+    contentArea.innerHTML = '';
+    const noResultsMsg = createElement('p', { classes: `${blockName}__no-results-message` });
+    const q = baseParams?.q || '';
+    noResultsMsg.textContent = getTextLabel('blog_results:no_results').replace('$0', `"${q}"`);
+    contentArea.append(noResultsMsg);
   } else {
-    currentBtn.dataset.active = true;
-    selectedCategories.push(currentCategory);
+    createPagination({
+      block,
+      contentArea,
+      totalPages,
+      renderItems: renderBlogList,
+      loadPageData,
+      initialPage: 0,
+    });
   }
 };
 
-const reduceCategories = (arts) => {
-  const categoryList = arts.map((x) => x.category);
-  const reducedCategories = reduceArrays(categoryList);
-  const orderedCategories = Object.keys(reducedCategories)
-    .sort()
-    .reduce((obj, key) => {
-      obj[key] = reducedCategories[key];
-      return obj;
-    }, {});
-  const reducedArray = Object.entries(orderedCategories);
+const addEventListeners = (block) => {
+  const searchInput = block.querySelector(`.${blockName}__search-bar input`);
+  const searchButton = block.querySelector(`.${blockName}__search-bar button`);
 
-  return reducedArray;
-};
+  const applySearch = async () => {
+    const query = searchInput.value?.trim();
+    block.querySelector('.pagination-content')?.remove();
+    block.querySelector('.pagination-nav')?.remove();
+    await initBlogPagination(block, query ? { q: query } : {});
+  };
 
-const formatDate = (date) => {
-  const convertedDate = new Date(parseInt(date, 10) * 1000);
-
-  const day = convertedDate.getDate();
-  const month = convertedDate.getMonth() + 1;
-  const year = convertedDate.getFullYear();
-
-  return `${month}/${day}/${year}`;
-};
-
-const handlePaginationStyling = (page, total, value, section) => {
-  const previousPage = page + 1;
-  const allBtns = section.querySelectorAll('.pagination-button');
-  allBtns.forEach((btn) => {
-    btn.dataset.active = true;
-  });
-
-  const lastBtn = section.querySelector('#btn-last');
-  const firstBtn = section.querySelector('#btn-first');
-  const nextBtn = section.querySelector('#btn-next');
-  const prevBtn = section.querySelector('#btn-prev');
-
-  const clickedBtn = section.querySelector(`#btn-${value}`);
-  let activeNumber;
-
-  if (Number.isFinite(Number(value))) clickedBtn.dataset.active = false;
-
-  if (+value === total || value === 'last') {
-    activeNumber = section.querySelector(`#btn-${total}`);
-    activeNumber.dataset.active = false;
-    lastBtn.dataset.active = false;
-    nextBtn.dataset.active = false;
-  }
-  if (+value === 1 || value === 'first') {
-    activeNumber = section.querySelector('#btn-1');
-    activeNumber.dataset.active = false;
-    firstBtn.dataset.active = false;
-    prevBtn.dataset.active = false;
-  }
-  if (value === 'next' && previousPage === total - 1) {
-    lastBtn.dataset.active = false;
-    nextBtn.dataset.active = false;
-  }
-  if (value === 'prev' && previousPage === 2) {
-    firstBtn.dataset.active = false;
-    prevBtn.dataset.active = false;
-  }
-  if (value === 'next') {
-    activeNumber = section.querySelector(`#btn-${previousPage + 1}`);
-    activeNumber.dataset.active = false;
-  }
-  if (value === 'prev') {
-    activeNumber = section.querySelector(`#btn-${previousPage - 1}`);
-    activeNumber.dataset.active = false;
-  }
-};
-
-const handlePagination = (e, articles, page, total) => {
-  firstBuild = false;
-  let nextPage;
-
-  const btnClassList = [...e.target.classList];
-
-  const isNumber = btnClassList.includes('page-number');
-  const btnId = e.target.id;
-  const btnValue = btnId.slice(4);
-
-  if (isNumber) {
-    nextPage = buildResults(articles, btnValue - 1);
-  }
-  if (btnValue === 'first') {
-    nextPage = buildResults(articles, 0);
-  }
-  if (btnValue === 'last') {
-    nextPage = buildResults(articles, total - 1);
-  }
-  if (btnValue === 'prev') {
-    if (page === 0) {
-      return null;
+  searchButton.addEventListener('click', applySearch);
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      applySearch();
     }
-    nextPage = buildResults(articles, page - 1);
-  }
-  if (btnValue === 'next') {
-    if (page === total - 1) {
-      return null;
-    }
-    nextPage = buildResults(articles, page + 1);
-  }
-  const currPage = document.querySelector(`.${blockName}-articles`);
-  currPage.insertAdjacentElement('beforebegin', nextPage);
-  currPage.remove();
-
-  handlePaginationStyling(page, total, btnValue, nextPage);
-  return false;
-};
-
-const buildPagination = (articles, totalPages, curentPage) => {
-  const paginationLabels = paginationText.split('[/]');
-  const [first, prev, next, last] = paginationLabels;
-
-  const bottomPaginationSection = createElement('div', { classes: 'pagination-bottom-section' });
-
-  const firstPageBtn = createElement('a', { classes: ['first-page', 'pagination-button'], props: { id: 'btn-first' } });
-  firstPageBtn.textContent = first;
-  if (firstBuild) firstPageBtn.dataset.active = false;
-  const prevPageBtn = createElement('a', { classes: ['prev-page', 'pagination-button'], props: { id: 'btn-prev' } });
-  prevPageBtn.textContent = prev;
-  if (firstBuild) prevPageBtn.dataset.active = false;
-  const nextPageBtn = createElement('a', { classes: ['next-page', 'pagination-button'], props: { id: 'btn-next' } });
-  nextPageBtn.textContent = next;
-  if (totalPages === 1) nextPageBtn.dataset.active = false;
-  const lastPageBtn = createElement('a', { classes: ['last-page', 'pagination-button'], props: { id: 'btn-last' } });
-  lastPageBtn.textContent = last;
-  if (totalPages === 1) lastPageBtn.dataset.active = false;
-
-  const paginationList = createElement('ul', { classes: 'pagination-list' });
-
-  for (let i = 0; i < totalPages; i += 1) {
-    const pageNumber = i + 1;
-    const pageItem = createElement('li', { classes: ['page-item', `page-number-${pageNumber}`] });
-    const pageLink = createElement('a', { classes: ['page-number', 'pagination-button'], props: { id: `btn-${pageNumber}` } });
-    pageLink.textContent = pageNumber;
-    if (i === 0 && firstBuild) pageLink.dataset.active = false;
-    pageItem.appendChild(pageLink);
-    paginationList.appendChild(pageItem);
-  }
-  bottomPaginationSection.append(firstPageBtn, prevPageBtn, paginationList, nextPageBtn, lastPageBtn);
-
-  const allBtns = bottomPaginationSection.querySelectorAll('.pagination-button');
-  allBtns.forEach((btn) => btn.addEventListener('click', (e) => handlePagination(e, articles, curentPage, totalPages)));
-
-  return bottomPaginationSection;
-};
-
-const buildSidebar = (articles, titleContent) => {
-  const sidebar = createElement('div', { classes: `${blockName}-sidebar` });
-
-  const titleSection = createElement('div', { classes: 'title-section' });
-  const title = createElement('h4', { classes: 'title' });
-  title.textContent = titleContent;
-  const closeButton = createElement('button', {
-    classes: ['close-button', 'fa', 'fa-close'],
-    props: {
-      type: 'button',
-      id: 'close-button',
-    },
   });
-  closeButton.onclick = () => deleteCats(sidebar);
-  titleSection.append(title, closeButton);
-
-  const filterSection = createElement('div', { classes: 'filter-section' });
-  const filterButton = createElement('button', {
-    classes: 'filter-button',
-    props: {
-      type: 'button',
-    },
-  });
-  filterButton.textContent = 'Filter';
-  filterButton.onclick = () => filterCats();
-  filterSection.append(filterButton);
-
-  const categoriesSection = createElement('div', { classes: 'categories-section' });
-  const amountsAndCategories = reduceCategories(articles);
-
-  amountsAndCategories.forEach((art) => {
-    const [cat, amount] = art;
-    const category = createElement('a', { classes: 'category', props: { id: `${cat}` } });
-
-    category.onclick = (e) => selectCats(e);
-    category.textContent = `${cat} (${amount})`;
-    categoriesSection.appendChild(category);
-  });
-  sidebar.append(titleSection, filterSection, categoriesSection);
-
-  return sidebar;
 };
 
 export default async function decorate(block) {
-  const { title, 'amount-of-articles': amount } = readBlockConfig(block);
-  articlesPerPage = +amount;
-
-  const queryParams = {
-    sort: 'PUBLISH_DATE_DESC',
-  };
-
-  const { articles } = await fetchArticlesAndFacets(queryParams);
-  allArticles = [...articles];
-
-  const sidebar = buildSidebar(allArticles, title);
-  const results = buildResults(allArticles, 0);
-
-  block.textContent = '';
-  block.append(sidebar, results);
+  block.append(renderSearchBar());
+  await initBlogPagination(block);
+  addEventListeners(block);
 }

@@ -333,11 +333,11 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
 
   if (error) return { results: [], error };
 
-  const { items, facets } = data.data[RC_BLOG_RECOMMEND];
+  const { items, facets, count } = data.data[RC_BLOG_RECOMMEND];
 
   const articles = items.map((item) => item.metadata);
 
-  return { articles, facets };
+  return { articles, facets, count };
 }
 
 export async function subcategorySearch({ category = '', subcategory = '', facetFields = [], dynamicFilters = [], limit = 100, offset = 0 }) {
@@ -400,10 +400,106 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
 
   if (error) return { items: [], facets: [], error };
 
-  const result = {
-    items: data.data[RC_SUBCATEGORIES_SEARCH].items,
-    facets: data.data[RC_SUBCATEGORIES_SEARCH].facets,
-  };
+  const { items, facets, count } = data.data[RC_SUBCATEGORIES_SEARCH];
+  const result = { items, facets, count };
 
   return result;
+}
+
+export async function fetchPdpProduct({ sku, requestedFields = [], language = getPageLanguage() || 'EN' }) {
+  const { SEARCH_URL_DEV, TENANT } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query PDP(
+        $requestedFields: [String!]!,
+        $tenant: RcTenantEnum!,
+        $language: RcLocaleEnum!,
+        $basePartNumber: String!
+      ) {
+        rcProductDescription(
+          requestedFields: $requestedFields,
+          tenant: $tenant,
+          language: $language,
+          basePartNumber: $basePartNumber
+        ) {
+          items {
+            metadata {
+              basePartNumber
+              dynamicFields
+            }
+          }
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      language,
+      basePartNumber: sku,
+      requestedFields,
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+
+  if (error) return { product: null, error };
+
+  const product = data?.data?.rcProductDescription?.items?.[0]?.metadata || null;
+
+  return { product, error: null };
+}
+
+export async function searchArticles({ q = 'Road', sort = 'PUBLISH_DATE_DESC', limit = 100, offset = 0 }) {
+  const { SEARCH_URL_DEV, RC_BLOG_SEARCH, TENANT } = SEARCH_CONFIG;
+
+  const graphqlQuery = {
+    query: `
+      query ${RC_BLOG_SEARCH}($q: String!, $tenant: RcTenantEnum!, $language: RcLocaleEnum!, $limit: Int, $category: [String], $facets: [RcBlogsFieldEnum], $offset: Int, $tags: [String], $sort: RcBlogsSortOptionsEnum) {
+        ${RC_BLOG_SEARCH}(q: $q, tenant: $tenant, language: $language, limit: $limit, category: $category, facets: $facets, offset: $offset, tags: $tags, sort: $sort) {
+          count
+          items {
+            uuid
+            metadata {
+              title
+              description
+              url
+              lastModified
+              language
+              category
+              tags
+              publishDate
+              image
+            }
+            score
+          }
+          facets {
+            field
+            items {
+              value
+              count
+            }
+          }
+          numberOfPages
+          currentPage
+        }
+      }
+    `,
+    variables: {
+      tenant: TENANT,
+      q,
+      limit,
+      offset,
+      sort,
+      language: getPageLanguage() || 'EN',
+    },
+  };
+
+  const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
+  if (error) return { results: [], error };
+
+  const { items, count } = data.data[RC_BLOG_SEARCH];
+
+  const articles = items.map((item) => item.metadata);
+
+  return { articles, count };
 }

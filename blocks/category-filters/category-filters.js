@@ -1,81 +1,114 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
 import { subcategorySearch } from '../../scripts/graphql-api.js';
+import { aggregateFilters, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 const blockName = 'category-filters';
-let products = window.categoryData;
-let isDecorated = false;
 const titleText = getTextLabel('category_filters_title');
 const clearText = getTextLabel('category_filters_clear_button');
-const applyText = getTextLabel('category_filters_apply_button');
+let queryObject;
 
-function getFiltersAndCategories() {
-  let filters = {};
-  let categoryObject = {};
-
+const fetchQueryParams = () => {
   try {
-    categoryObject = JSON.parse(sessionStorage.getItem('category-object'));
-    filters = JSON.parse(sessionStorage.getItem('filter-attribs'));
+    const item = sessionStorage.getItem('query-params');
+    queryObject = JSON.parse(item || '{}');
   } catch (error) {
     throw new Error('Error getting filters from sessionStorage: ', error);
   }
+};
 
-  return { filters, categoryObject };
-}
+// Update query object with the checked inputs
+const captureInputsAndUpdateQuery = (input) => {
+  const {
+    value,
+    dataset: { filterTitle: key },
+  } = input;
 
-const renderBlock = async (block) => {
-  const { filters, categoryObject } = getFiltersAndCategories();
-  const { category, subcategory } = categoryObject;
-  const filterKeys = Object.keys(filters).sort();
+  const filterIndex = queryObject.dynamicFilters.findIndex((f) => f.fieldName === key);
+  const filterObj = queryObject.dynamicFilters[filterIndex];
 
-  const filterTitle = createElement('h3', { classes: `${blockName}-title` });
-  filterTitle.textContent = titleText;
-  const filterForm = createElement('form', { classes: `${blockName}-form`, props: { id: `${blockName}-form` } });
-  const buttonsWrapper = createElement('div', { classes: `${blockName}-buttons-wrapper` });
-  const clearFilterBtn = createElement('button', {
-    classes: ['clear-filter-btn', 'filter-btn', 'secondary'],
-    props: {
-      type: 'submit',
-      form: `${blockName}-form`,
-      disabled: 'disabled',
-      id: 'clear-filter-btn',
-    },
+  if (filterObj) {
+    const valueIndex = filterObj.filterValue.indexOf(value);
+
+    if (valueIndex > -1) {
+      filterObj.filterValue.splice(valueIndex, 1);
+
+      if (filterObj.filterValue.length === 0) {
+        queryObject.dynamicFilters.splice(filterIndex, 1);
+      }
+    } else {
+      filterObj.filterValue.push(value);
+      if (!queryObject.facetFields.includes(key)) {
+        queryObject.facetFields.push(key);
+      }
+    }
+  } else {
+    queryObject.dynamicFilters.push({
+      fieldName: key,
+      filterValue: [value],
+    });
+
+    if (!queryObject.facetFields.includes(key)) {
+      queryObject.facetFields.push(key);
+    }
+  }
+  updateGlobalQueryObject('query-params', queryObject);
+};
+
+// when rebuilding the filters, make sure the correct inputs are active
+const updateCheckboxes = (form) => {
+  const dynamicFilters = queryObject.dynamicFilters;
+  const inputs = form.querySelectorAll(`.${blockName}-input`);
+
+  inputs.forEach((input) => {
+    const isPresent = dynamicFilters.some((obj) => obj.filterValue.includes(input.value));
+    input.checked = isPresent;
   });
-  clearFilterBtn.textContent = clearText;
-  const applyFilterBtn = createElement('button', {
-    classes: ['apply-filter-btn', 'filter-btn', 'primary'],
-    props: {
-      type: 'submit',
-      form: `${blockName}-form`,
-      disabled: 'disabled',
-      id: 'apply-filter-btn',
-    },
-  });
-  applyFilterBtn.textContent = applyText;
+};
+
+const isFilterActive = (key = '') => {
+  const dynamicFilters = queryObject.dynamicFilters;
+  if (dynamicFilters.length === 0) return false;
+  return dynamicFilters.some((item) => item.fieldName === key);
+};
+
+const isClearBtnEnabled = () => queryObject.dynamicFilters.length < 1;
+
+const renderFilters = (dynamicFilters, wrapper) => {
+  const filterFields = aggregateFilters(dynamicFilters);
+  const filterKeys = Object.keys(filterFields).sort();
   const filterList = createElement('ul', { classes: `${blockName}-list` });
 
-  // filter the data to add extra filters to every key
   filterKeys.forEach((key) => {
     const filterItem = createElement('li', { classes: `${blockName}-item` });
-    const titleWrapper = createElement('div', { classes: `${blockName}-title-wrapper` });
+    const titleWrapper = createElement('div', { classes: [`${blockName}-title-wrapper`, 'active'] });
+
     const filterAttrib = createElement('h6', { classes: `${blockName}-item-title` });
     filterAttrib.textContent = key;
     const plusBtn = createElement('span', { classes: ['plus-btn', 'fa', 'fa-plus'] });
-    const filterOptionsWrapper = createElement('ul', {
-      classes: [`${blockName}-options-wrapper`, 'hidden'],
-    });
+    const filterOptionsWrapper = createElement('ul', { classes: `${blockName}-options-wrapper` });
 
-    // Add checkbox for every attribute
-    const attributes = [...filters[key]];
-    attributes.forEach((el) => {
-      const { key: value, doc_count: count } = el;
+    if (!isFilterActive(key)) {
+      titleWrapper.classList.remove('active');
+      filterOptionsWrapper.classList.add('hidden');
+    }
+
+    const clearBtn = wrapper.querySelector('.clear-filter-btn');
+    clearBtn.disabled = isClearBtnEnabled();
+
+    const productAttributes = [...filterFields[key]];
+    // if no attribute is present for the filter then no need to add it
+    if (productAttributes.length === 0) return;
+
+    productAttributes.forEach((attribute) => {
+      const { key: attrName, doc_count: count } = attribute;
       const filterOption = createElement('li', { classes: `${blockName}-option` });
-      const inputId = `${key ? key.replace(' ', '_') : null}<&>${value ? value.replace(' ', '_') : null}`;
+      const inputId = `${key ? key.replace(' ', '_') : null}<&>${attrName ? attrName.replace(' ', '_') : null}`;
       const filterInput = createElement('input', {
         classes: `${blockName}-input`,
         props: {
           type: 'checkbox',
           'data-filter-title': key,
-          value: value,
+          value: attrName,
           id: inputId,
         },
       });
@@ -85,7 +118,7 @@ const renderBlock = async (block) => {
           for: inputId,
         },
       });
-      filterLabel.textContent = `${value} - (${count})`;
+      filterLabel.textContent = `${attrName} - (${count})`;
       filterOption.append(filterInput, filterLabel);
       filterOptionsWrapper.appendChild(filterOption);
     });
@@ -96,94 +129,80 @@ const renderBlock = async (block) => {
   });
 
   filterList.onclick = (e) => {
-    const elements = [`${blockName}-title-wrapper`, `${blockName}-title`, 'plus-btn'];
+    const elements = [`${blockName}-title-wrapper`, `${blockName}-item-title`, 'plus-btn'];
     if (elements.some((el) => e.target.classList.contains(el))) {
       const element = e.target.classList.contains(`${blockName}-title-wrapper`) ? e.target : e.target.parentElement;
       element.classList.toggle('active');
       element.nextElementSibling.classList.toggle('hidden');
     }
-    if (e.target.classList.contains(`${blockName}-input`)) {
-      /* enable/disable the Apply button
-       * depending on if there is at least one checked input of the whole list */
-      const parentFilterList = e.target.closest(`.${blockName}-list`);
-      const filterInputs = parentFilterList.querySelectorAll(`.${blockName}-input`);
-      const checkedInputs = [...filterInputs].filter((el) => el.checked);
-      const isChecked = checkedInputs.length > 0;
-      const targetBtnsWrapper = parentFilterList.previousElementSibling;
-      targetBtnsWrapper.querySelector('.apply-filter-btn').disabled = !isChecked;
-    }
   };
 
-  filterForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const {
-      submitter: { id },
-    } = e;
-    const isApply = id === 'apply-filter-btn';
+  updateCheckboxes(filterList);
 
-    if (isApply) {
-      const checkedInputs = [...filterList.querySelectorAll(`.${blockName}-input:checked`)];
-      const filteredAttrib = [];
-      filterForm.querySelector('.clear-filter-btn').disabled = false;
-      // [{ fieldName, filterValue: [value1, value2, ...] }]
-      checkedInputs.forEach((el) => {
-        const fieldName = el.dataset.filterTitle;
-        const { value } = el;
-        const obj = filteredAttrib.find((attrib) => attrib.fieldName === fieldName);
-        if (obj) {
-          obj.filterValue.push(value);
-        } else {
-          filteredAttrib.push({ fieldName, filterValue: [value] });
-        }
-      });
+  const hasOldFilters = wrapper.querySelector('ul');
+  if (hasOldFilters) {
+    hasOldFilters?.remove();
+  }
+  wrapper.append(filterList);
+};
 
-      //Re-do query with selected filters
-      const filteredQueryParams = {
-        category,
-        subcategory,
-        facetFields: filterKeys,
-        dynamicFilters: [...filteredAttrib],
-      };
+const renderBlock = (block, filters) => {
+  const filterTitle = createElement('h3', { classes: `${blockName}-title` });
+  filterTitle.textContent = titleText;
+  const filterForm = createElement('form', { classes: `${blockName}-form`, props: { id: `${blockName}-form` } });
+  const buttonsWrapper = createElement('div', { classes: `${blockName}-buttons-wrapper` });
+  const clearFilterBtn = createElement('button', {
+    classes: ['clear-filter-btn', 'filter-btn', 'secondary'],
+    props: {
+      form: `${blockName}-form`,
+      id: 'clear-filter-btn',
+    },
+  });
+  clearFilterBtn.textContent = clearText;
+  clearFilterBtn.disabled = isClearBtnEnabled();
 
-      const filteredQueryResult = await subcategorySearch(filteredQueryParams);
-      const filteredProducts = filteredQueryResult.items.map((item) => item.metadata);
+  buttonsWrapper.append(clearFilterBtn);
+  filterForm.append(buttonsWrapper);
 
-      const event = new CustomEvent('FilteredProducts', { detail: { filteredProducts } });
-      document.dispatchEvent(event);
-    } else {
-      filterForm.reset();
-      filterForm.querySelector('.clear-filter-btn').disabled = true;
-      filterForm.querySelector('.apply-filter-btn').disabled = true;
-      const event = new CustomEvent('FilteredProducts', { detail: { filteredProducts: products } });
-      document.dispatchEvent(event);
-      // close active title filters
-      const activeTitles = [...filterList.querySelectorAll(`.${blockName}-title-wrapper.active`)];
-      activeTitles.forEach((el) => {
-        el.classList.remove('active');
-        el.nextElementSibling.classList.add('hidden');
-      });
-    }
-  };
+  renderFilters(filters, filterForm);
 
-  buttonsWrapper.append(clearFilterBtn, applyFilterBtn);
-  filterForm.append(buttonsWrapper, filterList);
   block.append(filterTitle, filterForm);
 };
 
-const isRenderedCheck = (block) => {
-  if (getFiltersAndCategories() && products && !isDecorated) {
-    isDecorated = true;
-    renderBlock(block);
+const fetchAndRenderFilters = async (queryObject, form) => {
+  const filteredQueryResult = await subcategorySearch(queryObject);
+  const { facets } = filteredQueryResult;
+
+  renderFilters(facets, form);
+};
+
+const setFormListeners = (block) => {
+  const form = block.querySelector(`.${blockName}-form`);
+  form.addEventListener('change', async (e) => {
+    if (e.target.type === 'checkbox') {
+      captureInputsAndUpdateQuery(e.target);
+      await fetchAndRenderFilters(queryObject, form);
+    }
+  });
+
+  const clearBtn = form.querySelector('.clear-filter-btn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      queryObject.dynamicFilters = [];
+      updateGlobalQueryObject('query-params', queryObject);
+      await fetchAndRenderFilters(queryObject, form);
+    });
   }
 };
 
 export default async function decorate(block) {
-  isRenderedCheck(block);
-  if (isDecorated) return;
-  ['FilterAttribsLoaded', 'CategoryDataLoaded'].forEach((eventName) => {
-    document.addEventListener(eventName, () => {
-      products = window.categoryData;
-      isRenderedCheck(block);
-    });
-  });
+  fetchQueryParams();
+
+  const initialQuery = await subcategorySearch(queryObject);
+  const { facets } = initialQuery;
+
+  renderBlock(block, facets);
+  setFormListeners(block);
 }
