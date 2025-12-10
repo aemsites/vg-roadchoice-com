@@ -243,6 +243,8 @@ async function loadLazy(doc) {
   // TODO: Should we load fonts here like in:
   // https://github.com/adobe/aem-boilerplate/blob/main/scripts/scripts.js
   // (look for `loadFonts`)
+
+  import('../tools/sidekick/aem-genai-variations.js');
 }
 
 async function loadPage() {
