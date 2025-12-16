@@ -222,11 +222,7 @@ $hoverText = $('#hoverText').val();
   }
 })();
 
-console.log("Config Object:", window.locatorConfig);
-console.log("API Key Value:", window.locatorConfig ? window.locatorConfig.apiKey : "Undefined");
-
 $.fn.initGoogleMaps = function () {
-  console.log($key);
   if (!$key) {
     console.error("No API Key provided to initGoogleMaps");
     return;
@@ -236,9 +232,8 @@ $.fn.initGoogleMaps = function () {
     type: "GET",
     url: `https://maps.googleapis.com/maps/api/js?key=${$key}&libraries=places,geometry`,
     dataType: "script",
-    cache: true, // Speeds up subsequent loads
+    cache: true,
     success: function () {
-      // Initialize the geocoder HERE so it's tied to the authenticated session
       window.$geocoder = new google.maps.Geocoder();
       initMap();
     }
@@ -246,17 +241,18 @@ $.fn.initGoogleMaps = function () {
 };
 
 $.fn.getTimeZoneId = async function (dealer) {
-  console.log(dealer);
-  // var lat = dealer.MAIN_LATITUDE;
-  // var long = dealer.MAIN_LONGITUDE;
+  var lat = dealer.MAIN_LATITUDE;
+  var long = dealer.MAIN_LONGITUDE;
 
-  // var apiUrl = `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${long}&timestamp=${Math.floor(Date.now() / 1000)}&key=${$oldKey}`;
+  const timestamp = Math.floor(Date.now() / 1000);
 
-  // var response = await fetch(apiUrl);
-  // var locationObj = await response.json();
+  var apiUrl = `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${long}&timestamp=${timestamp}&key=${$oldKey}`;
 
-  // return locationObj.timeZoneId;
-  return 'America/New_York'
+  var response = await fetch(apiUrl);
+  var locationObj = await response.json();
+
+  return locationObj.timeZoneId;
+  // return 'America/New_York'
 };
 
 $.fn.loadPins = function () {
