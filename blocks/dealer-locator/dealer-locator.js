@@ -5,6 +5,9 @@ import { TOOLS_CONFIGS } from '../../scripts/common.js';
 const missingKeyMessage = 'MissingKey';
 const { ENDPOINT_URL = false, GOOGLE_API_KEY: apiKey = missingKeyMessage, BACKUP_URL = false } = TOOLS_CONFIGS;
 
+const newKey = 'AIzaSyDA2kl6xcb8bn_9aAVm2MN5BRYpxPrvQ58';
+const oldKey = 'AIzaSyAP8IewqHuU8SMz_6tNiIUlbU_l0GFOd1w';
+
 function escapeHTML(input) {
   return input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
@@ -49,7 +52,8 @@ export default async function decorate(block) {
       selectedBrand: 'roadchoice',
       dataSource: datasource || '',
       backupUrl: BACKUP_URL || '',
-      apiKey,
+      newKey,
+      oldKey,
       amenities: [
         'Appointments Accepted',
         'Bilingual Service',

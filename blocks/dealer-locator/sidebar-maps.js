@@ -65,7 +65,10 @@ $lastPane = "";                                                                 
 $radiusValue = $('#range').val();                                                               // the current radius value
 $sortedPins = null;                                                                             // stores all pins by distance (miles)
 $offset = ((new Date().getTimezoneOffset()) / 60) * -1;
-$key = window?.locatorConfig?.apiKey || '';
+
+$key = window?.locatorConfig?.apiKey|| '';
+$oldKkey = window?.locatorConfig?.oldKey || '';
+
 $myDealer = null;
 $wayPoints = [];
 $directionsService = null;
@@ -223,7 +226,7 @@ $.fn.initGoogleMaps = function () {
   // Lets us control OOO when some cases gmaps takes longer to initialize
   $.ajax({
     type: "GET",
-    url: "https://maps.googleapis.com/maps/api/js?key=AIzaSyAP8IewqHuU8SMz_6tNiIUlbU_l0GFOd1w&libraries=places,geometry",
+    url: `https://maps.googleapis.com/maps/api/js?key=${$key}&libraries=places,geometry`,
     dataType: "script",
     success: function (d) {
       initMap();
@@ -235,7 +238,7 @@ $.fn.getTimeZoneId = async function (dealer) {
   var lat = dealer.MAIN_LATITUDE;
   var long = dealer.MAIN_LONGITUDE;
 
-  var apiUrl = `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${long}&timestamp=${Math.floor(Date.now() / 1000)}&key=${$key}`;
+  var apiUrl = `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${long}&timestamp=${Math.floor(Date.now() / 1000)}&key=${$oldKkey}`;
 
   var response = await fetch(apiUrl);
   var locationObj = await response.json();
