@@ -222,17 +222,23 @@ $hoverText = $('#hoverText').val();
   }
 })();
 
-$.fn.initGoogleMaps = function () {
-  if (window.google && window.google.maps) {
-    initMap();
+$.fn.initGoogleMaps = function (apiKey) { // Pass the key explicitly to avoid global variable issues
+  if (!apiKey) {
+    console.error("No API Key provided to initGoogleMaps");
     return;
   }
 
-  const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${$key}&libraries=places,geometry&callback=initMap`;
-  script.async = true;
-  script.defer = true;
-  document.head.appendChild(script);
+  $.ajax({
+    type: "GET",
+    url: `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry`,
+    dataType: "script",
+    cache: true, // Speeds up subsequent loads
+    success: function () {
+      // Initialize the geocoder HERE so it's tied to the authenticated session
+      window.$geocoder = new google.maps.Geocoder();
+      initMap();
+    }
+  });
 };
 
 $.fn.getTimeZoneId = async function (dealer) {
