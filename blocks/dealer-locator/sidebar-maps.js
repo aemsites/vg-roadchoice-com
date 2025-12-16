@@ -236,15 +236,17 @@ $.fn.initGoogleMaps = function () {
 };
 
 $.fn.getTimeZoneId = async function (dealer) {
-  var lat = dealer.MAIN_LATITUDE;
-  var long = dealer.MAIN_LONGITUDE;
+  console.log(dealer);
+  // var lat = dealer.MAIN_LATITUDE;
+  // var long = dealer.MAIN_LONGITUDE;
 
-  var apiUrl = `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${long}&timestamp=${Math.floor(Date.now() / 1000)}&key=${$oldKey}`;
+  // var apiUrl = `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${long}&timestamp=${Math.floor(Date.now() / 1000)}&key=${$oldKey}`;
 
-  var response = await fetch(apiUrl);
-  var locationObj = await response.json();
+  // var response = await fetch(apiUrl);
+  // var locationObj = await response.json();
 
-  return locationObj.timeZoneId;
+  // return locationObj.timeZoneId;
+  return 'America/New_York'
 };
 
 $.fn.loadPins = function () {
@@ -624,8 +626,7 @@ $.fn.isOpen = async function (dealer, time) {
   var compareDate = '1/1/2000 '
   
   if (!dealer.timeZoneId) {
-    // dealer.timeZoneId = await $.fn.getTimeZoneId(dealer);
-    dealer.timeZoneId = 'America/New_York'
+    dealer.timeZoneId = await $.fn.getTimeZoneId(dealer);
   }
 
   if (hours) {
