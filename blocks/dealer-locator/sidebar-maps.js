@@ -222,15 +222,16 @@ $hoverText = $('#hoverText').val();
   }
 })();
 
-$.fn.initGoogleMaps = function ($key) { // Pass the key explicitly to avoid global variable issues
-  if (!$key) {
+$.fn.initGoogleMaps = function (currentKey) {
+  console.log(currentKey);
+  if (!currentKey) {
     console.error("No API Key provided to initGoogleMaps");
     return;
   }
 
   $.ajax({
     type: "GET",
-    url: `https://maps.googleapis.com/maps/api/js?key=${$key}&libraries=places,geometry`,
+    url: `https://maps.googleapis.com/maps/api/js?key=${currentKey}&libraries=places,geometry`,
     dataType: "script",
     cache: true, // Speeds up subsequent loads
     success: function () {
@@ -3122,4 +3123,4 @@ $(document).on('click', '#print', function (eventObject) {
 
 });
 
-$.fn.initGoogleMaps();//entry point to dealer locator
+$.fn.initGoogleMaps($key);//entry point to dealer locator
