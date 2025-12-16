@@ -624,7 +624,8 @@ $.fn.isOpen = async function (dealer, time) {
   var compareDate = '1/1/2000 '
   
   if (!dealer.timeZoneId) {
-    dealer.timeZoneId = await $.fn.getTimeZoneId(dealer);
+    // dealer.timeZoneId = await $.fn.getTimeZoneId(dealer);
+    dealer.timeZoneId = 'America/New_York'
   }
 
   if (hours) {
