@@ -66,7 +66,7 @@ $radiusValue = $('#range').val();                                               
 $sortedPins = null;                                                                             // stores all pins by distance (miles)
 $offset = ((new Date().getTimezoneOffset()) / 60) * -1;
 
-$key = window?.locatorConfig?.apiKey;
+$key = window?.locatorConfig?.newKey;
 $oldKey = window?.locatorConfig?.oldKey;
 
 $myDealer = null;
