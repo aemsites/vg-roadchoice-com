@@ -66,8 +66,8 @@ $radiusValue = $('#range').val();                                               
 $sortedPins = null;                                                                             // stores all pins by distance (miles)
 $offset = ((new Date().getTimezoneOffset()) / 60) * -1;
 
-$key = window?.locatorConfig?.apiKey;
-$oldKey = window?.locatorConfig?.oldKey;
+// $key = window?.locatorConfig?.apiKey;
+// $oldKey = window?.locatorConfig?.oldKey;
 
 $myDealer = null;
 $wayPoints = [];
@@ -222,7 +222,8 @@ $hoverText = $('#hoverText').val();
   }
 })();
 
-$.fn.initGoogleMaps = function (currentKey) {
+$.fn.initGoogleMaps = function () {
+  var currentKey = window.locatorConfig ? window.locatorConfig.apiKey : null;
   console.log(currentKey);
   if (!currentKey) {
     console.error("No API Key provided to initGoogleMaps");
@@ -3123,4 +3124,4 @@ $(document).on('click', '#print', function (eventObject) {
 
 });
 
-$.fn.initGoogleMaps($key);//entry point to dealer locator
+$.fn.initGoogleMaps();//entry point to dealer locator
