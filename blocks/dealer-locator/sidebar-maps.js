@@ -246,7 +246,7 @@ $.fn.getTimeZoneId = async function (dealer) {
 
   const timestamp = Math.floor(Date.now() / 1000);
 
-  var apiUrl = `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${long}&timestamp=${timestamp}&key=${$oldKey}`;
+  var apiUrl = `https://maps.googleapis.com/maps/api/timezone/json?location=${lat},${long}&timestamp=${timestamp}&key=${$key}`;
 
   var response = await fetch(apiUrl);
   var locationObj = await response.json();
