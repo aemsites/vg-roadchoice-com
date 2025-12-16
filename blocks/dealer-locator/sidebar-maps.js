@@ -66,8 +66,8 @@ $radiusValue = $('#range').val();                                               
 $sortedPins = null;                                                                             // stores all pins by distance (miles)
 $offset = ((new Date().getTimezoneOffset()) / 60) * -1;
 
-// $key = window?.locatorConfig?.apiKey;
-// $oldKey = window?.locatorConfig?.oldKey;
+$key = window?.locatorConfig?.apiKey;
+$oldKey = window?.locatorConfig?.oldKey;
 
 $myDealer = null;
 $wayPoints = [];
@@ -222,17 +222,19 @@ $hoverText = $('#hoverText').val();
   }
 })();
 
+console.log("Config Object:", window.locatorConfig);
+console.log("API Key Value:", window.locatorConfig ? window.locatorConfig.apiKey : "Undefined");
+
 $.fn.initGoogleMaps = function () {
-  var currentKey = window.locatorConfig ? window.locatorConfig.apiKey : null;
-  console.log(currentKey);
-  if (!currentKey) {
+  console.log($key);
+  if (!$key) {
     console.error("No API Key provided to initGoogleMaps");
     return;
   }
 
   $.ajax({
     type: "GET",
-    url: `https://maps.googleapis.com/maps/api/js?key=${currentKey}&libraries=places,geometry`,
+    url: `https://maps.googleapis.com/maps/api/js?key=${$key}&libraries=places,geometry`,
     dataType: "script",
     cache: true, // Speeds up subsequent loads
     success: function () {
