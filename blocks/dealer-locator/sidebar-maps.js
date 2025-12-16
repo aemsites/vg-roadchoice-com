@@ -222,15 +222,15 @@ $hoverText = $('#hoverText').val();
   }
 })();
 
-$.fn.initGoogleMaps = function (apiKey) { // Pass the key explicitly to avoid global variable issues
-  if (!apiKey) {
+$.fn.initGoogleMaps = function ($key) { // Pass the key explicitly to avoid global variable issues
+  if (!$key) {
     console.error("No API Key provided to initGoogleMaps");
     return;
   }
 
   $.ajax({
     type: "GET",
-    url: `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,geometry`,
+    url: `https://maps.googleapis.com/maps/api/js?key=${$key}&libraries=places,geometry`,
     dataType: "script",
     cache: true, // Speeds up subsequent loads
     success: function () {
