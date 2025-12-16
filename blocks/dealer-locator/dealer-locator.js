@@ -3,9 +3,8 @@ import { TOOLS_CONFIGS } from '../../scripts/common.js';
 
 // DEALER LOCATOR config coming from constants file.
 const missingKeyMessage = 'MissingKey';
-const { ENDPOINT_URL = false, GOOGLE_API_KEY: apiKey = missingKeyMessage, BACKUP_URL = false } = TOOLS_CONFIGS;
+const { ENDPOINT_URL = false, GOOGLE_API_KEY: newKey = missingKeyMessage, BACKUP_URL = false } = TOOLS_CONFIGS;
 
-const newKey = 'AIzaSyDA2kl6xcb8bn_9aAVm2MN5BRYpxPrvQ58';
 const oldKey = 'AIzaSyAP8IewqHuU8SMz_6tNiIUlbU_l0GFOd1w';
 
 function escapeHTML(input) {
@@ -39,7 +38,7 @@ export default async function decorate(block) {
     );
   }
   observer.observe(block, { attributes: true, attributeFilter: ['data-block-status'] });
-  if (!apiKey || apiKey === missingKeyMessage) {
+  if (!newKey || newKey === missingKeyMessage) {
     console.error(
       'The block is wrongly set up or is missing the %cGOOGLE_API_KEY%c in the %cTOOLS_CONFIGS',
       'color: red;',
