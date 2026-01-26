@@ -676,27 +676,6 @@ const getLongJSONData = async (props) => {
 };
 
 /**
- * Launch the search worker to load all the products
- * @returns {Worker} the search worker
- */
-function loadWorker() {
-  const currentUrl = new URL(window.location.href);
-  const { pathname } = currentUrl;
-  const langLocale = getMetadata('locale');
-  const rootLangPath = langLocale ? `/${langLocale.toLocaleLowerCase()}` : '';
-  const worker = new Worker(`${currentUrl.origin}/blocks/search/worker.js`);
-  // this just launch the worker, and the message listener is triggered in another script
-  worker.postMessage({ rootLangPath, pathname });
-  // this enable the search in any page
-  worker.onmessage = (e) => {
-    if (e?.data) {
-      window.allProducts = e.data;
-    }
-  };
-  return worker;
-}
-
-/**
  * Adds attributes to all anchors and buttons that start with properties between [ brackets ]
  * @param {NodeList} links list of links to check if have properties to add as attributes
  */
@@ -884,7 +863,6 @@ export {
   getLocaleContextedUrl,
   getLocale,
   checkLinkProps,
-  loadWorker,
   getLongJSONData,
   deepMerge,
   createResponsivePicture,
