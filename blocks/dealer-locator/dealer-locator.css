@@ -246,22 +246,6 @@ main .section.dealer-locator-container > div {
   visibility: visible;
 }
 
-.dealer-locator .main-directions .go-back button {
-  background: 0 0;
-  cursor: pointer;
-  border: 1px solid #000;
-  font-size: 14px;
-  padding: 6px;
-  margin-bottom: 10px;
-  opacity: 0.8;
-}
-
-.dealer-locator .main-directions .go-back button:hover {
-  opacity: 1;
-  background-color: #e6e6e6;
-  border: 1px solid transparent;
-}
-
 .dealer-locator .select-directions {
   display: inline-block;
   text-align: right;
@@ -451,24 +435,28 @@ main .section.dealer-locator-container > div {
   align-items: center;
 }
 
+.dealer-locator .nearby-pins article.teaser .teaser-bottom .left .website,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .call,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .direction,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .more,
+.dealer-locator .nearby-pins article.teaser .teaser-bottom .right .website,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .call,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .direction,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .more {
   border: 1px solid #000;
   padding: 3px 0 0;
-  margin-left: 10px;
+  margin-right: 10px;
   border-radius: 4px;
-  width: 69px;
+  min-width: 70px;
   height: 22px;
   text-align: center;
 }
 
+.dealer-locator .nearby-pins article.teaser .teaser-bottom .left .website:hover,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .call:hover,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .direction:hover,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .more:hover,
+.dealer-locator .nearby-pins article.teaser .teaser-bottom .right .website:hover,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .call:hover,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .direction:hover,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .more:hover {
@@ -476,9 +464,11 @@ main .section.dealer-locator-container > div {
 }
 
 @media (max-width: 992px) {
+  .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .website,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .call,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .direction,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .more,
+  .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .website,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .call,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .direction,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .more {
@@ -486,9 +476,11 @@ main .section.dealer-locator-container > div {
     margin-left: 4px;
   }
 
+  .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .website:hover,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .call:hover,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .direction:hover,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .more:hover,
+  .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .website:hover,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .call:hover,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .direction:hover,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .more:hover {
@@ -506,21 +498,6 @@ main .section.dealer-locator-container > div {
   .dealer-locator .nearby-pins article.teaser .teaser-top .left {
     max-width: unset;
   }
-}
-
-.dealer-locator .nearby-pins article.teaser .teaser-bottom .left .website,
-.dealer-locator .nearby-pins article.teaser .teaser-bottom .right .website {
-  border: 1px solid #000;
-  padding: 3px 0 0;
-  border-radius: 4px;
-  width: 69px;
-  height: 22px;
-  text-align: center;
-}
-
-.dealer-locator .nearby-pins article.teaser .teaser-bottom .left .website:hover,
-.dealer-locator .nearby-pins article.teaser .teaser-bottom .right .website:hover {
-  background: #fff;
 }
 
 @media (max-width: 992px) {
