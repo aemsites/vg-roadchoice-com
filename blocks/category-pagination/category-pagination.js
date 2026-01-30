@@ -53,7 +53,7 @@ const renderBlock = async (block, paginationData) => {
   currentDisplayedProds = hasMoreItems ? productsPerPage : productCount;
 
   if (!isFirstRenderPass) {
-    block.querySelector('.text-wrapper p').remove();
+    block.querySelector('.text-wrapper').remove();
   }
 
   const textWrapper = createElement('div', { classes: 'text-wrapper' });

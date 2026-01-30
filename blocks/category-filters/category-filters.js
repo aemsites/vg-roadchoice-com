@@ -37,19 +37,12 @@ const captureInputsAndUpdateQuery = (input) => {
       }
     } else {
       filterObj.filterValue.push(value);
-      if (!queryObject.facetFields.includes(key)) {
-        queryObject.facetFields.push(key);
-      }
     }
   } else {
     queryObject.dynamicFilters.push({
       fieldName: key,
       filterValue: [value],
     });
-
-    if (!queryObject.facetFields.includes(key)) {
-      queryObject.facetFields.push(key);
-    }
   }
   updateGlobalQueryObject('query-params', queryObject);
 };
