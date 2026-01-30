@@ -2,8 +2,8 @@ import { getTextLabel, createElement } from '../../scripts/common.js';
 import { getAndApplySearchResults } from '../search/search.js';
 
 const blockName = 'pagination';
-const buttonTextContent = getTextLabel('pagination_button');
-const partsWord = getTextLabel('parts');
+const buttonTextContent = getTextLabel('pagination:pagination_button');
+const partsWord = getTextLabel('pagination:parts');
 
 export default async function decorate(block) {
   const paginationSection = createElement('div', { classes: `${blockName}-section` });

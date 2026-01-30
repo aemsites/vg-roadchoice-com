@@ -26,7 +26,7 @@ const errorMessage = (errorTitle, errorText) => `<h3 class='${blockName}__title 
 const getMessageText = (isSuccess, isTitle) => {
   const key = isSuccess ? 'Successful' : 'Error';
   const type = isTitle ? 'Title' : 'Text';
-  return getTextLabel(`V2CustomForm:${key}Submission${type}`);
+  return getTextLabel(`v2-custom-form:${key}Submission${type}`);
 };
 
 // Form Block identifies the submit endpoint via these rules and in order

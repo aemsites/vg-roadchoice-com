@@ -4,159 +4,167 @@
   "limit": 26,
   "data": [
     {
-      "Key": "brand_name",
+      "Key": "breadcrumb:brand_name",
       "Text": "Road Choice"
     },
     {
-      "Key": "recommendations_title",
+      "Key": "recommendations:title",
       "Text": "Blog[/]You may also like..."
     },
     {
-      "Key": "read_more",
+      "Key": "recommendations:read_more",
       "Text": "READ MORE"
     },
     {
-      "Key": "blog_pagination_number",
-      "Text": "There are [$] results"
-    },
-    {
-      "Key": "pagination",
-      "Text": "First[/]Previous[/]Next[/]Last"
-    },
-    {
-      "Key": "cross-reference_number",
+      "Key": "search:cross-reference_number",
       "Text": "Cross-Reference No"
     },
     {
-      "Key": "part_number_or_description",
+      "Key": "search:part_number_or_description",
       "Text": "Part No or Description"
     },
     {
-      "Key": "part_number_slash_description",
+      "Key": "search:part_number_slash_description",
       "Text": "Part Number/Description"
     },
     {
-      "Key": "SEARCH_RESULT:cross_title",
+      "Key": "search:cross_title",
       "Text": "Search Results for Cross-Reference: [$q]"
     },
     {
-      "Key": "SEARCH_RESULT:parts_title",
+      "Key": "search:parts_title",
       "Text": "Search Results for [$1][$2][$q] parts"
     },
     {
-      "Key": "part_number",
+      "Key": "blog-list:part_number",
       "Text": "Part Number"
     },
     {
-      "Key": "parts",
+      "Key": "pagination:parts",
       "Text": "Parts"
     },
     {
-      "Key": "pagination_text",
+      "Key": "search:pagination_text",
       "Text": "Showing top [$] results"
     },
     {
-      "Key": "pagination_button",
+      "Key": "category-pagination:pagination_text",
+      "Text": "Showing top [$] results"
+    },
+    {
+      "Key": "category-pagination:pagination_button",
       "Text": "Show More"
     },
     {
-      "Key": "categories_label",
+      "Key": "pagination:pagination_button",
+      "Text": "Show More"
+    },
+    {
+      "Key": "search:pagination_button",
+      "Text": "Show More"
+    },
+    {
+      "Key": "filters:categories_label",
       "Text": "Categories"
     },
     {
-      "Key": "no_results_title",
+      "Key": "search:no_results_title",
       "Text": "SORRY, YOUR SEARCH FOR [$] RETURNED NO RESULTS!"
     },
     {
-      "Key": "no_results_subtitle",
+      "Key": "search-results:no_results_subtitle",
       "Text": "LET'S REFINE, OR TRY SEARCHING BY CROSS-REFERENCE INSTEAD."
     },
     {
-      "Key": "no_results_need_help",
+      "Key": "search-results:no_results_need_help",
       "Text": "NEED HELP FINDING YOUR PART?"
     },
     {
-      "Key": "no_results_contact_us",
+      "Key": "search-results:no_results_contact_us",
       "Text": "contact us at"
     },
     {
-      "Key": "category_filters_title",
+      "Key": "category-filters:title",
       "Text": "Filters"
     },
     {
-      "Key": "category_filters_clear_button",
+      "Key": "category-filters:clear_button",
       "Text": "Clear Filters"
     },
     {
-      "Key": "loading_label",
+      "Key": "results-list:loading_label",
       "Text": "Loading..."
     },
     {
-      "Key": "low_res_video_message",
+      "Key": "search:loading_label",
+      "Text": "Loading..."
+    },
+    {
+      "Key": "video:low_res_video_message",
       "Text": "For a premium high resolution experience, please accept cookies."
     },
     {
-      "Key": "change_cookie_settings",
+      "Key": "video:change_cookie_settings",
       "Text": "Change cookie settings"
     },
     {
-      "Key": "en",
+      "Key": "pdp:en",
       "Text": "English"
     },
     {
-      "Key": "fr",
+      "Key": "pdp:fr",
       "Text": "French"
     },
     {
-      "Key": "es",
+      "Key": "pdp:es",
       "Text": "Spanish"
     },
     {
-      "Key": "V2CustomForm:SuccessfulSubmissionTitle",
+      "Key": "v2-custom-form:SuccessfulSubmissionTitle",
       "Text": "THANK YOU!"
     },
     {
-      "Key": "V2CustomForm:SuccessfulSubmissionText",
+      "Key": "v2-custom-form:SuccessfulSubmissionText",
       "Text": "Your information has been submitted. Someone will be in touch with you shortly."
     },
     {
-      "Key": "V2CustomForm:ErrorSubmissionTitle",
+      "Key": "v2-custom-form:ErrorSubmissionTitle",
       "Text": "Error"
     },
     {
-      "Key": "V2CustomForm:ErrorSubmissionText",
+      "Key": "v2-custom-form:ErrorSubmissionText",
       "Text": "Information not sent. Please, try again later."
     },
     {
-      "Key": "NoSuggestionText",
+      "Key": "search:no_suggestion",
       "Text": "No suggestions for the term"
     },
     {
-      "Key": "DidyouMeanText",
+      "Key": "search:did_you_mean",
       "Text": "Did you mean?"
     },
     {
-      "Key": "category_metadata_title",
+      "Key": "part-category:metadata_title",
       "Text": "[[category]] Parts | Road Choice"
     },
     {
-      "Key": "category_metadata_description",
+      "Key": "part-category:metadata_description",
       "Text": "Explore parts in the [[category]] category on Road Choice."
     },
     {
-      "Key": "pdp_metadata_title",
+      "Key": "pdp:metadata_title",
       "Text": "[[part_number]] - [[part_name]]"
     },
     {
-      "Key": "pdp_metadata_description",
+      "Key": "pdp:metadata_description",
       "Text": "Learn more about part [[part_number]] ([[part_name]]) on Road Choice."
     },
     {
-      "Key": "subscribe:email_label",
+      "Key": "v2-forms:subscribe_email_label",
       "Text": "Enter your email"
     },
     {
-      "Key": "subscribe:button_submit",
+      "Key": "v2-forms:button_submit",
       "Text": "SUBMIT"
     },
     {
@@ -174,6 +182,18 @@
     {
     "Key": "blog_results:no_results",
     "Text": "sorry, your search for $0 returned no results!"
+    },
+    {
+      "Key": "404:back_link_title",
+      "Text": "Go back"
+    },
+    {
+      "Key": "video_helper:play_video_label",
+      "Text": "Play video"
+    },
+    {
+      "Key": "video_helper:pause_video_label",
+      "Text": "Pause video"
     }
   ],
   ":type": "sheet"
