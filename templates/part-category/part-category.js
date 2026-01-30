@@ -122,7 +122,7 @@ function setCanonicalUrl(category) {
 }
 
 function resolvePartLabel(type, cat) {
-  let label = getTextLabel(`category_metadata_${type}`);
+  let label = getTextLabel(`part-category:metadata_${type}`);
   if (label) {
     label = label.replace('[[category]]', cat);
   }
