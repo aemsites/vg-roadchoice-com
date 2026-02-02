@@ -2,7 +2,7 @@ import { getTextLabel, createElement, getLocaleContextedUrl, isLocalhost } from 
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
 const blockName = 'product-card';
-const partNumberText = getTextLabel('blog-list:part_number');
+const partNumberText = getTextLabel('blog_list:part_number');
 
 const getProperties = (prod, st) => {
   const cardContent = {};
