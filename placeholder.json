@@ -120,19 +120,19 @@
       "Text": "Spanish"
     },
     {
-      "Key": "v2_custom_form:SuccessfulSubmissionTitle",
+      "Key": "v2_custom_form:successful_submission_title",
       "Text": "THANK YOU!"
     },
     {
-      "Key": "v2_custom_form:SuccessfulSubmissionText",
+      "Key": "v2_custom_form:successful_submission_text",
       "Text": "Your information has been submitted. Someone will be in touch with you shortly."
     },
     {
-      "Key": "v2_custom_form:ErrorSubmissionTitle",
+      "Key": "v2_custom_form:error_submission_title",
       "Text": "Error"
     },
     {
-      "Key": "v2_custom_form:ErrorSubmissionText",
+      "Key": "v2_custom_form:error_submission_text",
       "Text": "Information not sent. Please, try again later."
     },
     {
