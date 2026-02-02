@@ -1048,7 +1048,6 @@ $.fn.renderAddDirectionsPin = function (marker, details) {
 
   templateClone.find('.heading p').text($.fn.camelCase(details.COMPANY_DBA_NAME));
   templateClone.find('.hours').text(isOpenHtml);
-  templateClone.find('.distance').text('~ ' + Math.round(details.distance) + ' mi');
   templateClone.find('.address').text(details.MAIN_ADDRESS_LINE_1_TXT + ' ' + details.MAIN_ADDRESS_LINE_2_TXT);
   templateClone.find('.city').text(details.MAIN_CITY_NM + ', ' + details.MAIN_STATE_PROV_CD + ' ' + details.MAIN_POSTAL_CD);
   templateClone.find('.phone').text(details.REG_PHONE_NUMBER);
@@ -1512,7 +1511,6 @@ $.fn.tmpPins = function (tmpPinList) {
 
     templateClone.find('.heading p').text($.fn.camelCase(pin.COMPANY_DBA_NAME));
     templateClone.find('.hours').text(isOpenHtml);
-    templateClone.find('.distance').text('~ ' + Math.round(pin.distance) + ' mi');
     templateClone.find('.address').text(pin.MAIN_ADDRESS_LINE_1_TXT);
     templateClone.find('.city').text(pin.MAIN_CITY_NM + ', ' + pin.MAIN_STATE_PROV_CD + ' ' + pin.MAIN_POSTAL_CD);
     templateClone.find('.direction a')
@@ -2021,7 +2019,6 @@ $.fn.selectNearbyPins = function () {
 
     templateClone.find('.heading p').text($.fn.camelCase(pin.COMPANY_DBA_NAME));
     templateClone.find('.hours').text(isOpenHtml);
-    templateClone.find('.distance').text('~ ' + Math.round(pin.distance) + ' mi');
     templateClone.find('.address').text(pin.MAIN_ADDRESS_LINE_1_TXT);
     templateClone.find('.city').text(pin.MAIN_CITY_NM + ', ' + pin.MAIN_STATE_PROV_CD + ' ' + pin.MAIN_POSTAL_CD);
     templateClone.find('.phone').text($.fn.formatPhoneNumber(pin.REG_PHONE_NUMBER));
