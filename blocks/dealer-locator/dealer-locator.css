@@ -347,7 +347,7 @@ main .section.dealer-locator-container > div {
 }
 
 .dealer-locator .nearby-pins article.teaser .dealerPanelContainer {
-  width: unset;
+  width: 80%;
 }
 
 .dealer-locator .nearby-pins article.teaser .teaser-top {
@@ -415,6 +415,7 @@ main .section.dealer-locator-container > div {
   -moz-box-pack: justify;
   -ms-flex-pack: justify;
   padding-top: 14px;
+  gap: 10px;
 }
 
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .left,
@@ -472,8 +473,7 @@ main .section.dealer-locator-container > div {
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .call,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .direction,
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .more {
-    width: 56px;
-    margin-left: 4px;
+    min-width: 45px;
   }
 
   .dealer-locator .nearby-pins article.teaser .teaser-bottom .left .website:hover,
