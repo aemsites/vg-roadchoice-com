@@ -440,7 +440,7 @@ main .section.dealer-locator-container > div {
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .direction,
 .dealer-locator .nearby-pins article.teaser .teaser-bottom .right .more {
   border: 1px solid #000;
-  padding: 3px 0 0;
+  padding: 3px 2px 0;
   margin-right: 10px;
   border-radius: 4px;
   min-width: 70px;
