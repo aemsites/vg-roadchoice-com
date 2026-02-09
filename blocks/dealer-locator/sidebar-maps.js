@@ -1739,6 +1739,35 @@ $.fn.filterNearbyPins = function () {
     })[0]);
   });
 
+  function buildAddressKey(item) {
+    return [
+      item.COMPANY_DBA_NAME?.trim().toLowerCase(),
+      item.MAIN_ADDRESS_LINE_1_TXT?.trim().toLowerCase(),
+      item.MAIN_ADDRESS_LINE_2_TXT?.trim().toLowerCase(),
+      item.MAIN_CITY_NM?.trim().toLowerCase(),
+      item.MAIN_STATE_PROV_CD?.trim().toLowerCase(),
+      item.MAIN_POSTAL_CD?.trim().toLowerCase(),
+    ].join('|');
+  }
+
+  function removeDuplicatesByTitleAndAddress(list) {
+    const seen = new Set();
+
+    return list.filter((item) => {
+      const key = buildAddressKey(item);
+
+      if (seen.has(key)) {
+        return false; // remove duplicated
+      }
+
+      seen.add(key);
+      return true;
+    });
+  }
+  console.log('tmpPinList before removing duplicates', tmpPinList);
+
+  tmpPinList = removeDuplicatesByTitleAndAddress(tmpPinList);
+  console.log('tmpPinList after removing duplicates', tmpPinList);
   tmpPinList.sort(function (a, b) {
     return parseFloat(a.distance) - parseFloat(b.distance);
   });
