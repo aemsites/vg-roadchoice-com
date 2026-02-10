@@ -1764,10 +1764,8 @@ $.fn.filterNearbyPins = function () {
       return true;
     });
   }
-  console.log('tmpPinList before removing duplicates', tmpPinList);
 
   tmpPinList = removeDuplicatesByTitleAndAddress(tmpPinList);
-  console.log('tmpPinList after removing duplicates', tmpPinList);
   tmpPinList.sort(function (a, b) {
     return parseFloat(a.distance) - parseFloat(b.distance);
   });
