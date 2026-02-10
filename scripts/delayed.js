@@ -1,12 +1,8 @@
 import { loadScript } from './aem.js';
-import { isPerformanceAllowed, isTargetingAllowed, COOKIE_CONFIGS, loadWorker } from './common.js';
+import { isPerformanceAllowed, isTargetingAllowed, COOKIE_CONFIGS } from './common.js';
 
 // COOKIE ACCEPTANCE AND IDs default to false in case no ID is present
 const { DATA_DOMAIN_SCRIPT = false, GTM_ID = false, HOTJAR_ID = false, ARTIBOT_ID = false, COOKIE_CHECK = true } = COOKIE_CONFIGS;
-
-// Roadchoice specific code ↓
-// This Worker loads all the product information into de global object window
-const productsWorker = loadWorker();
 
 window.OptanonWrapper = () => {
   const currentOnetrustActiveGroups = window.OnetrustActiveGroups;
@@ -149,5 +145,3 @@ function delayedInit() {
 }
 
 delayedInit();
-
-export const getProductsWorker = () => productsWorker;

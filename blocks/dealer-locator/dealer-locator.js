@@ -178,21 +178,6 @@ export default async function decorate(block) {
 
             </div>
         </div>
-        <div class="row main-directions" style="display: none;">
-            <div class="go-back-direction" style="text-align: right;">
-                <button type="button" id="cancel2">Back</button>
-            </div>
-            <div class="panel-header from-directions">
-                <input type="text" id="location" placeholder="Enter City, State, or Zip Code"/>
-            </div>
-            <div class="panel-header to-directions" style="margin-top:5px;">
-                <input type="text" id="location" placeholder="Enter City, State, or Zip Code"/>
-            </div>
-            <div class="panel-header add-directions" onclick="$.fn.switchSidebarPane('add-directions-return', this);"
-                 data-id="">
-                <i class="fa fa-refresh"></i> Recalculate Directions
-            </div>
-        </div>
         <div class="sidebar-content">
             <div class="go-back" style="display:none;">
                 <button type="button" class="tooltip" id="cancel">Back</button>
@@ -231,24 +216,20 @@ export default async function decorate(block) {
 
         </div>
         <div id="type"></div>
-        <div class="button-group">
-            <div id="my-dealer" style="display: none;"><i class="fa fa-star-o tooltip"><span
-                    class="tooltiptext mydealer">Your Preferred Dealer</span></i></div>
-        </div>
 
         <div class="dealer-details-header">
-            <div class="detail-website">
+            <div class="detail detail-website">
 
             </div>
-            <div class="detail-direction">
-                <a id="directions" data-id="" onclick="$.fn.switchSidebarPane('sidebar-directions', this);">
-                    <img src="/blocks/dealer-locator/images/GPS.svg"/>
-                    Directions</a>
+            <div class="detail detail-direction">
+                <a id="directions" data-id="">
+                    <img src="/blocks/dealer-locator/images/google-maps.svg"/>
+                    Google Maps</a>
             </div>
-            <div class="detail-call">
+            <div class="detail detail-call">
 
             </div>
-            <div class="detail-share">
+            <div class="detail detail-share">
 
                 <a id="share" class="accordion">
                     <img src="/blocks/dealer-locator/images/Share.svg"/>
@@ -326,11 +307,9 @@ export default async function decorate(block) {
                     <img id="marker" src=""/>
                 </div>
                 <div class="dealerPanelContainer">
-                    <div class="teaser-top" onclick="$.fn.switchSidebarPane('sidebar-pin', this);" data-id="">
+                    <div class="teaser-top" onclick="$.fn.switchSidebarPane('sidebar-pin', this);">
                         <div class="heading">
                             <p></p>
-
-                            <div class="distance"></div>
                         </div>
                         <div class="info">
                             <div class="hours"></div>
@@ -356,7 +335,6 @@ export default async function decorate(block) {
                         </div>
                         <div class="right">
                             <div class="call">
-
                             </div>
                         </div>
                         <div class="right">
@@ -416,46 +394,6 @@ export default async function decorate(block) {
         </div>
     </div>
 </div>
-<div id="sidebar-direction-list" style="display: none;">
-    <div class="row">
-        <div class="scroller">
-            <div class="directions-panel">
-                <div class="pin-actions directions">
-                    <button type="button" id="gmaps-link"><img
-                            src="/blocks/dealer-locator/images/Google-Maps-Old.svg"/><span>Open in<br>Google Maps</span>
-                    </button>
-                    <button type="button" id="print"><img
-                            src="/blocks/dealer-locator/images/Print.svg"/><span>Print</span></button>
-                    <button type="button" id="add-directions" onclick="$.fn.switchSidebarPane('sidebar-select-pins');">
-                        <img src="/blocks/dealer-locator/images/Add.svg"/></i><span>Modify Dealer<br>Waypoints</span>
-                    </button>
-                </div>
-                <div id="directions-container"></div>
-            </div>
-        </div>
-    </div>
-
-</div>
-<div id="sidebar-directions" style="display: none;">
-
-    <div class="row">
-        <div class="scroller">
-            <div class="directions-panel">
-                <div class="pin-actions directions">
-                    <button type="button" id="gmaps-link"><img
-                            src="/blocks/dealer-locator/images/Google-Maps-Old.svg"/><span>Open in<br>Google Maps</span>
-                    </button>
-                    <button type="button" id="print"><img
-                            src="/blocks/dealer-locator/images/Print.svg"/><span>Print</span></button>
-                    <button type="button" id="add-directions" onclick="$.fn.switchSidebarPane('sidebar-select-pins');">
-                        <img src="/blocks/dealer-locator/images/Add.svg"/></i><span>Modify Dealer<br>Waypoints</span>
-                    </button>
-                </div>
-                <div id="directions-container"></div>
-            </div>
-        </div>
-    </div>
-</div>
 <div id="sidebar-select-pins" style="display: none;">
     <div class="row">
         <span class="header-title">Advanced Routing</span>
@@ -478,7 +416,7 @@ export default async function decorate(block) {
             <article class="teaser">
 
                 <div style="width: 15%;">
-                    <i class="fa fa-close tooltip" onclick="$.fn.removeWaypoint(this)" data-id=""><span
+                    <i class="fa fa-close tooltip" onclick="$.fn.removeWaypoint(this)"><span
                             class="tooltiptext removepin">Remove from route</span></i>
                 </div>
                 <div style="width: 80%;">
