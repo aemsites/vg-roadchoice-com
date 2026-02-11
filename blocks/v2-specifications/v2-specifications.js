@@ -79,15 +79,27 @@ const applyRowStyleModifiers = (row) => {
 
   const modifiers = [];
 
-  if (hasInnerHeadings) modifiers.push(`${BLOCK_NAME}__list--subtitle`);
-  if (hasPicture) modifiers.push(`${BLOCK_NAME}__list--with-pictures`);
-  if (hasLink) modifiers.push(`${BLOCK_NAME}__list--with-link`);
-  if (!hasPicture && !hasLink) modifiers.push(`${BLOCK_NAME}__list--with-text`);
+  if (hasInnerHeadings) {
+    modifiers.push(`${BLOCK_NAME}__list--subtitle`);
+  }
+  if (hasPicture) {
+    modifiers.push(`${BLOCK_NAME}__list--with-pictures`);
+  }
+  if (hasLink) {
+    modifiers.push(`${BLOCK_NAME}__list--with-link`);
+  }
+  if (!hasPicture && !hasLink) {
+    modifiers.push(`${BLOCK_NAME}__list--with-text`);
+  }
 
   row.classList.add(...modifiers);
 
-  if (hasLink) convertButtonsToStandaloneLinks(row);
-  if (hasInnerHeadings) markInnerHeadingsAsSubtitles(headings);
+  if (hasLink) {
+    convertButtonsToStandaloneLinks(row);
+  }
+  if (hasInnerHeadings) {
+    markInnerHeadingsAsSubtitles(headings);
+  }
 };
 
 /**
@@ -134,10 +146,14 @@ const wireMobileSectionToggle = (root) => {
   const mq = window.matchMedia(DESKTOP_MEDIA_QUERY);
 
   root.addEventListener('click', (e) => {
-    if (mq.matches) return;
+    if (mq.matches) {
+      return;
+    }
 
     const buttonEl = e.target.closest(`.${BLOCK_NAME}__button`);
-    if (!buttonEl || !root.contains(buttonEl)) return;
+    if (!buttonEl || !root.contains(buttonEl)) {
+      return;
+    }
 
     const sectionEl = buttonEl.closest(`.${BLOCK_NAME}__item`);
     if (sectionEl) {
@@ -163,7 +179,9 @@ export default async function decorate(block) {
   let activeSection = null;
 
   const getOrCreateFallbackSection = () => {
-    if (activeSection) return activeSection;
+    if (activeSection) {
+      return activeSection;
+    }
 
     activeSection = buildSection(FALLBACK_SECTION_ID, null);
     sectionsEl.appendChild(activeSection.sectionEl);
