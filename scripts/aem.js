@@ -94,7 +94,9 @@ function sampleRUM(checkpoint, data) {
 
         sampleRUM.enhance = () => {
           // only enhance once
-          if (document.querySelector('script[src*="rum-enhancer"]')) return;
+          if (document.querySelector('script[src*="rum-enhancer"]')) {
+            return;
+          }
           const { enhancerVersion, enhancerHash } = sampleRUM.enhancerContext || {};
           const script = document.createElement('script');
           if (enhancerHash) {
@@ -207,7 +209,9 @@ function readBlockConfig(block) {
           } else {
             value = ps.map((p) => p.textContent);
           }
-        } else value = row.children[1].textContent;
+        } else {
+          value = row.children[1].textContent;
+        }
         config[name] = value;
       }
     }
@@ -335,9 +339,13 @@ function decorateTemplateAndTheme() {
     });
   };
   const template = getMetadata('template');
-  if (template) addClasses(document.body, template);
+  if (template) {
+    addClasses(document.body, template);
+  }
   const theme = getMetadata('theme');
-  if (theme) addClasses(document.body, theme);
+  if (theme) {
+    addClasses(document.body, theme);
+  }
 }
 
 /**
@@ -446,7 +454,9 @@ function decorateSections(main) {
         const wrapper = document.createElement('div');
         wrappers.push(wrapper);
         defaultContent = e.tagName !== 'DIV';
-        if (defaultContent) wrapper.classList.add('default-content-wrapper');
+        if (defaultContent) {
+          wrapper.classList.add('default-content-wrapper');
+        }
       }
       wrappers[wrappers.length - 1].append(e);
     });
@@ -470,7 +480,9 @@ function decorateSections(main) {
           // WARNING: This 'else if (key === 'background')' is a custom implementation!
           // along side with the addBackgroundImage method
           const picture = sectionMeta.querySelector('picture');
-          if (picture) addBackgroundImage(section, meta[key]);
+          if (picture) {
+            addBackgroundImage(section, meta[key]);
+          }
         } else {
           section.dataset[toCamelCase(key)] = meta[key];
         }
@@ -594,7 +606,9 @@ function decorateBlock(block) {
     const blockWrapper = block.parentElement;
     blockWrapper.classList.add(`${shortBlockName}-wrapper`);
     const section = block.closest('.section');
-    if (section) section.classList.add(`${shortBlockName}-container`);
+    if (section) {
+      section.classList.add(`${shortBlockName}-container`);
+    }
   }
 }
 
@@ -660,7 +674,9 @@ async function loadSection(section, loadCallback) {
     for (let i = 0; i < blocks.length; i += 1) {
       await loadBlock(blocks[i]);
     }
-    if (loadCallback) await loadCallback(section);
+    if (loadCallback) {
+      await loadCallback(section);
+    }
     section.dataset.sectionStatus = 'loaded';
     section.style.display = null;
   }

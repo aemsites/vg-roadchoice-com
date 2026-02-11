@@ -19,7 +19,9 @@ export default async function decorate(block) {
   const datasource = block.textContent.trim() || ENDPOINT_URL;
   const observer = new MutationObserver((list) => {
     list.forEach((change) => {
-      if (change.target.dataset.blockStatus !== 'loaded') return;
+      if (change.target.dataset.blockStatus !== 'loaded') {
+        return;
+      }
       block.classList.add('overflow');
       setTimeout(() => {
         block.classList.remove('overflow');

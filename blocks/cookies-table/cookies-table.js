@@ -7,7 +7,9 @@ const rowsToDelete = ['type', 'bold'];
 const buildHeaders = (headers) => {
   const tableRow = createElement('tr', { classes: `${blockName}-row` });
   headers.forEach((header, idx) => {
-    if (rowsToDelete.includes(header)) return null;
+    if (rowsToDelete.includes(header)) {
+      return null;
+    }
     const head = createElement('th', { classes: [`${blockName}-head`, `t-${idx}`] });
     head.textContent = header.replace('-', ' ');
     tableRow.appendChild(head);
@@ -25,7 +27,9 @@ const buildData = (data) => {
     const values = Object.values(e);
     values.forEach((value, idx) => {
       const cell = createElement('td', { classes: [`${blockName}-cell`, `t-${idx}`] });
-      if (value === boldValue) cell.classList.add('bold-red');
+      if (value === boldValue) {
+        cell.classList.add('bold-red');
+      }
       cell.textContent = value.replace('-', ' ');
       tableRow.appendChild(cell);
     });

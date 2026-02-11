@@ -206,7 +206,9 @@ export default async function decorate(block) {
     const classes = ['brand', 'sections', 'tools'];
     classes.forEach((c, i) => {
       const section = nav.children[i];
-      if (section) section.classList.add(`nav-${c}`);
+      if (section) {
+        section.classList.add(`nav-${c}`);
+      }
     });
 
     // add a link to the image logo brand
@@ -242,7 +244,9 @@ export default async function decorate(block) {
       }
       for (let i = 2; i <= navLevels; i += 1) {
         const subSectionNav = sectionNavs[0].querySelectorAll(`ul.level-${i}`);
-        if (subSectionNav) buildSubSection(subSectionNav);
+        if (subSectionNav) {
+          buildSubSection(subSectionNav);
+        }
       }
     }
 
@@ -257,7 +261,9 @@ export default async function decorate(block) {
     nav.prepend(hamburger);
     nav.setAttribute('aria-expanded', 'false');
     // prevent mobile nav behavior on window resize
-    if (isDesktop) toggleMenu(nav, navSections, !isDesktop);
+    if (isDesktop) {
+      toggleMenu(nav, navSections, !isDesktop);
+    }
 
     const navWrapper = createElement('div', { classes: 'nav-wrapper' });
     navWrapper.append(nav);

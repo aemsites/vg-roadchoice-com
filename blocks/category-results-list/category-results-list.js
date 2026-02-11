@@ -34,7 +34,9 @@ const fetchAndUpdateProductList = async (wrapper) => {
     queryObject = JSON.parse(sessionStorage.getItem('query-params'));
     const filteredQueryResult = await subcategorySearch(queryObject);
 
-    if (filteredQueryResult.items.length === 0) throw new Error('No items retrieved with current URL');
+    if (filteredQueryResult.items.length === 0) {
+      throw new Error('No items retrieved with current URL');
+    }
 
     setPaginationData(filteredQueryResult.count);
 
@@ -46,7 +48,9 @@ const fetchAndUpdateProductList = async (wrapper) => {
 
     products.forEach((prod, idx) => {
       const productItem = productCard(prod, searchType);
-      if (idx >= productsPerPage) productItem.classList.add('hidden');
+      if (idx >= productsPerPage) {
+        productItem.classList.add('hidden');
+      }
       wrapper.appendChild(productItem);
     });
 

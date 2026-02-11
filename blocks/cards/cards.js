@@ -23,7 +23,9 @@ const buildCards = (block) => {
       const hasButton = [...p.classList].includes('button-container');
       const isEmpty = p.textContent.trim().length === 0;
 
-      if (!isEmpty && !hasButton) textElmts.push(p);
+      if (!isEmpty && !hasButton) {
+        textElmts.push(p);
+      }
     });
     textElmts.forEach((e) => e.classList.add(`${blockName}-text`));
 

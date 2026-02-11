@@ -91,7 +91,9 @@ function resetModelsFilter(models, disabled = true) {
 
 function addSearchByListeners(wrapper, form) {
   wrapper.onclick = (e) => {
-    if (e.target.classList.contains('active')) return;
+    if (e.target.classList.contains('active')) {
+      return;
+    }
     // swap between search-by buttons
     form.querySelector(`.${blockName}__cross-reference__btn`).classList.toggle('active', !isCrossRefActive);
     form.querySelector(`.${blockName}__part-number__btn`).classList.toggle('active', isCrossRefActive);
@@ -229,7 +231,9 @@ const updateSearchResults = (results, searchType, query, make, model, resultsSec
       make,
       model,
     });
-    if (titleElement) titleElement.textContent = titleText;
+    if (titleElement) {
+      titleElement.textContent = titleText;
+    }
 
     updatePagination(resultsSection, targetOffset, results.length);
   } else {
@@ -244,7 +248,9 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
   const currentAmount = document.querySelectorAll('.product-card').length;
   const displayedTextContent = getTextLabel('pagination_text');
   const newText = displayedTextContent.replace('[$]', currentAmount);
-  if (resultsCountElement) resultsCountElement.innerText = newText;
+  if (resultsCountElement) {
+    resultsCountElement.innerText = newText;
+  }
 
   if (targetOffset === 0) {
     const bottomMoreBtn = createElement('button', { classes: ['more-button', 'bottom-more-button'] });
@@ -261,7 +267,9 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
 export const showNoResultsMessage = (query, searchResultsSection) => {
   const titleElement = searchResultsSection?.querySelector('.title');
   const titleText = getTextLabel('no_results_title').replace('[$]', query ? query : '');
-  if (titleElement) titleElement.innerText = titleText;
+  if (titleElement) {
+    titleElement.innerText = titleText;
+  }
   const fragment = document.createRange().createContextualFragment(noResultsTemplate);
   searchResultsSection?.classList.add('no-results');
   searchResultsSection?.insertBefore(fragment, document.querySelector('.filters-wrapper'));

@@ -83,7 +83,9 @@ const buildTables = (catalogs) => {
       note.textContent = notes;
 
       catalog.append(link);
-      if (notes.length > 0) link.append(note);
+      if (notes.length > 0) {
+        link.append(note);
+      }
       tableSection.append(catalog);
     });
     catalogsSubsection.append(heading, tableSection);

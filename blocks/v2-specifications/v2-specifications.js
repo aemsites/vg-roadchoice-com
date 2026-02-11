@@ -1,111 +1,211 @@
-import { loadBlock } from '../../scripts/aem.js';
 import { createElement, slugify, removeEmptyTags } from '../../scripts/common.js';
 
-const blockName = 'v2-specifications';
+const BLOCK_NAME = 'v2-specifications';
+const DESKTOP_MEDIA_QUERY = '(min-width: 1200px)';
+const FALLBACK_SECTION_ID = 'id-specifications';
 
-export default async function decorate(block) {
-  const accordionId = [...block.classList].find((className) => className.startsWith('id-'));
+/**
+ * Computes the heading level used as "section title" delimiter for this block.
+ * Convention: the closest section may define `data-header`, e.g. "Title 5",
+ * and we use the last character ("5") as the heading level.
+ *
+ * @param {HTMLElement} block
+ * @returns {string} Heading level character (e.g. "3", "5")
+ */
+const computeTitleHeadingLevel = (block) => {
+  const meta = block.closest('.section')?.dataset?.header || 3;
+  const value = String(meta);
+  return value.charAt(value.length - 1);
+};
 
-  const items = block.querySelectorAll(':scope > div');
+/**
+ * Checks whether a row starts a new specs section (i.e. contains the section title heading).
+ *
+ * @param {Element} row
+ * @param {string} titleHeadingLevel
+ * @returns {boolean}
+ */
+const isSectionTitleRow = (row, titleHeadingLevel) => !!row.querySelector(`h${titleHeadingLevel}`);
 
-  let accordion;
-  let accordionContent;
-  let accordionWrapper;
+/**
+ * Builds a stable section id from a title row by slugifying the title text.
+ *
+ * @param {Element} row
+ * @param {string} titleHeadingLevel
+ * @returns {string} e.g. "id-loose-items"
+ */
+const buildSectionIdFromTitleRow = (row, titleHeadingLevel) => {
+  const heading = row.querySelector(`h${titleHeadingLevel}`);
+  const text = heading?.textContent?.trim() || row.textContent.trim();
+  return `id-${slugify(text)}`;
+};
 
-  const accordionBlock = createElement('div', {
-    classes: ['block', 'v2-accordion', accordionId],
-    props: { 'data-block-name': 'v2-accordion' },
+/**
+ * Converts author-provided buttons into standalone links.
+ *
+ * @param {Element} row
+ * @returns {void}
+ */
+const convertButtonsToStandaloneLinks = (row) => {
+  row.querySelectorAll('.button-container a').forEach((a) => {
+    a.classList.replace('button', 'standalone-link');
   });
+};
 
-  const accordionBlockWrapper = createElement('div', {
-    classes: ['v2-accordion-wrapper'],
+/**
+ * Marks inner headings as subtitle headings for consistent styling.
+ *
+ * @param {HTMLElement[]} headings
+ * @returns {void}
+ */
+const markInnerHeadingsAsSubtitles = (headings) => {
+  headings.forEach((h) => {
+    h.classList.add(`${BLOCK_NAME}__subtitle`, 'h5');
   });
-  accordionBlockWrapper.appendChild(accordionBlock);
-  block.appendChild(accordionBlockWrapper);
+};
 
-  // Hx tag used for the titles of the accordion
-  const titleMeta = block.closest('.section').dataset.header || 3;
+/**
+ * Applies row modifier classes depending on the content type (text, pictures, links)
+ * and updates link/button styling where needed.
+ *
+ * @param {Element} row
+ * @returns {void}
+ */
+const applyRowStyleModifiers = (row) => {
+  const headings = [...row.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const hasInnerHeadings = headings.length > 0;
+  const hasPicture = !!row.querySelector('picture');
+  const hasLink = !!row.querySelector('.button-container a');
 
-  const headerTag = titleMeta.charAt(titleMeta.length - 1);
-  const headings = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].slice(headerTag);
+  const modifiers = [];
 
-  [...items].forEach((item) => {
-    const typeTitle = item.querySelector(`h${headerTag}`); // header of the accordion
-    const typePicture = item.querySelector('picture'); // with image
-    const typeLink = item.querySelector('.button-container a'); // with downloads
-
-    // Add title styles to the headings that are not as the accordion button
-    const headingString = headings.join(',');
-    const headingsList = [...block.querySelectorAll(headingString)];
-    headingsList.forEach((heading) => heading.classList.add(`${blockName}__subtitle`, 'h5'));
-    const subtitleCounter = item.querySelectorAll(`.${blockName}__subtitle`).length;
-
-    if (typeTitle) {
-      if (accordion) {
-        // close old Accordion content
-        accordionBlock.appendChild(accordion);
-        accordionWrapper.appendChild(accordionContent);
-        block.appendChild(accordionWrapper);
-      }
-
-      // create slug based on title name
-      const name = `id-${slugify(item.textContent.trim())}`;
-
-      // new Accordion content
-      // (accordionWrapper + accordionContent + accordion are needed)
-      accordionWrapper = createElement('div', { classes: [`${blockName}__accordion-wrapper`] });
-      accordionContent = createElement('div', {
-        classes: [`${blockName}__accordion-content`, name],
-        props: { 'data-block-status': 'loaded' },
-      });
-      accordion = createElement('div');
-
-      // Title of the accordion
-      const titleDiv = item.querySelector(':scope > div');
-      titleDiv.classList.add(`${blockName}__title`);
-      accordion.appendChild(titleDiv);
-
-      // Id to be updated in the accordion content
-      const divId = createElement('div');
-      divId.textContent = `#${name}`;
-      accordion.appendChild(divId);
-      item.remove();
-    }
-
-    const classes = [];
-    if (subtitleCounter) classes.push(`${blockName}__list--subtitle`);
-
-    // apply classes to the content based on items inside
-    if (typePicture) {
-      classes.push(`${blockName}__list--with-pictures`);
-    }
-
-    if (typeLink) {
-      classes.push(`${blockName}__list--with-link`);
-
-      const buttons = item.querySelectorAll('.button-container a');
-      buttons.forEach((bt) => {
-        bt.classList.replace('button', 'standalone-link');
-      });
-    }
-
-    if (!typePicture && !typeLink && !typeTitle) {
-      classes.push(`${blockName}__list--with-text`);
-    }
-
-    item.classList.add(...classes);
-
-    accordionContent.appendChild(item);
-  });
-
-  // close last accordion content
-  if (accordion) {
-    accordionBlock.appendChild(accordion);
-    accordionWrapper.appendChild(accordionContent);
-    block.appendChild(accordionWrapper);
+  if (hasInnerHeadings) {
+    modifiers.push(`${BLOCK_NAME}__list--subtitle`);
+  }
+  if (hasPicture) {
+    modifiers.push(`${BLOCK_NAME}__list--with-pictures`);
+  }
+  if (hasLink) {
+    modifiers.push(`${BLOCK_NAME}__list--with-link`);
+  }
+  if (!hasPicture && !hasLink) {
+    modifiers.push(`${BLOCK_NAME}__list--with-text`);
   }
 
-  removeEmptyTags(block);
+  row.classList.add(...modifiers);
 
-  await loadBlock(accordionBlock);
+  if (hasLink) {
+    convertButtonsToStandaloneLinks(row);
+  }
+  if (hasInnerHeadings) {
+    markInnerHeadingsAsSubtitles(headings);
+  }
+};
+
+/**
+ * Builds a specs section container with header button and content container.
+ * The section id is used both for linking and for external accordion references.
+ *
+ * @param {string} sectionId
+ * @param {Element | null} titleEl
+ * @returns {{ sectionEl: HTMLElement, contentEl: HTMLElement }}
+ */
+const buildSection = (sectionId, titleEl) => {
+  const sectionEl = createElement('div', {
+    classes: [`${BLOCK_NAME}__item`, `${BLOCK_NAME}__item-close`, sectionId],
+    props: { id: sectionId, 'data-block-status': 'loaded' },
+  });
+
+  const buttonEl = createElement('button', {
+    classes: [`${BLOCK_NAME}__button`],
+    props: { type: 'button' },
+  });
+
+  if (titleEl) {
+    titleEl.classList.add(`${BLOCK_NAME}__title`);
+    buttonEl.append(titleEl);
+  }
+
+  const contentEl = createElement('div', {
+    classes: [`${BLOCK_NAME}__content`],
+  });
+
+  sectionEl.append(buttonEl, contentEl);
+
+  return { sectionEl, contentEl };
+};
+
+/**
+ * Wires click toggle behavior for mobile/tablet.
+ * On desktop, sections are non-interactive and rely on CSS to keep content visible.
+ *
+ * @param {HTMLElement} root
+ * @returns {void}
+ */
+const wireMobileSectionToggle = (root) => {
+  const mq = window.matchMedia(DESKTOP_MEDIA_QUERY);
+
+  root.addEventListener('click', (e) => {
+    if (mq.matches) {
+      return;
+    }
+
+    const buttonEl = e.target.closest(`.${BLOCK_NAME}__button`);
+    if (!buttonEl || !root.contains(buttonEl)) {
+      return;
+    }
+
+    const sectionEl = buttonEl.closest(`.${BLOCK_NAME}__item`);
+    if (sectionEl) {
+      sectionEl.classList.toggle(`${BLOCK_NAME}__item-close`);
+    }
+  });
+};
+
+/**
+ * Builds specification sections with mobile accordion behaviour.
+ *
+ * @param {HTMLElement} block
+ * @returns {Promise<void>}
+ */
+export default async function decorate(block) {
+  const titleHeadingLevel = computeTitleHeadingLevel(block);
+  const rows = [...block.querySelectorAll(':scope > div')];
+
+  const sectionsEl = createElement('div', {
+    classes: [`${BLOCK_NAME}__sections`],
+  });
+
+  let activeSection = null;
+
+  const getOrCreateFallbackSection = () => {
+    if (activeSection) {
+      return activeSection;
+    }
+
+    activeSection = buildSection(FALLBACK_SECTION_ID, null);
+    sectionsEl.appendChild(activeSection.sectionEl);
+    return activeSection;
+  };
+
+  rows.forEach((row) => {
+    if (isSectionTitleRow(row, titleHeadingLevel)) {
+      const sectionId = buildSectionIdFromTitleRow(row, titleHeadingLevel);
+      const titleEl = row.querySelector(':scope > div') || row;
+
+      activeSection = buildSection(sectionId, titleEl);
+      sectionsEl.appendChild(activeSection.sectionEl);
+      return;
+    }
+
+    const { contentEl } = getOrCreateFallbackSection();
+    applyRowStyleModifiers(row);
+    contentEl.appendChild(row);
+  });
+
+  block.textContent = '';
+  block.appendChild(sectionsEl);
+
+  removeEmptyTags(block);
+  wireMobileSectionToggle(block);
 }

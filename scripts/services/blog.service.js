@@ -85,7 +85,9 @@ export async function getBlogCategory(subcategory) {
   try {
     const categoryList = await fetchCategories();
 
-    if (!categoryList || categoryList.length === 0) return null;
+    if (!categoryList || categoryList.length === 0) {
+      return null;
+    }
 
     return getCategoryObject(categoryList, subcategory);
   } catch (error) {

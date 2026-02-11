@@ -98,6 +98,54 @@
   margin: 8px 0 0;
 }
 
+.v2-specifications__button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--text-color);
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.v2-specifications__button:hover,
+.v2-specifications__button:focus {
+  background: transparent;
+}
+
+.v2-specifications__title {
+  margin: 10px 0 0;
+}
+
+.v2-specifications__content {
+  margin-top: 12px;
+}
+
+.v2-specifications__item-close .v2-specifications__content {
+  height: 0;
+  margin: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.v2-specifications__item {
+  padding: 12px;
+}
+
+.v2-specifications__item .v2-specifications__button {
+  padding: 12px;
+}
+
+.v2-specifications__item .v2-specifications__button:hover {
+  cursor: pointer;
+  background-color: var(--c-light-gray);
+}
+
 @media (min-width: 744px) {
   .v2-specifications__list--with-link strong,
   .v2-specifications__list--with-link .button-container a,
@@ -145,27 +193,25 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  /* Remove accordion in Desktop */
-  .v2-specifications .v2-accordion__button {
+  .v2-specifications__button {
     pointer-events: none;
   }
 
-  .v2-specifications .v2-accordion__button .v2-accordion__icon,
-  .v2-specifications .v2-accordion__button .v2-accordion__close {
-    display: none;
+  .v2-specifications__title {
+    padding-left: 12px;
   }
 
-  .v2-specifications .v2-accordion__item-close .v2-accordion__content {
+  .v2-specifications__item-close .v2-specifications__content {
     height: 100%;
     opacity: 1;
     overflow: auto;
   }
 
-  .v2-specifications .v2-accordion__item {
+  .v2-specifications__item {
     padding: 24px 0;
   }
 
-  .v2-specifications .v2-accordion__item:first-child {
+  .v2-specifications__item:first-child {
     padding-top: 10px;
   }
 }

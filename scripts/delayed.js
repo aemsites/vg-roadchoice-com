@@ -114,12 +114,18 @@ function delayedInit() {
 
   // COOKIE ACCEPTANCE CHECKING
   if (avoidCookieCheck || isPerformanceAllowed()) {
-    if (GTM_ID) loadGoogleTagManager();
-    if (HOTJAR_ID) loadHotjar();
+    if (GTM_ID) {
+      loadGoogleTagManager();
+    }
+    if (HOTJAR_ID) {
+      loadHotjar();
+    }
   }
 
   if (avoidCookieCheck || isTargetingAllowed()) {
-    if (ARTIBOT_ID) loadArtibot();
+    if (ARTIBOT_ID) {
+      loadArtibot();
+    }
   }
 
   loadMaze();
@@ -141,7 +147,9 @@ function delayedInit() {
 
   // This searches for id="cookie-preference" button and displays the cookie preference center.
   const preferenceBtn = document.querySelector('#cookie-preference');
-  if (preferenceBtn) preferenceBtn.addEventListener('click', () => window.OneTrust.ToggleInfoDisplay());
+  if (preferenceBtn) {
+    preferenceBtn.addEventListener('click', () => window.OneTrust.ToggleInfoDisplay());
+  }
 }
 
 delayedInit();

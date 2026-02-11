@@ -32,7 +32,9 @@ const getFilterAttrib = async (subcategory) => {
       limit: DEFAULT_LIMIT,
     });
 
-    if (!filtersJson) throw new Error('Failed to fetch filter data');
+    if (!filtersJson) {
+      throw new Error('Failed to fetch filter data');
+    }
 
     const filterAttribs = filtersJson.filter((el) => el.Subcategory === subcategory && el.Filter === '').map((el) => el.Attributes);
 
@@ -196,7 +198,9 @@ export default async function decorate(doc) {
 
       // Remove last breadcrumb item (it's the current category, which we’ll replace)
       const lastItem = breadcrumbList.lastElementChild;
-      if (lastItem) breadcrumbList.removeChild(lastItem);
+      if (lastItem) {
+        breadcrumbList.removeChild(lastItem);
+      }
 
       let index = breadcrumbList.children.length;
 

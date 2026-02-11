@@ -35,7 +35,9 @@ const handleShowMore = (buttons, paginationData) => {
       const activeSection = btn.closest('.category-filters-container');
 
       currentPage++;
-      if (currentPage >= totalPages) buttons.forEach((btn) => btn.remove());
+      if (currentPage >= totalPages) {
+        buttons.forEach((btn) => btn.remove());
+      }
 
       const visibleProductsNumber = currentDisplayedProds + productsPerPage >= productCount ? productCount : currentDisplayedProds + productsPerPage;
       currentDisplayedProds = currentDisplayedProds + productsPerPage;
