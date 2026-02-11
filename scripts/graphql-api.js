@@ -102,7 +102,9 @@ export async function fetchSearchResults({ query, offset, make, model, searchTyp
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { results: [], categories: [], error };
+  if (error) {
+    return { results: [], categories: [], error };
+  }
 
   const results = data.data[queryName].items.map((item) => item.metadata);
   const categories = data.data[queryName].facets.map((facet) => [facet.key, facet.doc_count]);
@@ -141,7 +143,9 @@ export async function fetchFilterFacets({ field, filter, language = getPageLangu
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { facets: [], error };
+  if (error) {
+    return { facets: [], error };
+  }
 
   return { facets: data.data[FILTER_FACETS_QUERY_NAME] };
 }
@@ -175,7 +179,9 @@ export async function fetchCrossReferenceSuggest({ term, category, language = ge
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { facets: [], error };
+  if (error) {
+    return { facets: [], error };
+  }
 
   return { suggestions: data.data[CROSS_REFERENCE_SUGGEST_QUERY_NAME] };
 }
@@ -213,7 +219,9 @@ export async function fetchPartReferenceSuggest({ term, make, model, category, l
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { facets: [], error };
+  if (error) {
+    return { facets: [], error };
+  }
 
   return { suggestions: data.data[PART_REFERENCE_SUGGEST_QUERY_NAME] };
 }
@@ -248,7 +256,9 @@ export async function fetchFuzzySuggest({ q, language = getPageLanguage() }) {
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { facets: [], error };
+  if (error) {
+    return { facets: [], error };
+  }
 
   return data.data[RC_PART_FUZZY_SEARCH];
 }
@@ -279,7 +289,9 @@ export async function fetchCategories() {
 
   const { data, error } = await fetchGraphQLData(categoriesQuery, SEARCH_URL_DEV);
 
-  if (error) return { facets: [], error };
+  if (error) {
+    return { facets: [], error };
+  }
 
   return data.data[RC_CATEGORY_FACETS].facets;
 }
@@ -331,7 +343,9 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { results: [], error };
+  if (error) {
+    return { results: [], error };
+  }
 
   const { items, facets, count } = data.data[RC_BLOG_RECOMMEND];
 
@@ -398,7 +412,9 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { items: [], facets: [], error };
+  if (error) {
+    return { items: [], facets: [], error };
+  }
 
   const { items, facets, count } = data.data[RC_SUBCATEGORIES_SEARCH];
   const result = { items, facets, count };
@@ -442,7 +458,9 @@ export async function fetchPdpProduct({ sku, requestedFields = [], language = ge
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
 
-  if (error) return { product: null, error };
+  if (error) {
+    return { product: null, error };
+  }
 
   const product = data?.data?.rcProductDescription?.items?.[0]?.metadata || null;
 
@@ -495,7 +513,9 @@ export async function searchArticles({ q = 'Road', sort = 'PUBLISH_DATE_DESC', l
   };
 
   const { data, error } = await fetchGraphQLData(graphqlQuery, SEARCH_URL_DEV);
-  if (error) return { results: [], error };
+  if (error) {
+    return { results: [], error };
+  }
 
   const { items, count } = data.data[RC_BLOG_SEARCH];
 

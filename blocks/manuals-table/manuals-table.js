@@ -9,7 +9,9 @@ export default function decorate(block) {
       const link = column.querySelector(':scope > a, :scope > p > a');
       column.removeAttribute('data-valign');
       column.className = `${blockName}-column`;
-      if (oneChild) column.parentElement.classList.add('one-child');
+      if (oneChild) {
+        column.parentElement.classList.add('one-child');
+      }
       if (!link && column.previousElementSibling) {
         column.previousElementSibling.classList.add('next-empty');
         column.classList.add('empty');

@@ -62,8 +62,12 @@ export function selectVideoLink(links, preferredType, videoType = videoTypes.bot
   const youTubeLink = findLinkByCondition((href) => href.includes('youtube.com/embed/'));
   const localMediaLink = findLinkByCondition((href) => href.split('?')[0].endsWith('.mp4'));
 
-  if (aemVideoLink) return aemVideoLink;
-  if (prefersYouTube && youTubeLink) return youTubeLink;
+  if (aemVideoLink) {
+    return aemVideoLink;
+  }
+  if (prefersYouTube && youTubeLink) {
+    return youTubeLink;
+  }
   return localMediaLink;
 }
 
@@ -311,7 +315,9 @@ const formatDebugTime = (date) => {
 };
 
 export const handleVideoMessage = (event, videoId, blockName = 'video') => {
-  if (!event.origin.endsWith(aemCloudDomain)) return;
+  if (!event.origin.endsWith(aemCloudDomain)) {
+    return;
+  }
   if (event.data.type === 'embedded-video-player-event') {
     const timeStamp = formatDebugTime(new Date());
 

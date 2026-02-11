@@ -63,7 +63,9 @@ export default async function decorate(block) {
   const h1 = content.querySelector('h1');
   h1.classList.add(`${blockName}__heading`);
   const nextEl = h1.nextElementSibling;
-  if (nextEl && !nextEl.querySelector('a')) nextEl.classList.add(`${blockName}__subtitle`);
+  if (nextEl && !nextEl.querySelector('a')) {
+    nextEl.classList.add(`${blockName}__subtitle`);
+  }
 
   const button = content.querySelector('a');
   const allTexts = content.querySelectorAll('p');
