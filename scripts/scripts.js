@@ -152,8 +152,8 @@ function decorateSpecial() {
       const newBtn = createElement('a', {
         classes: ['button', 'primary'],
         props: { id },
-        textContent,
       });
+      newBtn.textContent = textContent;
       el.textContent = '';
       el.classList.add('button-container');
       el.appendChild(newBtn);
