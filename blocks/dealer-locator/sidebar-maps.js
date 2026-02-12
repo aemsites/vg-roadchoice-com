@@ -1741,28 +1741,24 @@ $.fn.filterNearbyPins = function () {
 
   function buildAddressKey(item) {
     return [
-      item.COMPANY_DBA_NAME?.trim().toLowerCase(),
-      item.MAIN_ADDRESS_LINE_1_TXT?.trim().toLowerCase(),
-      item.MAIN_ADDRESS_LINE_2_TXT?.trim().toLowerCase(),
-      item.MAIN_CITY_NM?.trim().toLowerCase(),
-      item.MAIN_STATE_PROV_CD?.trim().toLowerCase(),
-      item.MAIN_POSTAL_CD?.trim().toLowerCase(),
-    ].join('|');
+      item.COMPANY_DBA_NAME?.trim(),
+      item.MAIN_ADDRESS_LINE_1_TXT?.trim(),
+      item.MAIN_ADDRESS_LINE_2_TXT?.trim(),
+      item.MAIN_CITY_NM?.trim(),
+      item.MAIN_STATE_PROV_CD?.trim(),
+      item.MAIN_POSTAL_CD?.trim(),
+    ].join('|').toLocaleLowerCase();
   }
 
   function removeDuplicatesByTitleAndAddress(list) {
-    const seen = new Set();
+    const map = new Map();
 
-    return list.filter((item) => {
+    for (const item of list) {
       const key = buildAddressKey(item);
+      map.set(key, item); // overwrite if that exists
+    }
 
-      if (seen.has(key)) {
-        return false; // remove duplicated
-      }
-
-      seen.add(key);
-      return true;
-    });
+    return [...map.values()];
   }
 
   tmpPinList = removeDuplicatesByTitleAndAddress(tmpPinList);
