@@ -49,7 +49,7 @@ function buildSuggestion(suggestions, form) {
     });
   } else if (!crInputContainer.classList.contains('hide')) {
     const noSuggestions = createElement('li', { classes: `${blockName}__autosuggest-item--no-results` });
-    noSuggestions.textContent = getTextLabel('NoSuggestionText');
+    noSuggestions.textContent = getTextLabel('search:no_suggestion');
     suggestionElements.push(noSuggestions);
   }
   return suggestionElements;
@@ -87,7 +87,7 @@ export async function applyFuzzySearch(fuzzyTerm) {
   if (suggestions && suggestions?.length) {
     const fuzzyWrapper = createElement('div', { classes: [`${blockName}__fuzzysearch-results-wrapper`] });
     const fuzzyText = createElement('span', { classes: [`${blockName}__fuzzysearch-results-text`] });
-    fuzzyText.textContent = getTextLabel('DidyouMeanText');
+    fuzzyText.textContent = getTextLabel('search:did_you_mean');
     const list = createElement('ul', { classes: [`${blockName}__fuzzysearch-results-list`] });
     const form = document.querySelector(`.${blockName}-form`);
     const searchBtn = form.querySelector(`.${blockName}__input-cr__submit`);
@@ -106,7 +106,7 @@ export async function applyFuzzySearch(fuzzyTerm) {
 
     fuzzyWrapper.append(fuzzyText, list);
     const noResultsTitleEl = createElement('h1', { classes: [`${blockName}__no-results-title`] });
-    const noResultsTitleHtml = getTextLabel('no_results_title').replace(
+    const noResultsTitleHtml = getTextLabel('search:no_results_title').replace(
       '[$]',
       `<span class="${blockName}__no-results-term">${fuzzyTerm || ''}</span>`,
     );

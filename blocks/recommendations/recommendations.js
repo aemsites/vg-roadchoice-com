@@ -5,8 +5,8 @@ import { getLimitFromBlock, clearCurrentArticle } from '../../scripts/services/b
 
 const blockName = 'recommendations';
 const category = getMetadata('category') || null;
-const title = getTextLabel('recommendations_title');
-const linkText = getTextLabel('read_more');
+const title = getTextLabel('recommendations:title');
+const linkText = getTextLabel('recommendations:read_more');
 
 const [homeTitle, recommendationsTitle] = title.split('[/]');
 const isBlogArticle = document.querySelector('.blog-article');

@@ -4,7 +4,7 @@ import { createElement, getTextLabel } from '../../scripts/common.js';
 const blockName = 'breadcrumb';
 const url = new URL(window.location.href);
 const categoryText = 'part-category';
-const brandName = getTextLabel('brand_name');
+const brandName = getTextLabel('breadcrumb:brand_name');
 
 export default async function decorate(block) {
   const locale = getMetadata('locale');

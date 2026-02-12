@@ -68,8 +68,8 @@ export function selectVideoLink(links, preferredType, videoType = videoTypes.bot
 }
 
 export function createLowResolutionBanner() {
-  const lowResolutionMessage = getTextLabel('low_res_video_message');
-  const changeCookieSettings = getTextLabel('change_cookie_settings');
+  const lowResolutionMessage = getTextLabel('video:low_res_video_message');
+  const changeCookieSettings = getTextLabel('video:change_cookie_settings');
 
   const banner = createElement('div', { classes: 'low-resolution-banner' });
   banner.innerHTML = `${lowResolutionMessage} <button class="low-resolution-banner-cookie-settings">${changeCookieSettings}</button>`;
@@ -208,7 +208,7 @@ const createPlayPauseButton = () => {
 const togglePlayPauseIcon = (isPaused, playIcon, pauseIcon, playPauseButton) => {
   playIcon.style.display = isPaused ? 'flex' : 'none';
   pauseIcon.style.display = isPaused ? 'none' : 'flex';
-  playPauseButton.setAttribute('aria-label', getTextLabel(isPaused ? 'Play video' : 'Pause video'));
+  playPauseButton.setAttribute('aria-label', getTextLabel(isPaused ? 'video_helper:play_video_label' : 'video_helper:pause_video_label'));
 };
 
 /**
