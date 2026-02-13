@@ -1747,7 +1747,7 @@ $.fn.filterNearbyPins = function () {
       item.MAIN_CITY_NM?.trim(),
       item.MAIN_STATE_PROV_CD?.trim(),
       item.MAIN_POSTAL_CD?.trim(),
-    ].join('|').toLocaleLowerCase();
+    ].join('|').toLowerCase();
   }
 
   function removeDuplicatesByTitleAndAddress(list) {
