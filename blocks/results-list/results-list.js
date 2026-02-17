@@ -2,7 +2,7 @@ import { createElement, getTextLabel } from '../../scripts/common.js';
 import { getAndApplySearchResults } from '../../blocks/search/search.js';
 
 const blockName = 'results-list';
-const loadingLabel = getTextLabel('loading_label');
+const loadingLabel = getTextLabel('results_list:loading_label');
 
 export default async function decorate(block) {
   const resultsSection = createElement('div', { classes: `${blockName}__section` });

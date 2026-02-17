@@ -354,13 +354,21 @@ export async function fetchArticlesAndFacets({ sort = 'PUBLISH_DATE_DESC', limit
   return { articles, facets, count };
 }
 
-export async function subcategorySearch({ category = '', subcategory = '', facetFields = [], dynamicFilters = [], limit = 100, offset = 0 }) {
+export async function subcategorySearch({
+  category = '',
+  subcategory = '',
+  facetFields = [],
+  dynamicFilters = [],
+  limit = 100,
+  offset = 0,
+  listAttributes = true,
+}) {
   const { SEARCH_URL_DEV, RC_SUBCATEGORIES_SEARCH, TENANT } = SEARCH_CONFIG;
 
   const graphqlQuery = {
     query: `
-      query ${RC_SUBCATEGORIES_SEARCH}($categoryFilter: String!, $subcategoryFilter: String!, $facetFields: [String], $dynamicFilters: [RcDynamicFilter], $sortOptions: RcSortOptionsEnum, $limit: Int, $offset: Int, $tenant: RcTenantEnum, $language: RcLocaleEnum) {
-        ${RC_SUBCATEGORIES_SEARCH}(categoryFilter: $categoryFilter, subcategoryFilter: $subcategoryFilter, facetFields: $facetFields, dynamicFilters: $dynamicFilters, sortOptions: $sortOptions, limit: $limit, offset: $offset, tenant: $tenant, language: $language) {
+      query ${RC_SUBCATEGORIES_SEARCH}($categoryFilter: String!, $subcategoryFilter: String!, $facetFields: [String], $dynamicFilters: [RcDynamicFilter], $sortOptions: RcSortOptionsEnum, $limit: Int, $offset: Int, $tenant: RcTenantEnum, $language: RcLocaleEnum, $listAttributes: Boolean) {
+        ${RC_SUBCATEGORIES_SEARCH}(categoryFilter: $categoryFilter, subcategoryFilter: $subcategoryFilter, facetFields: $facetFields, dynamicFilters: $dynamicFilters, sortOptions: $sortOptions, limit: $limit, offset: $offset, tenant: $tenant, language: $language, listAttributes: $listAttributes) {
           count
           currentPage
           numberOfPages
@@ -407,6 +415,7 @@ export async function subcategorySearch({ category = '', subcategory = '', facet
       dynamicFilters,
       limit,
       offset,
+      listAttributes,
     },
   };
 

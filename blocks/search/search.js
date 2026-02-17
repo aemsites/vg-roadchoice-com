@@ -9,9 +9,9 @@ export const blockName = 'search';
 let isCrossRefActive = true;
 
 const PLACEHOLDERS = {
-  crossReference: getTextLabel('cross-reference_number'),
-  partNumber: getTextLabel('part_number_or_description'),
-  partNumberLabel: getTextLabel('part_number_slash_description'),
+  crossReference: getTextLabel('search:cross-reference_number'),
+  partNumber: getTextLabel('search:part_number_or_description'),
+  partNumberLabel: getTextLabel('search:part_number_slash_description'),
 };
 
 const TEMPLATES = {
@@ -187,7 +187,7 @@ const updateUrl = (targetOffset) => {
 };
 
 const showLoader = (resultsSection) => {
-  const loadingLabel = getTextLabel('loading_label');
+  const loadingLabel = getTextLabel('search:loading_label');
   let loadingElement = document.querySelector('.loading');
   if (!loadingElement) {
     loadingElement = createElement('div', { classes: 'loading' });
@@ -210,7 +210,7 @@ const showLoader = (resultsSection) => {
  * @returns {string} - the search title text
  */
 const getSearchTitleText = ({ searchType, query, make, model }) => {
-  return getTextLabel(`SEARCH_RESULT:${searchType}_title`)
+  return getTextLabel(`search:${searchType}_title`)
     .replace('[$1]', make ? `"${make}" ` : '')
     .replace('[$2]', model ? `"${model}" ` : '')
     .replace('[$q]', query ? `"${query}"` : '');
@@ -243,10 +243,10 @@ const updateSearchResults = (results, searchType, query, make, model, resultsSec
 
 const updatePagination = (resultsSection, targetOffset, resultsLength) => {
   const { MAX_PRODUCTS_PER_QUERY = false } = SEARCH_CONFIG;
-  const buttonTextContent = getTextLabel('pagination_button');
+  const buttonTextContent = getTextLabel('search:pagination_button');
   const resultsCountElement = document.querySelector('.top-results-text');
   const currentAmount = document.querySelectorAll('.product-card').length;
-  const displayedTextContent = getTextLabel('pagination_text');
+  const displayedTextContent = getTextLabel('search:pagination_text');
   const newText = displayedTextContent.replace('[$]', currentAmount);
   if (resultsCountElement) {
     resultsCountElement.innerText = newText;
@@ -266,7 +266,7 @@ const updatePagination = (resultsSection, targetOffset, resultsLength) => {
 
 export const showNoResultsMessage = (query, searchResultsSection) => {
   const titleElement = searchResultsSection?.querySelector('.title');
-  const titleText = getTextLabel('no_results_title').replace('[$]', query ? query : '');
+  const titleText = getTextLabel('search:no_results_title').replace('[$]', query ? query : '');
   if (titleElement) {
     titleElement.innerText = titleText;
   }

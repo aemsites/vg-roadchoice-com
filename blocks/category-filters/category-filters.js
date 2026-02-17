@@ -3,8 +3,8 @@ import { subcategorySearch } from '../../scripts/graphql-api.js';
 import { aggregateFilters, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 const blockName = 'category-filters';
-const titleText = getTextLabel('category_filters_title');
-const clearText = getTextLabel('category_filters_clear_button');
+const titleText = getTextLabel('category_filters:title');
+const clearText = getTextLabel('category_filters:clear_button');
 let queryObject;
 
 const fetchQueryParams = () => {
@@ -37,19 +37,12 @@ const captureInputsAndUpdateQuery = (input) => {
       }
     } else {
       filterObj.filterValue.push(value);
-      if (!queryObject.facetFields.includes(key)) {
-        queryObject.facetFields.push(key);
-      }
     }
   } else {
     queryObject.dynamicFilters.push({
       fieldName: key,
       filterValue: [value],
     });
-
-    if (!queryObject.facetFields.includes(key)) {
-      queryObject.facetFields.push(key);
-    }
   }
   updateGlobalQueryObject('query-params', queryObject);
 };

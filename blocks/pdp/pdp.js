@@ -292,7 +292,7 @@ function renderDocsSection(docsList, sectionType) {
   Object.entries(docsList).forEach(([language, docs]) => {
     const docsFragment = docRange.createContextualFragment(`
       <li class="${blockName}-${sectionType}-list-item">
-        <div class="${blockName}-${sectionType}-list-title">${getTextLabel(language)}</div>
+        <div class="${blockName}-${sectionType}-list-title">${getTextLabel(`pdp:${language}`)}</div>
         <div class="${blockName}-${sectionType}-list-link"></div>
       </li>
     `);
@@ -555,7 +555,7 @@ function renderPartFit(partFitData) {
 
 function resolvePartLabel(type, part) {
   const { basePartNumber, name } = part;
-  let label = getTextLabel(`pdp_metadata_${type}`);
+  let label = getTextLabel(`pdp:metadata_${type}`);
   if (label) {
     label = label.replace('[[part_number]]', basePartNumber || '');
     label = label.replace('[[part_name]]', name || '');

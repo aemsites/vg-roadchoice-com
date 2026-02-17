@@ -1,7 +1,7 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
 
-const paginationText = getTextLabel('pagination_text');
-const buttonText = getTextLabel('pagination_button');
+const paginationText = getTextLabel('category_pagination:pagination_text');
+const buttonText = getTextLabel('category_pagination:pagination_button');
 let isFirstRenderPass = true;
 let hasMoreItems;
 let currentDisplayedProds;
@@ -55,7 +55,7 @@ const renderBlock = async (block, paginationData) => {
   currentDisplayedProds = hasMoreItems ? productsPerPage : productCount;
 
   if (!isFirstRenderPass) {
-    block.querySelector('.text-wrapper p').remove();
+    block.querySelector('.text-wrapper').remove();
   }
 
   const textWrapper = createElement('div', { classes: 'text-wrapper' });

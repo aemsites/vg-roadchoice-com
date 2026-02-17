@@ -1,7 +1,7 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
 
 const blockName = 'filters';
-const categoriesText = getTextLabel('categories_label');
+const categoriesText = getTextLabel('filters:categories_label');
 
 export const buildFilter = (cats) => {
   const section = createElement('div', { classes: `${blockName}-section` });
