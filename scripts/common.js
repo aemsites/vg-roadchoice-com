@@ -90,7 +90,9 @@ function createElement(tagName, options = {}) {
     const classesArr = isString ? [...(classes?.split(' ') || [])] : classes;
     elem.classList.add(...classesArr);
   }
-  if (!isString && classes.length === 0) elem.removeAttribute('class');
+  if (!isString && classes.length === 0) {
+    elem.removeAttribute('class');
+  }
 
   if (props) {
     Object.keys(props).forEach((propName) => {
@@ -376,7 +378,9 @@ async function getConstantValues() {
  * @returns {Object} The object containing the extracted key-value pairs.
  */
 const extractObjectFromArray = (data) => {
-  if (!Array.isArray(data)) return {};
+  if (!Array.isArray(data)) {
+    return {};
+  }
   const obj = {};
   for (const item of data) {
     try {
@@ -409,7 +413,9 @@ function checkOneTrustGroup(groupName, cookieCheck = false) {
 const getJsonFromUrl = async (route) => {
   try {
     const response = await fetch(route);
-    if (!response.ok) return null;
+    if (!response.ok) {
+      return null;
+    }
     const json = await response.json();
     return json;
   } catch (error) {
@@ -432,7 +438,9 @@ const getJsonFromUrl = async (route) => {
  *                     original input.
  */
 const formatStringToArray = (inputString) => {
-  if (typeof inputString !== 'string') return [];
+  if (typeof inputString !== 'string') {
+    return [];
+  }
   // eslint-disable-next-line no-useless-escape
   const cleanedString = inputString.replace(/[\[\]\\'"]+/g, '');
   return cleanedString
@@ -518,7 +526,9 @@ function createResponsivePicture(images, eager, alt, imageClass) {
     const originalFormat = image.src.split('.').pop();
 
     image.breakpoints.forEach((bp) => {
-      if (!bp.media) return;
+      if (!bp.media) {
+        return;
+      }
 
       const srcsetWebp = constructSrcset(image.src, bp.width, 'webp');
       const srcsetOriginal = constructSrcset(image.src, bp.width, originalFormat);
@@ -666,7 +676,9 @@ async function getMoreJSONData(url, total, offset = 0, limit = DEFAULT_LIMIT) {
 const getLongJSONData = async (props) => {
   const { url } = props;
   const json = await getInitialJSONData(props);
-  if (!json) return null;
+  if (!json) {
+    return null;
+  }
   const initialData = [...json.data];
   let moreData;
   if (json.total > json.limit) {
@@ -682,7 +694,9 @@ const getLongJSONData = async (props) => {
 function checkLinkProps(links) {
   links.forEach((link) => {
     const linkText = link.innerText;
-    if (linkText[0] !== '[') return;
+    if (linkText[0] !== '[') {
+      return;
+    }
     const brackets = linkText.match(/^\[(.*?)\]/);
     const rawProperties = brackets && brackets[1];
     const propertyArray = rawProperties?.split(',');
@@ -708,7 +722,9 @@ function checkLinkProps(links) {
  * @returns list of elements that pass the children check
  */
 export function getAllElWithChildren(elements, childrenCheck, isOpposite = false) {
-  if (isOpposite) return [...elements].filter((el) => !el.querySelector(childrenCheck));
+  if (isOpposite) {
+    return [...elements].filter((el) => !el.querySelector(childrenCheck));
+  }
   return [...elements].filter((el) => el.querySelector(childrenCheck));
 }
 

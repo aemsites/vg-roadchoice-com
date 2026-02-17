@@ -41,7 +41,9 @@ export default async function decorate(doc) {
   searchResultsWrapper.appendChild(searchResultsSection);
   section.appendChild(searchResultsWrapper);
 
-  if (searchBar) main.prepend(searchBar);
+  if (searchBar) {
+    main.prepend(searchBar);
+  }
   main.append(section);
 
   // These containers are beign left behind and generating unnecessary padding. Since we are appending the other 3

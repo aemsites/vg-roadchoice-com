@@ -60,7 +60,9 @@ const updateCheckboxes = (form) => {
 
 const isFilterActive = (key = '') => {
   const dynamicFilters = queryObject.dynamicFilters;
-  if (dynamicFilters.length === 0) return false;
+  if (dynamicFilters.length === 0) {
+    return false;
+  }
   return dynamicFilters.some((item) => item.fieldName === key);
 };
 
@@ -90,7 +92,9 @@ const renderFilters = (dynamicFilters, wrapper) => {
 
     const productAttributes = [...filterFields[key]];
     // if no attribute is present for the filter then no need to add it
-    if (productAttributes.length === 0) return;
+    if (productAttributes.length === 0) {
+      return;
+    }
 
     productAttributes.forEach((attribute) => {
       const { key: attrName, doc_count: count } = attribute;
