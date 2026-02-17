@@ -1,7 +1,7 @@
 import { createElement, getTextLabel } from '../../scripts/common.js';
 
-const paginationText = getTextLabel('pagination_text');
-const buttonText = getTextLabel('pagination_button');
+const paginationText = getTextLabel('category_pagination:pagination_text');
+const buttonText = getTextLabel('category_pagination:pagination_button');
 let isFirstRenderPass = true;
 let hasMoreItems;
 let currentDisplayedProds;

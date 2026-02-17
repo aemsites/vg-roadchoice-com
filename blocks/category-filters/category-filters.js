@@ -3,8 +3,8 @@ import { subcategorySearch } from '../../scripts/graphql-api.js';
 import { aggregateFilters, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 const blockName = 'category-filters';
-const titleText = getTextLabel('category_filters_title');
-const clearText = getTextLabel('category_filters_clear_button');
+const titleText = getTextLabel('category_filters:title');
+const clearText = getTextLabel('category_filters:clear_button');
 let queryObject;
 
 const fetchQueryParams = () => {
