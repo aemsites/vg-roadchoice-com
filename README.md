@@ -34,6 +34,8 @@ npm run lint
 2. Start the AEM proxy: `aem up` (opens your browser at http://localhost:3000)
 3. Open the `{repo}` directory in your favorite IDE and start coding :)
 
+**Note for Safari users:** When testing the dealer locator, run `npm run proxy:cors` in a separate terminal (starts CORS proxy on port 3001).
+
 ## Best practices using fonts
 
 * We are using [fallback fonts](https://github.com/pixel-point/fontpie) that avoid CLS.

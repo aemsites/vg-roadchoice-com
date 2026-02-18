@@ -11,6 +11,7 @@
     "dev": "aem up",
     "dev:ca": "AEM_PAGES_URL=https://main--roadchoice-ca--volvogroup.aem.page aem up",
     "dev:mx": "AEM_PAGES_URL=https://main--roadchoice-mx--volvogroup.aem.page aem up",
+    "proxy:cors": "node tools/proxy-cors.js",
     "lint:js": "eslint .",
     "lint:css": "stylelint common/**/*.css blocks/**/*.css styles/*.css",
     "lint:js:fix": "eslint . --fix",
