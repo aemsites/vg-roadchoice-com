@@ -85,15 +85,10 @@ $hoverText = $('#hoverText').val();
 // Google callback letting us know maps is ready to be used
 (function () {
   initMap = function () {
-    var mapElement = document.getElementById("map");
-    
-    if (!mapElement) {
-      return;
-    }
 
     $geocoder = new google.maps.Geocoder();
 
-    $map = new google.maps.Map(mapElement, {
+    $map = new google.maps.Map(document.getElementById("map"), {
       center: {
         lat: 39.670469,
         lng: -101.766407
@@ -209,34 +204,6 @@ $hoverText = $('#hoverText').val();
       }]
     });
 
-    // Safari fix: Force width if zero
-    var wrapper = document.querySelector('.wrapper');
-    var dealerLocator = document.querySelector('.dealer-locator');
-    if (mapElement.offsetWidth === 0) {
-      mapElement.style.width = '100vw';
-      mapElement.style.minWidth = '100vw';
-      if (wrapper) {
-        wrapper.style.width = '100%';
-        wrapper.style.minWidth = '100vw';
-      }
-      if (dealerLocator) {
-        dealerLocator.style.width = '100%';
-        dealerLocator.style.minWidth = '100vw';
-      }
-    }
-    
-    // Force map resize for Safari
-    setTimeout(function() {
-      google.maps.event.trigger($map, 'resize');
-      $map.setCenter({lat: 39.670469, lng: -101.766407});
-      
-      // Second resize for Safari - sometimes needed
-      setTimeout(function() {
-        google.maps.event.trigger($map, 'resize');
-        $map.setCenter({lat: 39.670469, lng: -101.766407});
-      }, 200);
-    }, 100);
-
     // Attempt geolocation
     $.fn.setLocation();
 
@@ -260,9 +227,6 @@ $.fn.initGoogleMaps = function () {
     dataType: "script",
     success: function (d) {
       initMap();
-    },
-    error: function(xhr, status, error) {
-      // Silent error - maps API failed to load
     }
   });
 };
@@ -288,22 +252,13 @@ $.fn.loadPins = function () {
     window.locatorConfig.dataSource = `/simpleprox.ashx?${window.locatorConfig.backupUrl}`;
   }
 
-  var dataUrl = window.locatorConfig.dataSource;
-  
-  // In localhost dev, use CORS proxy to avoid Safari CORS issues
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    dataUrl = 'http://localhost:3001';
-  }
-
   $.ajax({
-    url: `${dataUrl}?state=1`,
+    url: `${window.locatorConfig.dataSource}?state=1`,
     type: "GET",
     success: function (data) {
 
       try {
-        if (typeof data === 'string') {
-          data = JSON.parse(data);
-        }
+        data = JSON.parse(data);
       } catch (e) {
         // data is already an object, proceed.
       }
@@ -1308,6 +1263,8 @@ $.fn.filterRadius = function () {
         $markers[i].setMap($map);
 
         $markers[i].setZIndex(2);
+
+
 
         $nearbyPins.push($markers[i].ID);
 
@@ -2450,18 +2407,6 @@ $.fn.setAddress = function () {
 $.fn.setLocation = function () {
 
   if (navigator.geolocation) {
-    // Check permissions API if available (modern browsers)
-    if (navigator.permissions) {
-      navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
-        if (result.state === 'denied') {
-          alert('Location access is blocked. Please enable location permissions in Safari:\n\n1. Safari menu > Settings for This Website\n2. Set Location to "Allow"');
-          $.fn.handleLocationError(true);
-          return;
-        }
-      }).catch(function(err) {
-        // Permissions API not available
-      });
-    }
 
     navigator.geolocation.getCurrentPosition(function (position) {
 
@@ -2536,19 +2481,11 @@ $.fn.setLocation = function () {
         }
       });
 
-    }, function (error) {
+    }, function () {
 
-      // Better error messages for Safari
-      if (error.code === 1) {
-        // Permission denied
-      }
+      console.log('error with navigator');
+      $.fn.handleLocationError(true);
 
-      $.fn.handleLocationError(true, error.code);
-
-    }, {
-      enableHighAccuracy: false,
-      timeout: 15000, // Increased timeout for Safari
-      maximumAge: 300000
     });
 
 
@@ -2719,30 +2656,11 @@ $.fn.drawPin = function (text, width, height, color) {
   return 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22' + width + '%22%20height%3D%22' + height + '%22%20viewBox%3D%220%200%2038%2038%22%3E%3Cpath%20fill%3D%22%23' + color + '%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%22.5%22%20d%3D%22M34.305%2016.234c0%208.83-15.148%2019.158-15.148%2019.158S3.507%2025.065%203.507%2016.1c0-8.505%206.894-14.304%2015.4-14.304%208.504%200%2015.398%205.933%2015.398%2014.438z%22%2F%3E%3Ctext%20transform%3D%22translate%2819%2018.5%29%22%20fill%3D%22%23fff%22%20style%3D%22font-family%3A%20Arial%2C%20sans-serif%3Bfont-weight%3Abold%3Btext-align%3Acenter%3B%22%20font-size%3D%2212%22%20text-anchor%3D%22middle%22%3E' + text + '%3C%2Ftext%3E%3C%2Fsvg%3E';
 };
 
-$.fn.handleLocationError = function (browserHasGeolocation, errorCode, pos) {
+$.fn.handleLocationError = function (browserHasGeolocation, infoWindow, pos) {
 
   if (browserHasGeolocation) {
     $('.loading-overlay').css('display', 'none');
     $('.waiting-overlay').css('display', 'block');
-    
-    // Show helpful message based on error code
-    if (errorCode === 1) {
-      var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-      var message = 'Location access was denied.\n\n';
-      
-      if (isSafari) {
-        message += 'To enable location in Safari:\n';
-        message += '1. Click "Safari" in the menu bar\n';
-        message += '2. Select "Settings for This Website"\n';
-        message += '3. Set "Location" to "Allow"\n\n';
-        message += 'Or check System Settings > Privacy & Security > Location Services';
-      } else {
-        message += 'Please enable location permissions in your browser settings.';
-      }
-      
-      // Show message in waiting overlay instead of alert
-      $('.waiting-overlay p').html(message.replace(/\n/g, '<br>'));
-    }
   } else {
     alert('Error: Your browser doesn\'t support geolocation.');
   }
@@ -3139,6 +3057,7 @@ $(document).on('click', '.accordion', function (eventObject) {
 });
 
 $(document).on('click', '#set-dealer', function (eventObject) {
+  console.log("inside set dealer");
   var pinId = $(this).attr('data-pin');
 
   var pin = $.fn.getPinById(pinId);
@@ -3165,22 +3084,4 @@ $(document).on('click', '#print', function (eventObject) {
 
 });
 
-// Wait for jQuery and DOM to be ready before initializing - Safari compatibility
-if (typeof $ !== 'undefined' && $.fn) {
-  if (document.readyState === 'loading') {
-    $(document).ready(function() {
-      $.fn.initGoogleMaps();
-    });
-  } else {
-    // DOM already loaded
-    $.fn.initGoogleMaps();
-  }
-} else {
-  // Fallback: wait for jQuery to be available
-  var checkJQuery = setInterval(function() {
-    if (typeof $ !== 'undefined' && $.fn) {
-      clearInterval(checkJQuery);
-      $.fn.initGoogleMaps();
-    }
-  }, 100);
-}
+$.fn.initGoogleMaps();//entry point to dealer locator

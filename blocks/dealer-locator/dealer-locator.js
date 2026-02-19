@@ -68,6 +68,16 @@ export default async function decorate(block) {
     };
   }
 
+  loadScript('/blocks/dealer-locator/vendor/jquery.min.js', { type: 'text/javascript', charset: 'UTF-8' }).then(() => {
+    // these scripts depend on jquery:
+    loadScript('/blocks/dealer-locator/sidebar-maps.js', { type: 'text/javascript', charset: 'UTF-8' });
+    loadScript('/blocks/dealer-locator/my-dealer.js', { type: 'text/javascript', charset: 'UTF-8' });
+  });
+
+  loadScript('/blocks/dealer-locator/vendor/moment.js', { type: 'text/javascript', charset: 'UTF-8' }).then(() => {
+    loadScript('/blocks/dealer-locator/vendor/moment-timezone.min.js', { type: 'text/javascript', charset: 'UTF-8' });
+  });
+
   block.innerHTML = `<input id="hoverText" value="Please unselect the selected option to click this option" hidden/>
 <div class="wrapper">
     <div class="mobile-main-header">
@@ -444,15 +454,4 @@ export default async function decorate(block) {
 <div id="locator-snackbar"></div>
 
 </div> `;
-
-  // Load scripts AFTER HTML is inserted in DOM
-  loadScript('/blocks/dealer-locator/vendor/jquery.min.js', { type: 'text/javascript', charset: 'UTF-8' }).then(() => {
-    // these scripts depend on jquery:
-    loadScript('/blocks/dealer-locator/sidebar-maps.js', { type: 'text/javascript', charset: 'UTF-8' });
-    loadScript('/blocks/dealer-locator/my-dealer.js', { type: 'text/javascript', charset: 'UTF-8' });
-  });
-
-  loadScript('/blocks/dealer-locator/vendor/moment.js', { type: 'text/javascript', charset: 'UTF-8' }).then(() => {
-    loadScript('/blocks/dealer-locator/vendor/moment-timezone.min.js', { type: 'text/javascript', charset: 'UTF-8' });
-  });
 }
