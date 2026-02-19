@@ -16,12 +16,14 @@
 }
 
 .dealer-locator {
-  height: calc(100vh - var(--nav-height));
+  height: calc(100vh - var(--nav-height, 0px));
+  min-height: calc(100vh - var(--nav-height, 0px));
 }
 
 @supports (height: 1svh) {
   .dealer-locator {
-    height: calc(100svh - var(--nav-height));
+    height: calc(100svh - var(--nav-height, 0px));
+    min-height: calc(100svh - var(--nav-height, 0px));
   }
 }
 
@@ -2219,6 +2221,7 @@ main .section.dealer-locator-container > div {
 .dealer-locator .wrapper {
   position: relative;
   overflow: hidden;
+  height: 100%;
   min-height: 100%;
 }
 
