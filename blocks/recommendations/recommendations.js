@@ -5,8 +5,8 @@ import { getLimitFromBlock, clearCurrentArticle } from '../../scripts/services/b
 
 const blockName = 'recommendations';
 const category = getMetadata('category') || null;
-const title = getTextLabel('recommendations_title');
-const linkText = getTextLabel('read_more');
+const title = getTextLabel('recommendations:title');
+const linkText = getTextLabel('recommendations:read_more');
 
 const [homeTitle, recommendationsTitle] = title.split('[/]');
 const isBlogArticle = document.querySelector('.blog-article');
@@ -16,7 +16,9 @@ export const getLimit = (block) => {
   let limit;
   classes.forEach((e) => {
     const [name, value] = e.split('-');
-    if (name === 'limit') limit = value;
+    if (name === 'limit') {
+      limit = value;
+    }
   });
   return limit;
 };
@@ -25,7 +27,9 @@ export const clearRepeatedArticles = (articles) =>
   articles.filter((e) => {
     const currentArticlePath = window.location.href.split('/').pop();
     const path = e.path.split('/').pop();
-    if (path !== currentArticlePath) return e;
+    if (path !== currentArticlePath) {
+      return e;
+    }
     return null;
   });
 

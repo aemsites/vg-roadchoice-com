@@ -37,7 +37,9 @@ function buildHeroBlock(main) {
     return;
   }
 
-  if (heroBlock) return;
+  if (heroBlock) {
+    return;
+  }
 
   if (header && picture && header.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING) {
     const section = document.createElement('div');
@@ -49,7 +51,9 @@ function buildHeroBlock(main) {
 
 function buildSearchForm(main, head) {
   const noSearchBlock = head.querySelector('meta[name="no-search"]');
-  if (noSearchBlock) return;
+  if (noSearchBlock) {
+    return;
+  }
   const section = createElement('div');
   section.appendChild(buildBlock('search', []));
   main.prepend(section);
@@ -152,8 +156,8 @@ function decorateSpecial() {
       const newBtn = createElement('a', {
         classes: ['button', 'primary'],
         props: { id },
-        textContent,
       });
+      newBtn.textContent = textContent;
       el.textContent = '';
       el.classList.add('button-container');
       el.appendChild(newBtn);
@@ -214,14 +218,18 @@ async function loadEager(doc) {
  */
 async function loadLazy(doc) {
   const templateName = getMetadata('template');
-  if (templateName) await loadTemplate(doc, templateName);
+  if (templateName) {
+    await loadTemplate(doc, templateName);
+  }
 
   const main = doc.querySelector('main');
   await loadSections(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
-  if (hash && element) element.scrollIntoView();
+  if (hash && element) {
+    element.scrollIntoView();
+  }
   const header = doc.querySelector('header');
   const subnav = header.querySelector('.block.sub-nav');
 

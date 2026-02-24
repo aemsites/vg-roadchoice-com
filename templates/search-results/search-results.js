@@ -1,8 +1,8 @@
 import { getTextLabel, createElement } from '../../scripts/common.js';
 
-const subTitleText = getTextLabel('no_results_subtitle');
-const needHelp = getTextLabel('no_results_need_help');
-const contactUsText = getTextLabel('no_results_contact_us');
+const subTitleText = getTextLabel('search_results:no_results_subtitle');
+const needHelp = getTextLabel('search_results:no_results_need_help');
+const contactUsText = getTextLabel('search_results:no_results_contact_us');
 export const results = [];
 export const allProducts = {};
 
@@ -41,7 +41,9 @@ export default async function decorate(doc) {
   searchResultsWrapper.appendChild(searchResultsSection);
   section.appendChild(searchResultsWrapper);
 
-  if (searchBar) main.prepend(searchBar);
+  if (searchBar) {
+    main.prepend(searchBar);
+  }
   main.append(section);
 
   // These containers are beign left behind and generating unnecessary padding. Since we are appending the other 3

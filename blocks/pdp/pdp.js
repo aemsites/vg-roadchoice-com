@@ -21,7 +21,9 @@ const SUPPORTED_LOCALES_WITH_PREFIX = ['en-ca', 'fr-ca'];
 const PDP_BASE_FIELDS = ['part_name', 'description', 'category', 'subcategory'];
 
 function normalizeField(value) {
-  if (Array.isArray(value)) return value[0] ?? '';
+  if (Array.isArray(value)) {
+    return value[0] ?? '';
+  }
   return value ?? '';
 }
 
@@ -36,7 +38,9 @@ function mapGraphQLProductToPart(product, categoryKeys) {
   const attributeLabels = (categoryKeys || []).map((item) => item.Attributes).filter(Boolean);
 
   attributeLabels.forEach((label) => {
-    if (label.toLowerCase() === 'description') return; // prevent duplicate
+    if (label.toLowerCase() === 'description') {
+      return;
+    } // prevent duplicate
     const value = dynamic[label];
     if (value != null && value !== '') {
       attributes[label] = value;
@@ -122,7 +126,9 @@ async function fetchPartImages(sku) {
 
 function renderColDetails(part, block, categoryKeys) {
   const list = block.querySelector(`.${blockName}-list`);
-  if (!list) return;
+  if (!list) {
+    return;
+  }
 
   const attributes = part.attributes || {};
   const keys = Array.isArray(categoryKeys) ? categoryKeys : [];
@@ -131,7 +137,9 @@ function renderColDetails(part, block, categoryKeys) {
     const label = item.Attributes;
     const value = attributes[label];
 
-    if (!label || value == null || value === '') return;
+    if (!label || value == null || value === '') {
+      return;
+    }
 
     const liFragment = docRange.createContextualFragment(`
       <li class="${blockName}-list-item">
@@ -147,7 +155,9 @@ function renderImages(block, images) {
   const imageWrapper = block.querySelector(`.${blockName}-image-wrapper`);
   const selectedImage = block.querySelector(`.${blockName}-selected-image`);
 
-  if (!images || !images.length) return;
+  if (!images || !images.length) {
+    return;
+  }
   // main image
   const mainPictureUrl = images[0]['Image URL'];
   const mainPicture = createOptimizedPicture(mainPictureUrl, 'Part image', true, undefined, !mainPictureUrl.startsWith('/'));
@@ -155,7 +165,9 @@ function renderImages(block, images) {
   selectedImage.append(mainPicture);
 
   // additional images
-  if (images.length <= 1) return;
+  if (images.length <= 1) {
+    return;
+  }
 
   const imageList = createElement('ul', { classes: `${blockName}-image-list` });
   images.forEach((image, id) => {
@@ -228,7 +240,9 @@ async function fetchCategoryKeys(category) {
       url: getLocaleContextedUrl('/product-data/rc-attribute-master-file.json'),
       limit: DEFAULT_LIMIT,
     });
-    if (!json || json.length === 0) return [];
+    if (!json || json.length === 0) {
+      return [];
+    }
 
     return filterByCategory(json, category, 'Subcategory');
   } catch (error) {
@@ -249,7 +263,9 @@ function filterByDocType(data, type, category) {
 async function fetchDocs(category) {
   try {
     const json = await getJsonData(getLocaleContextedUrl('/catalogs-categories.json'));
-    if (!json) return null;
+    if (!json) {
+      return null;
+    }
     const data = json?.data;
     return {
       catalogs: filterByDocType(data, docTypes.catalog, category),
@@ -264,7 +280,9 @@ async function fetchDocs(category) {
 function renderDocsSection(docsList, sectionType) {
   const section = document.querySelector(`.${blockName}-${sectionType}`);
   const sectionWrapper = section?.querySelector('.default-content-wrapper');
-  if (!section || !sectionWrapper || !Object.keys(docsList)?.length) return;
+  if (!section || !sectionWrapper || !Object.keys(docsList)?.length) {
+    return;
+  }
 
   const fragment = docRange.createContextualFragment(`
     <ul class="${blockName}-${sectionType}-list"></ul>
@@ -274,7 +292,7 @@ function renderDocsSection(docsList, sectionType) {
   Object.entries(docsList).forEach(([language, docs]) => {
     const docsFragment = docRange.createContextualFragment(`
       <li class="${blockName}-${sectionType}-list-item">
-        <div class="${blockName}-${sectionType}-list-title">${getTextLabel(language)}</div>
+        <div class="${blockName}-${sectionType}-list-title">${getTextLabel(`pdp:${language}`)}</div>
         <div class="${blockName}-${sectionType}-list-link"></div>
       </li>
     `);
@@ -289,7 +307,9 @@ function renderDocsSection(docsList, sectionType) {
 }
 
 function renderDocs(docs) {
-  if (!docs) return;
+  if (!docs) {
+    return;
+  }
   renderDocsSection(docs.catalogs, 'catalogs');
   renderDocsSection(docs.manuals, 'manuals');
 }
@@ -298,7 +318,9 @@ function renderDocs(docs) {
 async function fetchSDS(category) {
   try {
     const json = await getJsonData(getLocaleContextedUrl('/sds-categories.json'));
-    if (!json) return null;
+    if (!json) {
+      return null;
+    }
     return filterByCategory(json?.data, category);
   } catch (error) {
     console.error(error);
@@ -307,10 +329,14 @@ async function fetchSDS(category) {
 }
 
 function renderSDS(sdsList) {
-  if (!sdsList) return;
+  if (!sdsList) {
+    return;
+  }
   const sdsContainer = document.querySelector(`.${blockName}-sds`);
   const sectionWrapper = sdsContainer.querySelector('.default-content-wrapper');
-  if (!sdsContainer || !sectionWrapper || !sdsList?.length) return;
+  if (!sdsContainer || !sectionWrapper || !sdsList?.length) {
+    return;
+  }
 
   const fragment = docRange.createContextualFragment(`
     <ul class="${blockName}-sds-list"></ul>
@@ -351,10 +377,14 @@ async function fetchBlogs(category) {
 }
 
 function renderBlogs(blogList) {
-  if (!blogList) return;
+  if (!blogList) {
+    return;
+  }
   const blogsContainer = document.querySelector(`.${blockName}-blogs`);
   const sectionWrapper = blogsContainer.querySelector('.default-content-wrapper');
-  if (!blogsContainer || !sectionWrapper || !blogList?.length) return;
+  if (!blogsContainer || !sectionWrapper || !blogList?.length) {
+    return;
+  }
 
   const fragment = docRange.createContextualFragment(`
     <ul class="${blockName}-blogs-list"></ul>
@@ -382,7 +412,9 @@ function renderBlogs(blogList) {
 async function getPartFitConfig(category) {
   try {
     const json = await getJsonData(getLocaleContextedUrl('/product-fit-vehicles/product-fit-vehicles-config.json'));
-    if (!json) return null;
+    if (!json) {
+      return null;
+    }
     return filterByCategory(json?.data, category);
   } catch (error) {
     console.error(error);
@@ -394,10 +426,14 @@ async function fetchPartFit(pathSegments) {
   const { category, sku } = pathSegments;
 
   const hasPartFit = await getPartFitConfig(category);
-  if (hasPartFit?.length === 0) return null;
+  if (hasPartFit?.length === 0) {
+    return null;
+  }
   try {
     const json = await getJsonData(getLocaleContextedUrl(`/product-fit-vehicles/${category.replace(/[^\w]/g, '-')}-application-data.json`));
-    if (!json) return null;
+    if (!json) {
+      return null;
+    }
     return filterModelsBySKU(json?.data, sku);
   } catch (error) {
     console.error(error);
@@ -406,7 +442,9 @@ async function fetchPartFit(pathSegments) {
 }
 
 function renderPartFit(partFitData) {
-  if (!partFitData) return;
+  if (!partFitData) {
+    return;
+  }
   const partFitContainer = document.querySelector(`.${blockName}-part-fit`);
   let sectionWrapper = partFitContainer.querySelector('.default-content-wrapper');
 
@@ -415,7 +453,9 @@ function renderPartFit(partFitData) {
     partFitContainer.append(sectionWrapper);
   }
 
-  if (!partFitContainer || !sectionWrapper || !partFitData?.length) return;
+  if (!partFitContainer || !sectionWrapper || !partFitData?.length) {
+    return;
+  }
 
   const fragment = docRange.createContextualFragment(`
     <div class="${blockName}-part-fit-expanded">
@@ -515,7 +555,7 @@ function renderPartFit(partFitData) {
 
 function resolvePartLabel(type, part) {
   const { basePartNumber, name } = part;
-  let label = getTextLabel(`pdp_metadata_${type}`);
+  let label = getTextLabel(`pdp:metadata_${type}`);
   if (label) {
     label = label.replace('[[part_number]]', basePartNumber || '');
     label = label.replace('[[part_name]]', name || '');
@@ -550,14 +590,18 @@ function updateCanonicalUrl(category, sku) {
 }
 
 function updateImageMetadata(images) {
-  if (!images || !images.length) return;
+  if (!images || !images.length) {
+    return;
+  }
   setOrCreateMetadata('og:image', images[0]['Image URL']);
   setOrCreateMetadata('twitter:image', images[0]['Image URL']);
 }
 
 function renderBreadcrumbs(part) {
   const breadcrumbSection = document.querySelector('.section.breadcrumbs');
-  if (!breadcrumbSection) return;
+  if (!breadcrumbSection) {
+    return;
+  }
 
   const locale = getMetadata('locale')?.toLowerCase();
   const isLocalizedMarket = ['en-ca', 'fr-ca'].includes(locale);

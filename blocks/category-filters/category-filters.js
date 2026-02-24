@@ -3,8 +3,8 @@ import { subcategorySearch } from '../../scripts/graphql-api.js';
 import { aggregateFilters, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 const blockName = 'category-filters';
-const titleText = getTextLabel('category_filters_title');
-const clearText = getTextLabel('category_filters_clear_button');
+const titleText = getTextLabel('category_filters:title');
+const clearText = getTextLabel('category_filters:clear_button');
 let queryObject;
 
 const fetchQueryParams = () => {
@@ -37,19 +37,12 @@ const captureInputsAndUpdateQuery = (input) => {
       }
     } else {
       filterObj.filterValue.push(value);
-      if (!queryObject.facetFields.includes(key)) {
-        queryObject.facetFields.push(key);
-      }
     }
   } else {
     queryObject.dynamicFilters.push({
       fieldName: key,
       filterValue: [value],
     });
-
-    if (!queryObject.facetFields.includes(key)) {
-      queryObject.facetFields.push(key);
-    }
   }
   updateGlobalQueryObject('query-params', queryObject);
 };
@@ -67,7 +60,9 @@ const updateCheckboxes = (form) => {
 
 const isFilterActive = (key = '') => {
   const dynamicFilters = queryObject.dynamicFilters;
-  if (dynamicFilters.length === 0) return false;
+  if (dynamicFilters.length === 0) {
+    return false;
+  }
   return dynamicFilters.some((item) => item.fieldName === key);
 };
 
@@ -97,7 +92,9 @@ const renderFilters = (dynamicFilters, wrapper) => {
 
     const productAttributes = [...filterFields[key]];
     // if no attribute is present for the filter then no need to add it
-    if (productAttributes.length === 0) return;
+    if (productAttributes.length === 0) {
+      return;
+    }
 
     productAttributes.forEach((attribute) => {
       const { key: attrName, doc_count: count } = attribute;
