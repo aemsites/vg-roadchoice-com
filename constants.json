@@ -131,7 +131,7 @@
     "data": [
       {
         "name": "PLACEHOLDERS_URL",
-        "value": "https://www.roadchoice.com/placeholders-test.json"
+        "value": "https://www.roadchoice.com/placeholder.json"
       }
     ],
     "columns": [
