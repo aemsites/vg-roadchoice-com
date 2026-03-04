@@ -9,7 +9,7 @@ export const blockName = 'search';
 let isCrossRefActive = true;
 
 const PLACEHOLDERS = {
-  crossReference: getTextLabel('search:cross-reference_number'),
+  crossReference: getTextLabel('search:cross_reference_number'),
   partNumber: getTextLabel('search:part_number_or_description'),
   partNumberLabel: getTextLabel('search:part_number_slash_description'),
 };
