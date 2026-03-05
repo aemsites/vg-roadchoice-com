@@ -19,20 +19,22 @@ import { isLocalhost } from '../common.js';
  * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
 export const getCategory = () => {
-  if (isLocalhost()) {
-    const url = new URL(window.location.href);
-    const urlParams = new URLSearchParams(url.search);
+  const url = new URL(window.location.href);
+  const urlParams = new URLSearchParams(url.search);
+  const queryCategory = (urlParams.get('category') || '').trim();
 
-    return urlParams.get('category') || null;
-  } else {
-    const parts = window.location.pathname.split('/').filter(Boolean);
-    const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
-
-    if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
-      return null;
-    }
-    return segment;
+  if (queryCategory) {
+    return queryCategory;
   }
+
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
+
+  if (!segment || ['part-category', 'landing', 'landing.docx'].includes(segment.toLowerCase())) {
+    return null;
+  }
+
+  return segment;
 };
 
 /**
@@ -119,7 +121,8 @@ export const queryObjectToUrl = (obj) => {
 
   const metaCategory = getCategory();
 
-  const subcatParam = isLocalhost() ? `?category=${metaCategory}&` : '?';
+  const isCleanCategoryPath = /\/part-category\/[^/]+\/?$/.test(window.location.pathname);
+  const subcatParam = isLocalhost() && !isCleanCategoryPath ? `?category=${metaCategory}&` : '?';
   const base = window.location.pathname + subcatParam;
 
   if (obj.dynamicFilters && obj.dynamicFilters.length > 0) {
