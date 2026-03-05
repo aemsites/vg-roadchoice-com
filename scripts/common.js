@@ -6,6 +6,12 @@ import { loadCSS, getMetadata } from './aem.js';
 const DEFAULT_LIMIT = 100_000;
 
 /**
+ * Default locale used when resolving placeholders.
+ * Used as a fallback when no locale (or no matching locale column) is available.
+ */
+const DEFAULT_PLACEHOLDER_LOCALE = 'en';
+
+/**
  * Placeholders data for the application and the translations
  * @type {Object|null}
  */
@@ -44,8 +50,6 @@ const getLanguagePath = () => {
 
   return langCodeMatch ? langCodeMatch[1] : '/';
 };
-
-const DEFAULT_PLACEHOLDER_LOCALE = 'en';
 
 /**
  * Resolves the localized text for a single placeholder row.
