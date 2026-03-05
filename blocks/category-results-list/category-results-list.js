@@ -1,4 +1,4 @@
-import { createElement, getLocaleContextedUrl, isLocalhost } from '../../scripts/common.js';
+import { createElement, getLocaleContextedUrl } from '../../scripts/common.js';
 import productCard from '../results-list/product-card.js';
 import { subcategorySearch } from '../../scripts/graphql-api.js';
 import { triggerCustomEventWithPayload } from '../../scripts/services/part-category.service.js';
@@ -9,9 +9,7 @@ let products;
 const productsPerPage = 12;
 
 function get404PageUrl() {
-  if (isLocalhost()) {
-    return getLocaleContextedUrl('/404.html');
-  }
+  return getLocaleContextedUrl('/404.html');
 }
 
 // Dispatches an event to be captured by the category-pagination block with:
@@ -34,7 +32,7 @@ const fetchAndUpdateProductList = async (wrapper) => {
     queryObject = JSON.parse(sessionStorage.getItem('query-params'));
     const filteredQueryResult = await subcategorySearch(queryObject);
 
-    if (filteredQueryResult.items.length === 0) {
+    if (!filteredQueryResult?.items || filteredQueryResult.items.length === 0) {
       throw new Error('No items retrieved with current URL');
     }
 
@@ -57,7 +55,7 @@ const fetchAndUpdateProductList = async (wrapper) => {
     return wrapper;
   } catch (err) {
     console.log('%cError fetching items', 'color:red;background-color:aliceblue', err);
-    window.location.href = get404PageUrl();
+    window.location.replace(get404PageUrl());
   }
 };
 
@@ -77,6 +75,9 @@ export default async function decorate(block) {
   // when the global query object gets updated, the products list gets re-rendered
   document.addEventListener('QueryUpdated', async (e) => {
     queryObject = e.detail;
-    await fetchAndUpdateProductList(block);
+    const productList = block.querySelector('.category-results-list');
+    if (productList) {
+      await fetchAndUpdateProductList(productList);
+    }
   });
 }
