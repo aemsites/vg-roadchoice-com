@@ -11,6 +11,8 @@ function redirectToNotFound() {
 }
 
 function redirectLegacyCategoryUrl() {
+  // Local `aem up` cannot resolve clean category URLs through config-service rewrites,
+  // so localhost must keep using query-param debug URLs.
   if (isLocalhost()) {
     return false;
   }
@@ -24,6 +26,7 @@ function redirectLegacyCategoryUrl() {
 
   const targetUrl = new URL(getLocaleContextedUrl(`/part-category/${encodeURIComponent(queryCategory)}`), window.location.origin);
 
+  // Preserve existing non-category query params (e.g., `df_*`) when normalizing URL.
   currentUrl.searchParams.forEach((value, key) => {
     if (key !== 'category') {
       targetUrl.searchParams.append(key, value);

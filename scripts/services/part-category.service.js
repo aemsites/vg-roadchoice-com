@@ -23,6 +23,12 @@ export const getCategory = () => {
   const urlParams = new URLSearchParams(url.search);
   const queryCategory = (urlParams.get('category') || '').trim();
 
+  // Local `aem up` does not apply config-service rewrites for clean category paths.
+  // In localhost we only trust the legacy debug format: `/part-category/?category=<slug>`.
+  if (isLocalhost()) {
+    return queryCategory || null;
+  }
+
   if (queryCategory) {
     return queryCategory;
   }
@@ -120,10 +126,13 @@ export const queryObjectToUrl = (obj) => {
   const params = [];
 
   const metaCategory = getCategory();
+  const subcategoryFromQuery = (metaCategory || obj.subcategory || '').trim();
 
-  const isCleanCategoryPath = /\/part-category\/[^/]+\/?$/.test(window.location.pathname);
-  const subcatParam = isLocalhost() && !isCleanCategoryPath ? `?category=${metaCategory}&` : '?';
-  const base = window.location.pathname + subcatParam;
+  // Keep local URLs on the template root (`/part-category/`) and carry category as query param.
+  // This prevents localhost navigation to clean URLs that are only resolved by edge rewrites.
+  const localCategoryPath = window.location.pathname.replace(/(\/part-category)\/[^/]+\/?$/, '$1/');
+  const subcatParam = isLocalhost() && subcategoryFromQuery ? `?category=${encodeURIComponent(subcategoryFromQuery)}&` : '?';
+  const base = (isLocalhost() ? localCategoryPath : window.location.pathname) + subcatParam;
 
   if (obj.dynamicFilters && obj.dynamicFilters.length > 0) {
     obj.dynamicFilters.forEach((filter) => {
