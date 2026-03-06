@@ -19,20 +19,28 @@ import { isLocalhost } from '../common.js';
  * @returns {string|null} The category name from the URL path, or `null` if the path points to a landing page.
  */
 export const getCategory = () => {
+  const url = new URL(window.location.href);
+  const urlParams = new URLSearchParams(url.search);
+  const queryCategory = (urlParams.get('category') || '').trim();
+
+  // Local `aem up` does not apply config-service rewrites for clean category paths.
+  // In localhost we only trust the legacy debug format: `/part-category/?category=<slug>`.
   if (isLocalhost()) {
-    const url = new URL(window.location.href);
-    const urlParams = new URLSearchParams(url.search);
-
-    return urlParams.get('category') || null;
-  } else {
-    const parts = window.location.pathname.split('/').filter(Boolean);
-    const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
-
-    if (!segment || ['landing', 'landing.docx'].includes(segment.toLowerCase())) {
-      return null;
-    }
-    return segment;
+    return queryCategory || null;
   }
+
+  if (queryCategory) {
+    return queryCategory;
+  }
+
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const segment = decodeURIComponent(parts[parts.length - 1] || '').trim();
+
+  if (!segment || ['part-category', 'landing', 'landing.docx'].includes(segment.toLowerCase())) {
+    return null;
+  }
+
+  return segment;
 };
 
 /**
@@ -118,9 +126,13 @@ export const queryObjectToUrl = (obj) => {
   const params = [];
 
   const metaCategory = getCategory();
+  const subcategoryFromQuery = (metaCategory || obj.subcategory || '').trim();
 
-  const subcatParam = isLocalhost() ? `?category=${metaCategory}&` : '?';
-  const base = window.location.pathname + subcatParam;
+  // Keep local URLs on the template root (`/part-category/`) and carry category as query param.
+  // This prevents localhost navigation to clean URLs that are only resolved by edge rewrites.
+  const localCategoryPath = window.location.pathname.replace(/(\/part-category)\/[^/]+\/?$/, '$1/');
+  const subcatParam = isLocalhost() && subcategoryFromQuery ? `?category=${encodeURIComponent(subcategoryFromQuery)}&` : '?';
+  const base = (isLocalhost() ? localCategoryPath : window.location.pathname) + subcatParam;
 
   if (obj.dynamicFilters && obj.dynamicFilters.length > 0) {
     obj.dynamicFilters.forEach((filter) => {

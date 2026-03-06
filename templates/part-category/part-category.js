@@ -3,9 +3,45 @@ import { createElement, getLocaleContextedUrl, setOrCreateMetadata, getTextLabel
 import { getCategory, urlToQueryObject, updateGlobalQueryObject } from '../../scripts/services/part-category.service.js';
 
 function get404PageUrl() {
+  return getLocaleContextedUrl('/404.html');
+}
+
+function redirectToNotFound() {
+  window.location.replace(get404PageUrl());
+}
+
+function redirectLegacyCategoryUrl() {
+  // Local `aem up` cannot resolve clean category URLs through config-service rewrites,
+  // so localhost must keep using query-param debug URLs.
   if (isLocalhost()) {
-    return getLocaleContextedUrl('/404.html');
+    return false;
   }
+
+  const currentUrl = new URL(window.location.href);
+  const queryCategory = (currentUrl.searchParams.get('category') || '').trim();
+
+  if (!queryCategory) {
+    return false;
+  }
+
+  const targetUrl = new URL(getLocaleContextedUrl(`/part-category/${encodeURIComponent(queryCategory)}`), window.location.origin);
+
+  // Preserve existing non-category query params (e.g., `df_*`) when normalizing URL.
+  currentUrl.searchParams.forEach((value, key) => {
+    if (key !== 'category') {
+      targetUrl.searchParams.append(key, value);
+    }
+  });
+
+  const normalizedCurrent = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
+  const normalizedTarget = `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`;
+
+  if (normalizedCurrent === normalizedTarget) {
+    return false;
+  }
+
+  window.location.replace(targetUrl.toString());
+  return true;
 }
 
 /**
@@ -104,13 +140,29 @@ function updateMetadata(category) {
 }
 
 export default async function decorate(doc) {
-  const metaSubcategory = getCategory();
-  if (!metaSubcategory) {
-    console.log('No category provided — assuming this is the category template');
+  if (redirectLegacyCategoryUrl()) {
     return;
   }
-  setCanonicalUrl(metaSubcategory);
-  updateMetadata(metaSubcategory);
+
+  const metaSubcategory = getCategory();
+  if (!metaSubcategory) {
+    redirectToNotFound();
+    return;
+  }
+
+  const allCategories = await fetchCategories();
+  const categoryObject = getCategoryObject(allCategories, metaSubcategory);
+
+  if (!categoryObject) {
+    redirectToNotFound();
+    return;
+  }
+
+  const { category, subcategory } = categoryObject;
+
+  setCanonicalUrl(subcategory);
+  updateMetadata(subcategory);
+
   const main = doc.querySelector('main');
   const breadcrumbBlock = main.querySelector('.breadcrumb-container .breadcrumb');
   const titleWrapper = createElement('div', { classes: 'title-wrapper' });
@@ -123,11 +175,6 @@ export default async function decorate(doc) {
   section.prepend(titleWrapper);
 
   resetCategoryData();
-
-  const allCategories = await fetchCategories();
-  const categoryObject = getCategoryObject(allCategories, metaSubcategory);
-
-  const { category, subcategory } = categoryObject;
 
   const sanitizedUrl = new URL(window.location.href);
   const filtersFromUrl = urlToQueryObject(sanitizedUrl.href);
