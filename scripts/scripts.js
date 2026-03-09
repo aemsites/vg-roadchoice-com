@@ -198,17 +198,15 @@ async function loadEager(doc) {
   const meta_locale = doc.querySelector('meta[name="locale"]');
   document.documentElement.lang = (meta_i18n && meta_i18n.content) || (meta_locale && meta_locale.content.toLowerCase()) || 'en';
   decorateTemplateAndTheme();
+  const placeholdersReady = getPlaceholders();
   const main = doc.querySelector('main');
   const { head } = doc;
+  await placeholdersReady;
   if (main) {
     decorateMain(main, head);
     document.body.classList.add('appear');
 
-    await getPlaceholders();
-
     await loadSection(main.querySelector('.section'), waitForFirstImage);
-  } else {
-    await getPlaceholders();
   }
 }
 

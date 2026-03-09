@@ -124,11 +124,27 @@
       }
     ]
   },
+  "placeholdersConfig": {
+    "total": 2,
+    "offset": 0,
+    "limit": 2,
+    "data": [
+      {
+        "name": "PLACEHOLDERS_URL",
+        "value": "https://www.roadchoice.com/placeholder.json"
+      }
+    ],
+    "columns": [
+      "name",
+      "value"
+    ]
+  },
   ":version": 3,
   ":names": [
     "cookieValues",
     "tools",
-    "searchConfig"
+    "searchConfig",
+    "placeholdersConfig"
   ],
   ":type": "multi-sheet"
 }

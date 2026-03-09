@@ -5,7 +5,23 @@ import { loadCSS, getMetadata } from './aem.js';
  */
 const DEFAULT_LIMIT = 100_000;
 
+/**
+ * Default locale used when resolving placeholders.
+ * Used as a fallback when no locale (or no matching locale column) is available.
+ */
+const DEFAULT_PLACEHOLDER_LOCALE = 'en';
+
+/**
+ * Placeholders data for the application and the translations
+ * @type {Object|null}
+ */
 let placeholders = null;
+/**
+ * Promise that resolves to the placeholders data.
+ * Used to cache and share the placeholders loading operation across multiple requests.
+ * @type {Promise<Object>|null}
+ */
+let placeholdersPromise = null;
 
 /**
  * Returns the true origin of the current page in the browser.
@@ -36,22 +52,179 @@ const getLanguagePath = () => {
 };
 
 /**
- * Fetches placeholders from a JSON file based on the current language path.
- * @returns {Promise<void>} A promise that resolves when the placeholders are fetched and stored.
+ * Resolves the localized text for a single placeholder row.
+ *
+ * Fallback order:
+ * 1. Exact locale (e.g. "fr-ca")
+ * 2. Base language (e.g. "fr")
+ * 3. Any matching language variant (e.g. "fr-*", deterministic)
+ * 4. Default locale (DEFAULT_PLACEHOLDER_LOCALE)
+ *
+ * @param {Object} placeholderRow
+ * @param {string} pageLocale
+ * @returns {string}
  */
-async function getPlaceholders() {
-  const url = `${getLanguagePath()}placeholder.json`;
+export function resolveTextForLocale(placeholderRow, pageLocale) {
+  if (!placeholderRow || typeof placeholderRow !== 'object') {
+    return '';
+  }
 
-  placeholders = await fetch(url).then((resp) => resp.json());
+  const pageLocaleNormalized = String(pageLocale || '')
+    .toLowerCase()
+    .trim();
+  const languageCode = pageLocaleNormalized ? pageLocaleNormalized.split('-')[0] : '';
+
+  const readText = (value) => {
+    if (typeof value !== 'string') {
+      return '';
+    }
+    return value.trim() || '';
+  };
+
+  if (pageLocaleNormalized) {
+    const exactLocaleText = readText(placeholderRow[pageLocaleNormalized]);
+    if (exactLocaleText) {
+      return exactLocaleText;
+    }
+  }
+
+  if (languageCode) {
+    const baseLanguageText = readText(placeholderRow[languageCode]);
+    if (baseLanguageText) {
+      return baseLanguageText;
+    }
+
+    const languageVariantPrefix = `${languageCode}-`;
+    let bestVariantColumnKey = '';
+    let bestVariantColumnKeyNormalized = '';
+
+    for (const columnKey of Object.keys(placeholderRow)) {
+      const columnKeyNormalized = String(columnKey).toLowerCase();
+      if (!columnKeyNormalized.startsWith(languageVariantPrefix)) {
+        continue;
+      }
+      if (!bestVariantColumnKey || columnKeyNormalized < bestVariantColumnKeyNormalized) {
+        bestVariantColumnKey = columnKey;
+        bestVariantColumnKeyNormalized = columnKeyNormalized;
+      }
+    }
+
+    if (bestVariantColumnKey) {
+      const variantText = readText(placeholderRow[bestVariantColumnKey]);
+      if (variantText) {
+        return variantText;
+      }
+    }
+  }
+
+  return readText(placeholderRow[DEFAULT_PLACEHOLDER_LOCALE]);
 }
 
 /**
- * Gets the text label for a given key from the placeholders.
- * @param {string} key - The key to look up in the placeholders.
- * @returns {string} The text label corresponding to the key, or the key itself if not found.
+ * Builds a map of placeholder keys to resolved localized values.
+ *
+ * Rows without a valid key or resolved text are ignored.
+ * Duplicate keys overwrite previous values and log a warning.
+ *
+ * @param {Object} placeholdersPayload
+ * @param {string} pageLocale
+ * @returns {Map<string, string>}
+ */
+function buildPlaceholdersMap(placeholdersPayload, pageLocale) {
+  const dataRows = Array.isArray(placeholdersPayload?.data) ? placeholdersPayload.data : [];
+  const placeholdersByKey = new Map();
+
+  for (const dataRow of dataRows) {
+    const authoredKey = dataRow?.Key ?? dataRow?.key;
+    if (authoredKey === undefined || authoredKey === null) {
+      continue;
+    }
+
+    const placeholderKey = String(authoredKey).trim();
+    if (!placeholderKey) {
+      continue;
+    }
+
+    const resolvedText = resolveTextForLocale(dataRow, pageLocale);
+    if (!resolvedText) {
+      continue;
+    }
+
+    if (placeholdersByKey.has(placeholderKey)) {
+      console.warn('[placeholders] Duplicate placeholder key:', placeholderKey);
+    }
+
+    placeholdersByKey.set(placeholderKey, resolvedText);
+  }
+
+  return placeholdersByKey;
+}
+
+/**
+ * Loads and caches the placeholders map for the current locale.
+ * Ensures a single in-flight request. On failure, an empty map is stored.
+ *
+ * @returns {Promise<void>}
+ */
+async function getPlaceholders() {
+  if (placeholders) {
+    return Promise.resolve();
+  }
+
+  if (placeholdersPromise) {
+    return placeholdersPromise;
+  }
+
+  const locale = getLocale();
+  const pageLocale = locale ? locale.toLowerCase().trim() : DEFAULT_PLACEHOLDER_LOCALE;
+  const placeholdersUrl = typeof PLACEHOLDERS_URL === 'string' ? PLACEHOLDERS_URL.trim() : '';
+
+  if (!placeholdersUrl) {
+    console.error('[placeholders] Missing PLACEHOLDERS_URL.');
+    placeholders = new Map();
+    return Promise.resolve();
+  }
+
+  placeholdersPromise = (async () => {
+    try {
+      const response = await fetch(placeholdersUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch placeholders (${response.status} ${response.statusText})`);
+      }
+
+      const placeholdersPayload = await response.json();
+      const dataRows = Array.isArray(placeholdersPayload?.data) ? placeholdersPayload.data : [];
+
+      if (dataRows.length) {
+        const hasLocaleColumn = dataRows.some((dataRow) => {
+          return dataRow && typeof dataRow === 'object' && pageLocale in dataRow;
+        });
+
+        if (!hasLocaleColumn) {
+          console.warn('[placeholders] Locale column missing in placeholder file:', pageLocale);
+        }
+      }
+
+      placeholders = buildPlaceholdersMap(placeholdersPayload, pageLocale);
+    } catch (error) {
+      console.error('[placeholders] Fetch failed:', { url: placeholdersUrl, error });
+      placeholders = new Map();
+    } finally {
+      placeholdersPromise = null;
+    }
+  })();
+
+  return placeholdersPromise;
+}
+
+/**
+ * Return the resolved placeholder text for a key.
+ *
+ * @param {string} key
+ * @returns {string}
  */
 function getTextLabel(key) {
-  return placeholders?.data.find((el) => el.Key === key)?.Text || key;
+  return placeholders?.get(key) ?? key;
 }
 
 /**
@@ -356,17 +529,21 @@ const slugify = (text) =>
  * loads the constants file where configuration values are stored
  */
 async function getConstantValues() {
-  const url = `${getLanguagePath()}constants.json`;
-  let constants;
+  const constantsUrl = `${getLanguagePath()}constants.json`;
+
   try {
-    const response = await fetch(url).then((resp) => resp.json());
+    const response = await fetch(constantsUrl);
+
     if (!response.ok) {
-      constants = response;
+      console.error('[constants] Failed to fetch constants:', response.status, response.statusText, constantsUrl);
+      return {};
     }
+
+    return await response.json();
   } catch (error) {
-    console.error('Error with constants file', error);
+    console.error('[constants] Error fetching constants file:', constantsUrl, error);
+    return {};
   }
-  return constants;
 }
 
 /**
@@ -863,12 +1040,14 @@ function isSocialAllowed() {
   return checkOneTrustGroup(COOKIE_CONFIGS.SOCIAL_COOKIE);
 }
 
-const { cookieValues, tools, searchConfig } = await getConstantValues();
+const CONSTANTS = (await getConstantValues()) || {};
+const { cookieValues, tools, searchConfig, placeholdersConfig } = CONSTANTS;
 
 // This data comes from the sharepoint 'constants.xlsx' file
 const COOKIE_CONFIGS = formatValues(cookieValues?.data);
 const TOOLS_CONFIGS = formatValues(tools?.data);
 const SEARCH_CONFIG = formatValues(searchConfig?.data);
+const PLACEHOLDERS_URL = formatValues(placeholdersConfig?.data)?.PLACEHOLDERS_URL;
 
 const allLinks = [...document.querySelectorAll('a'), ...document.querySelectorAll('button')];
 checkLinkProps(allLinks);
